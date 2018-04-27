@@ -1,5 +1,6 @@
 package com.example.android.models;
 
+
 public class Data_PM extends Data{
     Double pm2_5;
     Double pm10;
@@ -15,4 +16,5 @@ public class Data_PM extends Data{
         String str = getDate() + " : "  +  pm2_5 + " : " + pm10;
         return str;
     }
+
 }

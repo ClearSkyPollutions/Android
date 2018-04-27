@@ -7,6 +7,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Data;
+import com.example.android.models.DataModel;
 import com.example.android.models.Data_PM;
 
 import org.json.JSONArray;
@@ -39,7 +40,7 @@ public class FetchDataClient {
         return url;
     }
 
-    public static Data getLastData(RequestQueue queue) {
+    public static void getLastData(final DataModel mdata, RequestQueue queue) {
 
         String result = null;
         String query = "order=id,desc&page=1,1&transform=1";
@@ -47,7 +48,7 @@ public class FetchDataClient {
 
         URL tmp_url = buildUrl(ip_file, query);
         if(tmp_url == null) {
-            return data;
+            return;
         }
         urlLastData = tmp_url.toString();
 
@@ -70,10 +71,10 @@ public class FetchDataClient {
                                 JSONObject measure = array.getJSONObject(i);
 
                                 // Get the current (json object) data
-                                data = new Data_PM(measure.getInt("id"),
+                                mdata.getmeasurementLive().setValue(new Data_PM(measure.getInt("id"),
                                         measure.getString("date_mesure"),
                                         measure.getDouble("pm2_5"),
-                                        measure.getDouble("pm10"));
+                                        measure.getDouble("pm10")));
 
                             }
                         }catch (JSONException e){
@@ -90,6 +91,5 @@ public class FetchDataClient {
         );
 
         queue.add(jsonObjectRequest);
-        return data;
     }
 }

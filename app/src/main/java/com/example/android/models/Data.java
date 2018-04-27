@@ -7,6 +7,7 @@ import java.util.Locale;
 
 
 public abstract class Data {
+
     int id;
     private Date date;
 
@@ -20,7 +21,6 @@ public abstract class Data {
             e.printStackTrace();
         }
     }
-
 
     public String getDate() {
         return date.toString();
