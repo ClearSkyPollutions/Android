@@ -6,7 +6,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.android.activities.BuildConfig;
-import com.example.android.models.Data;
 import com.example.android.models.DataModel;
 import com.example.android.models.Data_PM;
 
@@ -21,12 +20,11 @@ import java.net.URL;
 
 public class FetchDataClient {
 
-    private static String ip_address = "192.168.2.108";
-    private static String ip_file = "/Concentration_pm";
-    private static Data data;
+    @SuppressWarnings("FieldCanBeLocal")
+    private static final String ip_address = "192.168.2.108";
 
     private static URL buildUrl(String table, String query) {
-        URI uri = null;
+        URI uri;
         URL url = null;
 
         try {
@@ -42,7 +40,7 @@ public class FetchDataClient {
 
     public static void getLastData(final DataModel mdata, RequestQueue queue) {
 
-        String result = null;
+        final String ip_file = "/Concentration_pm";
         String query = "order=id,desc&page=1,1&transform=1";
         String urlLastData;
 

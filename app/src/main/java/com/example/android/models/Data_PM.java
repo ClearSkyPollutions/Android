@@ -13,8 +13,7 @@ public class Data_PM extends Data{
 
     @Override
     public String toString() {
-        String str = getDate() + " : "  +  pm2_5 + " : " + pm10;
-        return str;
+        return getDate() + " : "  +  pm2_5 + " : " + pm10;
     }
 
 }
