@@ -1,11 +1,11 @@
 package com.example.android.models;
 
 
-public class Data_PM extends Data{
+public class DataPM extends Data{
     Double pm2_5;
     Double pm10;
 
-    public Data_PM(int id, String date_mesure, Double pm2_5, Double pm10) {
+    public DataPM(int id, String date_mesure, Double pm2_5, Double pm10) {
         super(id, date_mesure);
         this.pm2_5 = pm2_5;
         this.pm10 = pm10;

@@ -16,7 +16,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.example.android.activities.R;
 import com.example.android.models.DataModel;
-import com.example.android.models.Data_PM;
+import com.example.android.models.DataPM;
 import com.example.android.network.FetchDataClient;
 
 
@@ -39,9 +39,9 @@ public class LastDataFragment extends Fragment {
         mdata = ViewModelProviders.of(this).get(DataModel.class);
 
         // Create the observer which updates the UI.
-        final Observer<Data_PM> dataPmObserver = new Observer<Data_PM>() {
+        final Observer<DataPM> dataPmObserver = new Observer<DataPM>() {
             @Override
-            public void onChanged(@Nullable final Data_PM newMeasurement) {
+            public void onChanged(@Nullable final DataPM newMeasurement) {
                 // Update the UI, in this case, a TextView.
                 mTextView.setText(newMeasurement.toString());
             }

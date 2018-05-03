@@ -13,6 +13,8 @@ import android.widget.ListView;
 
 import com.example.android.activities.R;
 import com.example.android.adapters.PollutantItemAdapter;
+import com.example.android.helpers.AlertDialogHelper;
+import com.example.android.helpers.JsonReaderHelper;
 import com.example.android.models.Pollutant;
 
 import org.json.JSONArray;
@@ -34,7 +36,7 @@ public class ListPollutantsFragment extends Fragment {
 
         View rootView= inflater.inflate(R.layout.fragment_list_pollutants, container, false);
         // Construct the data source
-        listPollutant = loadJSONFromAsset();
+        listPollutant = getPollutantsData();
 
         // Create the adapter to convert the array to views
         PollutantItemAdapter pollutantAdapter = new PollutantItemAdapter(getActivity(), listPollutant);
@@ -48,22 +50,12 @@ public class ListPollutantsFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                        getActivity());
 
+                AlertDialogHelper.createOkAlertDialog(
+                        listPollutant.get(position).getName(),
+                        listPollutant.get(position).getDesc(),
+                         getActivity()).show();
 
-                alertDialogBuilder.setTitle(listPollutant.get(position).getName());
-                alertDialogBuilder
-                        .setMessage(listPollutant.get(position).getDesc())
-                        .setPositiveButton("OK",new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-                AlertDialog alertDialog = alertDialogBuilder.create();
-
-                alertDialog.show();
             }
         });
 
@@ -71,20 +63,9 @@ public class ListPollutantsFragment extends Fragment {
     }
 
 
+    private ArrayList<Pollutant> getPollutantsData() {
+        String json = JsonReaderHelper.loadJSONFromAsset("pollutants.json", getActivity());
 
-    private ArrayList<Pollutant> loadJSONFromAsset() {
-        String json = null;
-        try {
-            InputStream is = getActivity().getAssets().open("pollutants.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
         try {
             JSONObject obj = new JSONObject(json);
             // Get JSON Array node

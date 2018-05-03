@@ -8,7 +8,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Data;
 import com.example.android.models.DataModel;
-import com.example.android.models.Data_PM;
+import com.example.android.models.DataPM;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,7 +71,7 @@ public class FetchDataClient {
                                 JSONObject measure = array.getJSONObject(i);
 
                                 // Get the current (json object) data
-                                mdata.getmeasurementLive().setValue(new Data_PM(measure.getInt("id"),
+                                mdata.getmeasurementLive().setValue(new DataPM(measure.getInt("id"),
                                         measure.getString("date_mesure"),
                                         measure.getDouble("pm2_5"),
                                         measure.getDouble("pm10")));
