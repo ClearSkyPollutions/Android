@@ -8,12 +8,12 @@ import java.util.Locale;
 
 public abstract class Data {
 
-    int id;
+    private int id;
     private Date date;
 
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.FRANCE);
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.FRANCE);
 
-    public Data (int id, String date_mesure) {
+    Data(int id, String date_mesure) {
         this.id = id;
         try {
             setDate(date_mesure);
@@ -22,11 +22,11 @@ public abstract class Data {
         }
     }
 
-    public String getDate() {
+    String getDate() {
         return date.toString();
     }
 
-    public void setDate(String date_mesure) throws ParseException {
+    private void setDate(String date_mesure) throws ParseException {
         date = format.parse(date_mesure);
     }
 }
