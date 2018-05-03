@@ -1,64 +1,56 @@
 package com.example.android.activities;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-import com.example.android.models.Data;
-import com.example.android.models.DataModel;
-import com.example.android.network.FetchDataClient;
+import com.example.android.fragments.LastDataFragment;
+import com.example.android.fragments.ListPollutantsFragment;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextView;
-    private DataModel mdata;
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selectedFragment = null;
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    selectedFragment = new LastDataFragment();
+                    break;
+                case R.id.navigation_map:
+                    selectedFragment = new ListPollutantsFragment();
+                    break;
+                case R.id.navigation_pollutants:
+                    selectedFragment = new ListPollutantsFragment();
+                    break;
+            }
+            loadFragment(selectedFragment);
+            return true;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Get the objects id from XML layout
-        mTextView = findViewById(R.id.textView);
-        Button mButtonRefresh = findViewById(R.id.button_refresh);
-
-        // Get the ViewModel.
-        mdata = ViewModelProviders.of(this).get(DataModel.class);
-
-        // Create the observer which updates the UI.
-        final Observer<Data> dataPmObserver = new Observer<Data>() {
-            @Override
-            public void onChanged(@Nullable final Data newMeasurement) {
-                // Update the UI, in this case, a TextView.
-                if(newMeasurement != null) {
-                    mTextView.setText(newMeasurement.toString());
-                }
-                else {
-                    mTextView.setText("Data Error");
-                }
-            }
-        };
-
-        //init new RequestQueue
-        final RequestQueue queue = Volley.newRequestQueue(this);
-        FetchDataClient.getLastData(mdata, queue);
-
-        mdata.getmeasurementLive().observe(this, dataPmObserver);
-
-        mButtonRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FetchDataClient.getLastData(mdata, queue);
-            }
-        });
-
+        BottomNavigationView navigation =  findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(navListener);
+        loadFragment(new LastDataFragment());
     }
+
+    private void loadFragment(Fragment fragment){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
+    }
+
 }
