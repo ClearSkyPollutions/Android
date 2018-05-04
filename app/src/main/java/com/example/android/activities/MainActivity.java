@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import com.example.android.fragments.LastDataFragment;
 import com.example.android.fragments.ListPollutantsFragment;
+import com.example.android.network.RequestQueueSingleton;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Create a Request queue with application lifecycle
+        RequestQueueSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
 
         BottomNavigationView navigation =  findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(navListener);
