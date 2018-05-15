@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import com.example.android.fragments.LastDataFragment;
 import com.example.android.fragments.ListPollutantsFragment;
+import com.example.android.fragments.MapFragment;
 import com.example.android.network.RequestQueueSingleton;
 
 
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = new LastDataFragment();
                     break;
                 case R.id.navigation_map:
-                    selectedFragment = new ListPollutantsFragment();
+                    selectedFragment = new MapFragment();
                     break;
                 case R.id.navigation_pollutants:
                     selectedFragment = new ListPollutantsFragment();

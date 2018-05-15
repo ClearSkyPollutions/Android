@@ -30,9 +30,11 @@ public class PollutantItemAdapter extends ArrayAdapter<Pollutant> {
 
         ImageView pollutant_image = convertView.findViewById(R.id.pollutant_img);
         TextView pollutant_name = convertView.findViewById(R.id.pollutant_name);
+        TextView pollutant_source = convertView.findViewById(R.id.pollutant_source);
 
         pollutant_image.setImageResource(pollutant.getImage());
         pollutant_name.setText(pollutant.getName());
+        pollutant_source.setText(pollutant.getSource());
 
 
         return convertView;

@@ -5,6 +5,7 @@ package com.example.android.models;
 public class Pollutant  {
     private String name;
     private String desc;
+    private String source;
     private int image;
 
     public Pollutant() {
@@ -18,6 +19,10 @@ public class Pollutant  {
         return desc;
     }
 
+    public String getSource() {
+        return source;
+    }
+
     public int getImage() {
         return image;
     }
@@ -28,6 +33,10 @@ public class Pollutant  {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public void setImage(int image) {
