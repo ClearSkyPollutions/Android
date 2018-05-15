@@ -1,4 +1,4 @@
-package com.example.android.androidapp;
+package com.example.android.activities;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
