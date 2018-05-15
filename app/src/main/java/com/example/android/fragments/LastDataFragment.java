@@ -10,9 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentLastDataBinding;
 import com.example.android.models.DataModel;

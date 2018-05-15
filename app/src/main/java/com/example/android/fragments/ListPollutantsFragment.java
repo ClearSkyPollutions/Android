@@ -1,9 +1,7 @@
 package com.example.android.fragments;
 
-import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +18,6 @@ import com.example.android.models.Pollutant;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ListPollutantsFragment extends Fragment {
@@ -76,6 +71,7 @@ public class ListPollutantsFragment extends Fragment {
                 Pollutant p = new Pollutant();
                 p.setName(jObj.getString("name"));
                 p.setDesc(jObj.getString("desc"));
+                p.setSource(jObj.getString("source"));
 
                 // Get resource id from image name
                 p.setImage(getResources().getIdentifier(

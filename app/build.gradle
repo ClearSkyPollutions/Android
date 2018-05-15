@@ -16,8 +16,8 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField 'int', 'PortHTTP', '4080'
-            buildConfigField 'int', 'PortDB', '4306'
+            buildConfigField 'int', 'PortHTTP', '8000'
+            buildConfigField 'int', 'PortDB', '8001'
         }
         release {
             minifyEnabled false
