@@ -1,4 +1,4 @@
-package com.example.android.androidapp;
+package com.example.android.activities;
 
 import org.junit.Test;
 

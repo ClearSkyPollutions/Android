@@ -1,0 +1,36 @@
+{
+  "pollutants" : [
+    {
+      "name": "PM2.5",
+      "desc": "<b>Primary sources:</b> Habitation (coal fire, kitchen, etc) <p><b>Health effects:</b>  Asthma, lung cancer, cardio-respiratory diseases, adverse pregnancy outcomes. It corresponds to thoracic particles which reach bronchi.",
+      "image": "pm25"
+    },
+    {
+      "name": "PM10",
+      "desc": "<b>Primary sources:</b> Habitation, industry, farming, road traffic. <p><b>Health effects:</b> Asthma, lung cancer, cardio-respiratory diseases, adverse pregnancy outcomes. It corresponds to inhalable particle that doesn't reach the lungs and thoracic particles which are not filtered by the cilia.",
+      "image": "pm10"
+    },
+    {
+      "name": "Nitrogne oxide",
+      "desc": "<b>Primary sources:</b> Road traffic. <p><b>Health effects:</b> Respiratory diseases, bronchial irritation, increased asthmatic reactions in children.",
+      "image": "nox"
+    },
+    {
+      "name": "Sulfur dioxide",
+      "desc": "<b>Primary sources:</b> Industry. <p><b>Health effects:</b> Breathing difficulties, increased asmathic sensitivity, gastric irritations, itches, hot flashes, death in case of strong intoxication.",
+      "image": "so2"
+    },
+    {
+      "name": "Carbon monoxide",
+      "desc": "<b>Primary sources:</b> Habitation, industry. <p><b>Health effects:</b>  It has no taste or smell and cannot be seen but can be lethal for human. It reduces the amount of oxygen transported to vital organs leading to ",
+      "image": "pm25"
+    },
+    {
+      "name": "Noise",
+      "desc": "<b>Primary sources:</b> Depends mostly on the location. <p><b>Health effects:</b> hearing loss, sleep disturbances, high blood pressure, heart attack, strokes.",
+      "image": "noise"
+    }
+
+  ]
+
+}
