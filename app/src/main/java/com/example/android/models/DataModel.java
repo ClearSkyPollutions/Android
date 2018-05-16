@@ -19,97 +19,18 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DataModel extends ViewModel {
+public abstract class DataModel extends ViewModel {
 
     private static final String ip_address = "192.168.2.69";
 
-    private DataPM measurementLive;
+    public abstract void setMeasurementLive(JSONObject measure);
 
-    MutableLiveData<String> dateMeasurement;
-    MutableLiveData<Double> pm2_5;
-    MutableLiveData<Double> pm10;
+    public abstract void LoadData(Context mCtx);
 
-    public DataPM getMeasurementLive() {
-        return measurementLive;
-    }
-
-    public void setMeasurementLive(DataPM measurementLive) {
-        this.measurementLive = measurementLive;
-        dateMeasurement.postValue(measurementLive.getDate());
-        pm2_5.postValue(measurementLive.pm2_5);
-        pm10.postValue(measurementLive.pm10);
-    }
-
-    public MutableLiveData<String> getDateMeasurement() {
-        if(dateMeasurement == null) {
-            dateMeasurement = new MutableLiveData<>();
-        }
-        return dateMeasurement;
-    }
-
-    public MutableLiveData<Double> getPm2_5() {
-        if(pm2_5 == null) {
-            pm2_5 = new MutableLiveData<>();
-        }
-        return pm2_5;
-    }
-
-    public MutableLiveData<Double> getPm10() {
-        if(pm10 == null) {
-            pm10 = new MutableLiveData<>();
-        }
-        return pm10;
-    }
-
-    public void LoadData(Context mCtx) {
-        final String ip_file = "/Concentration_pm";
-        String query = "order=id,desc&page=1,1&transform=1";
-        String urlLastData;
-
-        URL tmp_url = buildUrl(ip_file, query);
-        urlLastData = tmp_url.toString();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                urlLastData,
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        // Process the JSON
-                        try {
-                            // Get the date and time of the measure
-                            JSONArray array = response.getJSONArray("Concentration_pm");
-
-                            // Loop through the array elements
-                            for (int i = 0; i < array.length(); i++) {
-                                // Get current json object
-                                JSONObject measure = array.getJSONObject(i);
-
-                                // Get the current (json object) data
-                                setMeasurementLive(new DataPM(measure.getInt("id"),
-                                        measure.getString("date_mesure"),
-                                        measure.getDouble("pm2_5"),
-                                        measure.getDouble("pm10")));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError e) {
-                        e.printStackTrace();
-                    }
-                }
-        );
-        RequestQueueSingleton.getInstance(mCtx).addToRequestQueue(jsonObjectRequest);
-    }
-
-    private static URL buildUrl(String table, String query) {
+    protected static URL buildUrl(String table, String query) {
         URI uri;
         URL url = null;
 
