@@ -34,16 +34,22 @@ public class LastDataFragment extends Fragment {
 
         // Create or get the ViewModel for our date, load the data from server
         dataPM = ViewModelProviders.of(this).get(DataPM.class);
-        dataPM.LoadData(getContext());
+        dataPM.LoadLastData(getContext());
+
+        dataHT = ViewModelProviders.of(this).get(DataHT.class);
+        dataHT.LoadLastData(getContext());
+
 
         // Bind the UI elements to the viewmodel
-        binding.setLastData(dataPM);
+        binding.setLastDataPM(dataPM);
+        binding.setLastDataHT(dataHT);
 
         Button mButtonRefresh = rootView.findViewById(R.id.buttonRefresh);
         mButtonRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataPM.LoadData(getContext());
+                dataPM.LoadLastData(getContext());
+                dataHT.LoadLastData(getContext());
             }
         });
 

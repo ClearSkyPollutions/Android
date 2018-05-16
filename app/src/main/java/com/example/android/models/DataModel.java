@@ -24,18 +24,53 @@ import java.util.List;
 
 public abstract class DataModel extends ViewModel {
 
-    private static final String ip_address = "192.168.2.69";
+    protected static final String ip_address = "192.168.2.69";
 
-    public abstract void setMeasurementLive(JSONObject measure);
 
-    public abstract void LoadData(Context mCtx);
+    protected abstract void setMeasurementLive(JSONObject response);
 
-    protected static URL buildUrl(String table, String query) {
+    public abstract String getTableName();
+
+    public void LoadLastData(Context mCtx){
+        String query = "order=id,desc&page=1,1&transform=1";
+
+        URL url = buildUrl(query);
+        String urlLastData;
+
+        if ( url != null )
+        {
+            urlLastData = url.toString();
+        }
+        else {
+            urlLastData = null;
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                 urlLastData,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        setMeasurementLive(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+        RequestQueueSingleton.getInstance(mCtx).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private URL buildUrl(String query) {
         URI uri;
         URL url = null;
 
         try {
-            uri = new URI("http", null, ip_address, BuildConfig.PortHTTP, table, query, null);
+            uri = new URI("http", null, ip_address, BuildConfig.PortHTTP, "/"+ getTableName(), query, null);
             url = uri.toURL();
         } catch (URISyntaxException | MalformedURLException e) {
             System.out.println("Wrong URL");
