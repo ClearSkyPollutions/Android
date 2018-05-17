@@ -17,7 +17,7 @@ public class DataHT extends DataModel{
 
     @Override
     protected void setMeasurementLive(JSONObject response) {
-        JSONArray array = null;
+        JSONArray array;
         try {
             array = response.getJSONArray(TABLE_NAME);
             JSONObject measure = array.getJSONObject(array.length() - 1);

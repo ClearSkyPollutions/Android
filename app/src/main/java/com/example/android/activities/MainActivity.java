@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.example.android.fragments.LastDataFragment;
+import com.example.android.fragments.HomeFragment;
 import com.example.android.fragments.ListPollutantsFragment;
 import com.example.android.fragments.MapFragment;
 import com.example.android.network.RequestQueueSingleton;
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
             Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    selectedFragment = new LastDataFragment();
+                    selectedFragment = new HomeFragment();
                     break;
                 case R.id.navigation_map:
                     selectedFragment = new MapFragment();
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation =  findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(navListener);
-        loadFragment(new LastDataFragment());
+        loadFragment(new HomeFragment());
     }
 
     private void loadFragment(Fragment fragment){
