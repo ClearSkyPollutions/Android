@@ -6,6 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,8 @@ public class DataPM extends DataModel{
                 JSONObject measure =  array.getJSONObject(i);
                 Double pm25_d = measure.getDouble("pm25");
                 Double pm10_d = measure.getDouble("pm10");
+                //String date = measure.getString("date");
+                // To do: convert date string to a datetime object using joda library
                 pmArray.add(new Float[]{pm25_d.floatValue(), pm10_d.floatValue()});
                 if(i == array.length() - 1) {
                     pm2_5.postValue(pm25_d);

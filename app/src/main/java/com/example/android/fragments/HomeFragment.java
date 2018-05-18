@@ -3,6 +3,7 @@ package com.example.android.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -36,8 +37,12 @@ public class HomeFragment extends Fragment {
         View rootView= binding.getRoot();
         mChart = rootView.findViewById(R.id.lineChart);
 
+       int backgroundColor = Color.WHITE;
+       int textColor = getResources().getColor(R.color.primaryTextColor);
+       int pm25lineColor = getResources().getColor(R.color.primaryColor);
+       int pm10lineColor = getResources().getColor(R.color.secondaryDarkColor);
 
-        ChartHelper.initChart(mChart);
+        ChartHelper.initChart(mChart, backgroundColor, textColor);
 
         // Create or get the ViewModel for our date, load the data from server
         dataPM = ViewModelProviders.of(this).get(DataPM.class);
@@ -52,8 +57,9 @@ public class HomeFragment extends Fragment {
         binding.setLastDataHT(dataHT);
 
         dataPM.pmEntries.observe(this, pmEntries -> {
+            mChart.clearValues();
             for(Float[] pmEntry : pmEntries) {
-                ChartHelper.addEntry(mChart, pmEntry);
+                ChartHelper.addEntry(mChart, pmEntry, pm25lineColor, pm10lineColor);
             }
         });
 

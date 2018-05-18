@@ -25,7 +25,7 @@ public abstract class DataModel extends ViewModel {
     public abstract String getTableName();
 
     public void LoadLastData(Context mCtx){
-        String query = "transform=1";
+        String query = "order=id,desc&page=1,168&transform=1"; // takes the 168 last entries
 
         URL url = buildUrl(query);
         String urlLastData = url.toString();

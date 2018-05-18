@@ -20,7 +20,7 @@ public final class ChartHelper {
 
     private static final String DESCRIPTION = "";
 
-    public static void initChart(LineChart mChart) {
+    public static void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
 
         // customize line chart
         Description des = new Description();
@@ -42,11 +42,11 @@ public final class ChartHelper {
         mChart.setPinchZoom(true);
 
         // alternative background color
-        mChart.setBackgroundColor(Color.WHITE);
+        mChart.setBackgroundColor(BackgroundColor);
 
         // DATA
         LineData data = new LineData();
-        data.setValueTextColor(Color.RED);
+        data.setValueTextColor(TextColor);
 
         // add data to line chart
         mChart.setData(data);
@@ -56,18 +56,18 @@ public final class ChartHelper {
 
         // customize legend
         l.setForm(Legend.LegendForm.LINE);
-        l.setTextColor(Color.BLACK);
+        l.setTextColor(TextColor);
 
 
         mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         XAxis x1 = mChart.getXAxis();
-        x1.setTextColor(Color.BLACK);
-        x1.setDrawGridLines(true);
+        x1.setTextColor(TextColor);
+        x1.setDrawGridLines(false);
         x1.setAvoidFirstLastClipping(true);
-        x1.setEnabled(false);
+        x1.setEnabled(true);
 
         YAxis y1 = mChart.getAxisLeft();
-        y1.setTextColor(Color.BLACK);
+        y1.setTextColor(TextColor);
         // auto set y axis min max with 5% spacing:
         float percent = 5;
         y1.setSpaceTop(percent);
@@ -79,7 +79,7 @@ public final class ChartHelper {
 
     }
 
-    public static void addEntry(LineChart mChart, Float[] concentration_pm) {
+    public static void addEntry(LineChart mChart, Float[] concentration_pm, int pm25LineColor, int pm10LineColor) {
         LineData data = mChart.getData();
         Float pm25 = concentration_pm[0];
         Float pm10 = concentration_pm[1];
@@ -90,7 +90,7 @@ public final class ChartHelper {
             ILineDataSet set = data.getDataSetByIndex(0);
 
             if (set == null) {
-                set = createSet(PM25_lABEL);
+                set = createSet(PM25_lABEL, pm25LineColor, pm10LineColor);
                 data.addDataSet(set);
             }
 
@@ -100,7 +100,7 @@ public final class ChartHelper {
             set = data.getDataSetByIndex(1);
 
             if (set == null) {
-                set = createSet(PM10_LABEL);
+                set = createSet(PM10_LABEL, pm25LineColor, pm10LineColor);
                 data.addDataSet(set);
             }
 
@@ -122,16 +122,16 @@ public final class ChartHelper {
     }
 
 
-    private static LineDataSet createSet(String label) {
+    private static LineDataSet createSet(String label, int pm25LineColor, int pm10LineColor) {
         LineDataSet set = new LineDataSet(null, label);
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         Integer color;
         switch (label){
             case PM25_lABEL:
-                color = Color.RED;
+                color = pm25LineColor;
                 break;
             case PM10_LABEL:
-                color = Color.GREEN;
+                color = pm10LineColor;
                 break;
             default:
                 color = Color.BLACK;
@@ -143,7 +143,7 @@ public final class ChartHelper {
         set.setValueTextColor(color);
         set.setValueTextSize(10f);
         // To show values of each point
-        set.setDrawValues(true);
+        set.setDrawValues(false);
 
         return set;
     }
