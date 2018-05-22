@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import com.example.android.activities.R;
-import com.example.android.activities.databinding.FragmentLastDataBinding;
+import com.example.android.activities.databinding.FragmentHomeBinding;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.models.DataHT;
 import com.example.android.models.DataPM;
@@ -30,7 +30,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         // Inflate using Databinding library
-        FragmentLastDataBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_last_data, container, false);
+        FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         binding.setLifecycleOwner(this);
 
         // Get the root view and the LineChart view
@@ -42,13 +42,14 @@ public class HomeFragment extends Fragment {
        int pm25lineColor = getResources().getColor(R.color.primaryColor);
        int pm10lineColor = getResources().getColor(R.color.secondaryDarkColor);
 
-        ChartHelper.initChart(mChart, backgroundColor, textColor);
+       ChartHelper chartHelper = new ChartHelper();
+       chartHelper.initChart(mChart, backgroundColor, textColor);
 
         // Create or get the ViewModel for our date, load the data from server
-        dataPM = ViewModelProviders.of(this).get(DataPM.class);
+        dataPM = ViewModelProviders.of(getActivity()).get(DataPM.class);
         dataPM.LoadLastData(getContext());
 
-        dataHT = ViewModelProviders.of(this).get(DataHT.class);
+        dataHT = ViewModelProviders.of(getActivity()).get(DataHT.class);
         dataHT.LoadLastData(getContext());
 
 
@@ -59,7 +60,7 @@ public class HomeFragment extends Fragment {
         dataPM.pmEntries.observe(this, pmEntries -> {
             mChart.clearValues();
             for(Float[] pmEntry : pmEntries) {
-                ChartHelper.addEntry(mChart, pmEntry, pm25lineColor, pm10lineColor);
+                chartHelper.addEntry(mChart, pmEntry, pm25lineColor, pm10lineColor);
             }
         });
 

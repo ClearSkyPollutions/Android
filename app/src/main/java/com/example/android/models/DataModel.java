@@ -2,6 +2,8 @@ package com.example.android.models;
 
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
+import android.util.Log;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -49,6 +51,7 @@ public abstract class DataModel extends ViewModel {
                 }
         );
         RequestQueueSingleton.getInstance(mCtx).addToRequestQueue(jsonObjectRequest);
+        Log.d(DataModel.class.toString(), "LoadLastData: network request");
     }
 
 

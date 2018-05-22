@@ -3,6 +3,7 @@ package com.example.android.helpers;
 import android.graphics.Color;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -10,9 +11,12 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
-public final class ChartHelper {
+import java.sql.Timestamp;
+
+public final class ChartHelper implements IAxisValueFormatter {
 
     private static final String PM25_lABEL = "pm25";
 
@@ -20,7 +24,7 @@ public final class ChartHelper {
 
     private static final String DESCRIPTION = "";
 
-    public static void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
+    public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
 
         // customize line chart
         Description des = new Description();
@@ -39,7 +43,7 @@ public final class ChartHelper {
         mChart.setDrawGridBackground(false);
 
         // enable pinch zoom to avoid scaling x and y axis separately
-        mChart.setPinchZoom(true);
+        mChart.setPinchZoom(false);
 
         // alternative background color
         mChart.setBackgroundColor(BackgroundColor);
@@ -61,6 +65,7 @@ public final class ChartHelper {
 
         mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         XAxis x1 = mChart.getXAxis();
+        x1.setValueFormatter(this);
         x1.setTextColor(TextColor);
         x1.setDrawGridLines(false);
         x1.setAvoidFirstLastClipping(true);
@@ -72,17 +77,18 @@ public final class ChartHelper {
         float percent = 5;
         y1.setSpaceTop(percent);
         y1.setSpaceBottom(percent);
-        y1.setDrawGridLines(true);
+        y1.setDrawGridLines(false);
 
         YAxis y12 = mChart.getAxisRight();
         y12.setEnabled(false);
 
     }
 
-    public static void addEntry(LineChart mChart, Float[] concentration_pm, int pm25LineColor, int pm10LineColor) {
+    public void addEntry(LineChart mChart, Float[] concentration_pm, int pm25LineColor, int pm10LineColor) {
         LineData data = mChart.getData();
-        Float pm25 = concentration_pm[0];
-        Float pm10 = concentration_pm[1];
+        Float ts_f = concentration_pm[0];
+        Float pm25 = concentration_pm[1];
+        Float pm10 = concentration_pm[2];
 
         if (data != null) {
 
@@ -94,7 +100,7 @@ public final class ChartHelper {
                 data.addDataSet(set);
             }
 
-            data.addEntry(new Entry(set.getEntryCount(), pm25), 0);
+            data.addEntry(new Entry(ts_f, pm25), 0);
 
             // APhsB
             set = data.getDataSetByIndex(1);
@@ -104,25 +110,22 @@ public final class ChartHelper {
                 data.addDataSet(set);
             }
 
-            data.addEntry(new Entry(set.getEntryCount(), pm10), 1);
+            data.addEntry(new Entry(ts_f, pm10), 1);
 
             // let the chart know it's data has changed
             data.notifyDataChanged();
             mChart.notifyDataSetChanged();
 
             // limit the number of visible entries
-//            mChart.setVisibleXRangeMaximum(15);
-            float minXRange = 10;
-            float maxXRange = 10;
-            mChart.setVisibleXRange(minXRange, maxXRange);
+           mChart.setVisibleXRange(8, 8);
 
             // move to the latest entry
-            mChart.moveViewToX(data.getEntryCount());
+            mChart.moveViewToX(ts_f);
         }
     }
 
 
-    private static LineDataSet createSet(String label, int pm25LineColor, int pm10LineColor) {
+    private LineDataSet createSet(String label, int pm25LineColor, int pm10LineColor) {
         LineDataSet set = new LineDataSet(null, label);
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         Integer color;
@@ -143,9 +146,14 @@ public final class ChartHelper {
         set.setValueTextColor(color);
         set.setValueTextSize(10f);
         // To show values of each point
-        set.setDrawValues(false);
+        set.setDrawValues(true);
 
         return set;
     }
 
+    @Override
+    public String getFormattedValue(float value, AxisBase axis) {
+        Timestamp ts = new Timestamp((long) value*3600000);
+        return ts.toString().substring(11,16); // returns the corresponding time in the string format "HH:mm"
+    }
 }

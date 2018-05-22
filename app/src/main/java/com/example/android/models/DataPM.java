@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,18 +29,20 @@ public class DataPM extends DataModel{
             // Get the date and time of the measure
             ArrayList<Float[]> pmArray = new ArrayList<>();
             JSONArray array = response.getJSONArray(TABLE_NAME);
-            for (int i = 0; i < array.length(); i++) {
+            Float ts_reference = .0f;
+            for (int i = array.length() - 1; i >= 0; i--) {
                 JSONObject measure =  array.getJSONObject(i);
                 Double pm25_d = measure.getDouble("pm25");
                 Double pm10_d = measure.getDouble("pm10");
-                //String date = measure.getString("date");
-                // To do: convert date string to a datetime object using joda library
-                pmArray.add(new Float[]{pm25_d.floatValue(), pm10_d.floatValue()});
-                if(i == array.length() - 1) {
+                String date = measure.getString("date");
+                Timestamp ts = Timestamp.valueOf(date);
+                Float ts_f = Float.parseFloat("" + ts.getTime());
+                if(i == 0) {
                     pm2_5.postValue(pm25_d);
                     pm10.postValue(pm10_d);
                     dateMeasurement.postValue(measure.getString("date"));
                 }
+                pmArray.add(new Float[]{ts_f/3600000, pm25_d.floatValue(), pm10_d.floatValue()});
             }
             pmEntries.postValue(pmArray);
         } catch (JSONException e) {
