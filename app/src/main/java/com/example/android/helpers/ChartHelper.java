@@ -1,7 +1,9 @@
 package com.example.android.helpers;
 
 import android.graphics.Color;
+import android.os.Build;
 
+import com.example.android.models.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -18,21 +20,28 @@ import java.sql.Timestamp;
 
 public final class ChartHelper implements IAxisValueFormatter {
 
-    private static final String PM25_lABEL = "pm25";
+    public static final String DESCRIPTION = "evolution";
 
-    private static final String PM10_LABEL = "pm10";
+    private int scalingCoeff;
 
-    private static final String DESCRIPTION = "";
 
     public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
 
-        // customize line chart
-        Description des = new Description();
-        des.setText(DESCRIPTION);
-        mChart.setDescription(des);
+        if (DataModel.currentTableName == "AVG_HOUR") {
+            scalingCoeff = 3600000;
+        } else if (DataModel.currentTableName == "AVG_DAY") {
+            scalingCoeff = 3600000*24;
+        } else if (DataModel.currentTableName == "AVG_MONTH") {
+            scalingCoeff = 3600000*24*30;
+        }
+
+        Description des = mChart.getDescription();
+        des.setText("");
 
         // enable value highlighting
-        // mChart.setDefaultFocusHighlightEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mChart.setDefaultFocusHighlightEnabled(true);
+        }
 
         // enable touch gestures
         mChart.setTouchEnabled(true);
@@ -63,61 +72,50 @@ public final class ChartHelper implements IAxisValueFormatter {
         l.setTextColor(TextColor);
 
 
-        mChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        mChart.getXAxis().setPosition(XAxis.XAxisPosition.TOP);
         XAxis x1 = mChart.getXAxis();
         x1.setValueFormatter(this);
         x1.setTextColor(TextColor);
-        x1.setDrawGridLines(false);
-        x1.setAvoidFirstLastClipping(true);
+        x1.setDrawGridLines(true);
+        x1.setAvoidFirstLastClipping(false);
         x1.setEnabled(true);
 
         YAxis y1 = mChart.getAxisLeft();
         y1.setTextColor(TextColor);
         // auto set y axis min max with 5% spacing:
-        float percent = 5;
+        float percent = 25;
         y1.setSpaceTop(percent);
         y1.setSpaceBottom(percent);
         y1.setDrawGridLines(false);
+        y1.setEnabled(false);
 
-        YAxis y12 = mChart.getAxisRight();
-        y12.setEnabled(false);
+        YAxis y2 = mChart.getAxisRight();
+        y2.setEnabled(false);
 
     }
 
-    public void addEntry(LineChart mChart, Float[] concentration_pm, int pm25LineColor, int pm10LineColor) {
+    public void addEntry(LineChart mChart, String label, Float[] concentration_pm, int lineColor) {
         LineData data = mChart.getData();
         Float ts_f = concentration_pm[0];
-        Float pm25 = concentration_pm[1];
-        Float pm10 = concentration_pm[2];
+        Float dataValue = concentration_pm[1];
 
         if (data != null) {
 
-            // APhsA
             ILineDataSet set = data.getDataSetByIndex(0);
 
             if (set == null) {
-                set = createSet(PM25_lABEL, pm25LineColor, pm10LineColor);
+                set = createSet(DataModel.currentColumnName, lineColor);
                 data.addDataSet(set);
             }
 
-            data.addEntry(new Entry(ts_f, pm25), 0);
-
-            // APhsB
-            set = data.getDataSetByIndex(1);
-
-            if (set == null) {
-                set = createSet(PM10_LABEL, pm25LineColor, pm10LineColor);
-                data.addDataSet(set);
-            }
-
-            data.addEntry(new Entry(ts_f, pm10), 1);
+            data.addEntry(new Entry(ts_f/scalingCoeff, dataValue), 0);
 
             // let the chart know it's data has changed
             data.notifyDataChanged();
             mChart.notifyDataSetChanged();
 
             // limit the number of visible entries
-           mChart.setVisibleXRange(8, 8);
+          // mChart.setVisibleXRange(8,8);
 
             // move to the latest entry
             mChart.moveViewToX(ts_f);
@@ -125,20 +123,11 @@ public final class ChartHelper implements IAxisValueFormatter {
     }
 
 
-    private LineDataSet createSet(String label, int pm25LineColor, int pm10LineColor) {
+    private LineDataSet createSet(String label, int lineColor) {
         LineDataSet set = new LineDataSet(null, label);
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        Integer color;
-        switch (label){
-            case PM25_lABEL:
-                color = pm25LineColor;
-                break;
-            case PM10_LABEL:
-                color = pm10LineColor;
-                break;
-            default:
-                color = Color.BLACK;
-        }
+        Integer color = lineColor;
+
         set.setColors(color);
         set.setCircleColor(color);
         set.setLineWidth(2f);
@@ -153,7 +142,15 @@ public final class ChartHelper implements IAxisValueFormatter {
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        Timestamp ts = new Timestamp((long) value*3600000);
-        return ts.toString().substring(11,16); // returns the corresponding time in the string format "HH:mm"
+        Timestamp ts = new Timestamp((long) value*scalingCoeff);
+        String formattedValue = "";
+        if (DataModel.currentTableName == "AVG_HOUR") {
+            formattedValue = ts.toString().substring(11,13)+"h";
+        } else if (DataModel.currentTableName == "AVG_DAY") {
+            formattedValue = ts.toString().substring(8,10);
+        } else if (DataModel.currentTableName == "AVG_MONTH") {
+            formattedValue = ts.toString().substring(5,7);
+        }
+        return formattedValue; // returns the corresponding time in the string format "HH:mm"
     }
 }
