@@ -29,12 +29,11 @@ public abstract class DataModel extends ViewModel {
     private static final String ip_address = "192.168.2.69";
     public static String currentTableName;
     public static String currentColumnName;
-    public static String numberOfValues;
-    public MutableLiveData<List<Float[]>> pmEntries = new MutableLiveData<>();
+    public static String currentNumberOfValues;
 
-    public void loadLastData(Context mCtx){
+    public void loadLastData(Context mCtx, String tableName){
 
-        String query = "order=id,desc&page=1,1&transform=1";
+        String query = "order=date,desc&page=1,1&transform=1";
         URL url = buildUrl(query);
         String urlLastData = null;
         if ( url != null) {
@@ -48,7 +47,7 @@ public abstract class DataModel extends ViewModel {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        setLastData(response);
+                        setLastData(response, tableName);
                     }
                 },
                 new Response.ErrorListener() {
@@ -62,9 +61,9 @@ public abstract class DataModel extends ViewModel {
         Log.d(DataModel.class.toString(), "loadLastData: network request");
     }
 
-    public void fillGraph(Context mCtx, String columnName){
+    public void fillGraph(Context mCtx, String tableName, String columnName){
         currentColumnName = columnName;
-        String query = "order=id,desc&page=1,"+numberOfValues+"&columns=date,"+columnName+"&transform=1";
+        String query = "order=date,desc&page=1,"+currentNumberOfValues+"&columns=date,"+columnName+"&transform=1";
         URL url = buildUrl(query);
         String urlLastData = null;
         if ( url != null) {
@@ -77,7 +76,7 @@ public abstract class DataModel extends ViewModel {
                 null,
                 new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONObject response) { setChartData(response, columnName);}
+                    public void onResponse(JSONObject response) { setChartData(response,tableName, columnName);}
                 },
                 new Response.ErrorListener() {
                     @Override
@@ -85,26 +84,15 @@ public abstract class DataModel extends ViewModel {
                 }
         );
         RequestQueueSingleton.getInstance(mCtx).addToRequestQueue(jsonObjectRequest);
-        Log.d(DataModel.class.toString(), "loadLastData: network request");
+        Log.d(DataModel.class.toString(), "fillGraph: network request");
     }
 
-    private  void setChartData(JSONObject response, String columnName) {
-        try {
-            ArrayList<Float[]> pmArray = new ArrayList<>();
-            JSONArray array = response.getJSONArray(currentTableName);
-            for (int i = array.length() - 1; i >= 0; i--) {
-                JSONObject measure =  array.getJSONObject(i);
-                Double dataValue = measure.getDouble(columnName);
-                String date = measure.getString(this.getColumnDateStr());
-                Timestamp ts = Timestamp.valueOf(date);
-                Float ts_f = Float.parseFloat("" + ts.getTime());
-                pmArray.add(new Float[]{ts_f, dataValue.floatValue()});
-            }
-            this.pmEntries.postValue(pmArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public static void setScale(String tableName, String numberOfValues) {
+        currentTableName = tableName;
+        currentNumberOfValues = numberOfValues;
     }
+
+    protected abstract void setChartData(JSONObject response, String tableName, String columnName);
 
     private URL buildUrl(String query) {
         URI uri;
@@ -117,10 +105,10 @@ public abstract class DataModel extends ViewModel {
             System.out.println("Wrong URL");
             e.printStackTrace();
         }
-
+        Log.d(DataModel.class.toString(), url.toString());
         return url;
     }
 
     protected abstract String getColumnDateStr();
-    protected abstract void setLastData(JSONObject response);
+    protected abstract void setLastData(JSONObject response, String tableName);
 }

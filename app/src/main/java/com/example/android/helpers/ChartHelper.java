@@ -1,6 +1,5 @@
 package com.example.android.helpers;
 
-import android.graphics.Color;
 import android.os.Build;
 
 import com.example.android.models.DataModel;
@@ -18,21 +17,20 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.sql.Timestamp;
 
-public final class ChartHelper implements IAxisValueFormatter {
+public class ChartHelper implements IAxisValueFormatter {
 
-    public static final String DESCRIPTION = "evolution";
+    private String DESCRIPTION;
 
-    private int scalingCoeff;
-
+    private int scalingCoefficient;
 
     public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
 
         if (DataModel.currentTableName == "AVG_HOUR") {
-            scalingCoeff = 3600000;
+            scalingCoefficient = 3600000;
         } else if (DataModel.currentTableName == "AVG_DAY") {
-            scalingCoeff = 3600000*24;
+            scalingCoefficient = 3600000*24;
         } else if (DataModel.currentTableName == "AVG_MONTH") {
-            scalingCoeff = 3600000*24*30;
+            scalingCoefficient = 3600000*24*30;
         }
 
         Description des = mChart.getDescription();
@@ -94,7 +92,7 @@ public final class ChartHelper implements IAxisValueFormatter {
 
     }
 
-    public void addEntry(LineChart mChart, String label, Float[] concentration_pm, int lineColor) {
+    public void addEntry(LineChart mChart, Float[] concentration_pm, int lineColor) {
         LineData data = mChart.getData();
         Float ts_f = concentration_pm[0];
         Float dataValue = concentration_pm[1];
@@ -108,7 +106,7 @@ public final class ChartHelper implements IAxisValueFormatter {
                 data.addDataSet(set);
             }
 
-            data.addEntry(new Entry(ts_f/scalingCoeff, dataValue), 0);
+            data.addEntry(new Entry(ts_f/ scalingCoefficient, dataValue), 0);
 
             // let the chart know it's data has changed
             data.notifyDataChanged();
@@ -142,7 +140,7 @@ public final class ChartHelper implements IAxisValueFormatter {
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        Timestamp ts = new Timestamp((long) value*scalingCoeff);
+        Timestamp ts = new Timestamp((long) value* scalingCoefficient);
         String formattedValue = "";
         if (DataModel.currentTableName == "AVG_HOUR") {
             formattedValue = ts.toString().substring(11,13)+"h";
@@ -153,4 +151,5 @@ public final class ChartHelper implements IAxisValueFormatter {
         }
         return formattedValue; // returns the corresponding time in the string format "HH:mm"
     }
+
 }
