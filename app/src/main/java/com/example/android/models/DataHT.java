@@ -12,32 +12,32 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataPM extends DataModel{
+
+public class DataHT extends DataModel{
 
     private static final String TAG =  DataHT.class.toString();
 
-    public MutableLiveData<String> dateMeasurement = new MutableLiveData<>();
-    public MutableLiveData<Double> pm25 = new MutableLiveData<>();
-    public MutableLiveData<Double> pm10 = new MutableLiveData<>();
-    public MutableLiveData<List<Float[]>> pm10Entries = new MutableLiveData<>();
-    public MutableLiveData<List<Float[]>> pm25Entries = new MutableLiveData<>();
-    public static final String col_pm25 = "pm25";
-    public static final String col_pm10 = "pm10";
+    public MutableLiveData<Double> temperature = new MutableLiveData<>();
+    public MutableLiveData<Double> humidity = new MutableLiveData<>();
+    public MutableLiveData<List<Float[]>> humEntries = new MutableLiveData<>();
+    public MutableLiveData<List<Float[]>> tempEntries = new MutableLiveData<>();
+    public static final String col_humidity = "humidity";
+    public static final String col_temperature = "temperature";
     public static final String col_date = "date";
 
-    public DataPM() {
+    public DataHT() {
         this.loadLastData(DataModel.currentTableName);
     }
 
     @Override
     protected void setLastData(JSONObject response, String tableName) {
+        JSONArray array;
         try {
-            JSONArray array = response.getJSONArray(tableName);
+            array = response.getJSONArray(tableName);
             Log.d(TAG, array.toString());
-            JSONObject measure =  array.getJSONObject(0);
-            pm25.postValue(measure.getDouble(col_pm25));
-            pm10.postValue(measure.getDouble(col_pm10));
-            dateMeasurement.postValue(measure.getString(col_date));
+            JSONObject measure = array.getJSONObject(0);
+            temperature.postValue(measure.getDouble(col_temperature));
+            humidity.postValue(measure.getDouble(col_humidity));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -53,13 +53,13 @@ public class DataPM extends DataModel{
                 Double dataValue = measure.getDouble(columnName);
                 String date = measure.getString(this.getColumnDateStr());
                 Timestamp ts = Timestamp.valueOf(date);
-                Float ts_f = (float) ts.getTime();
+                Float ts_f = Float.parseFloat("" + ts.getTime());
                 pmArray.add(new Float[]{ts_f, dataValue.floatValue()});
             }
-            if (columnName == DataPM.col_pm10) {
-                this.pm10Entries.postValue(pmArray);
-            } else if (columnName == DataPM.col_pm25) {
-                this.pm25Entries.postValue(pmArray);
+            if (columnName == DataHT.col_humidity) {
+                this.humEntries.postValue(pmArray);
+            } else if (columnName == DataHT.col_temperature) {
+                this.tempEntries.postValue(pmArray);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -67,5 +67,7 @@ public class DataPM extends DataModel{
     }
 
     @Override
-    protected String getColumnDateStr() { return col_date; }
+    protected String getColumnDateStr() {
+        return col_date;
+    }
 }

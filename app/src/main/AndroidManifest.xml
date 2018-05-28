@@ -14,15 +14,9 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.android.fragments.ListPollutantsFragment" />
-        <activity android:name="com.example.android.adapters.PollutantItemAdapter" />
-        <activity
-            android:name="com.example.android.fragments.LastDataFragment"
-            android:label="@string/title_activity_tabs"></activity>
     </application>
 
 </manifest>

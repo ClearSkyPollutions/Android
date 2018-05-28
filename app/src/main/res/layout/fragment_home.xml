@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.android.fragments.HomeFragment">
+    <data>
+        <variable
+            name="lastDataPM"
+            type="com.example.android.models.DataPM"/>
+        <variable
+            name="lastDataHT"
+            type="com.example.android.models.DataHT"/>
+    </data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginBottom="55dp">
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="5dp"
+            android:layout_weight="10"
+            card_view:cardCornerRadius="6dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal"
+                    android:layout_weight="2">
+                    <TextView
+                        android:id="@+id/date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="9"
+                        android:layout_gravity="start"
+                        android:text='@{" Air Quality\n "+lastDataPM.dateMeasurement, default=mockdate}'
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+
+                    <Button
+                        android:id="@+id/buttonRefresh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_gravity="clip_vertical"
+                        android:text="@string/refresh"
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/pm25_bt"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="20dp"
+                        android:text= "pm25"
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                    <TextView
+                        android:id="@+id/pm25_tv"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text='@{lastDataPM.pm25.toString() + " µg/m^3", default=mockpm25}'
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/pm10_bt"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="start"
+                        android:layout_marginLeft="20dp"
+                        android:text= "pm10"
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp"/>
+                    <TextView
+                        android:id="@+id/pm10_tv"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text='@{lastDataPM.pm10.toString() + " µg/m^3", default=mockpm10}'
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/temperature_bt"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="start"
+                        android:layout_marginLeft="20dp"
+                        android:text= "Temperature"
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                    <TextView
+                        android:id="@+id/temperature_tv"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text='@{lastDataHT.temperature.toString() + " °C", default=mocktemp}'
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/humidity_bt"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="start"
+                        android:layout_marginLeft="20dp"
+                        android:text= "Humidity"
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                    <TextView
+                        android:id="@+id/humidity_tv"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text='@{lastDataHT.humidity.toString() + " %", default=mockhum}'
+                        android:textColor="@color/primaryColor"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/day_bt"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:text= "Day"
+                android:textColor="@color/primaryColor"
+                android:textSize="15sp" />
+            <Button
+                android:id="@+id/month_bt"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Month"
+                android:textColor="@color/primaryColor"
+                android:textSize="15sp" />
+            <Button
+                android:id="@+id/year_bt"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Year"
+                android:textColor="@color/primaryColor"
+                android:textSize="15sp" />
+        </LinearLayout>
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="8" />
+    </LinearLayout>
+</layout>
