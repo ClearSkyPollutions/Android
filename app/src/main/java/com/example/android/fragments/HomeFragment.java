@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,15 +38,6 @@ public class HomeFragment extends Fragment {
         binding.setLifecycleOwner(this);
         View rootView= binding.getRoot();
 
-        // Init LineChart
-        mChart = rootView.findViewById(R.id.lineChart);
-        int backgroundColor = Color.WHITE;
-        int textColor = getResources().getColor(R.color.primaryTextColor);
-        int lineColor = getResources().getColor(R.color.secondaryDarkColor);
-        DataModel.setScale("AVG_HOUR", "24"); // must be done before initChart
-        ChartHelper chartHelper = new ChartHelper();
-        chartHelper.initChart(mChart, backgroundColor, textColor);
-
         // Create or get the ViewModel for our date
         dataPM = ViewModelProviders.of(getActivity()).get(DataPM.class);
         dataHT = ViewModelProviders.of(getActivity()).get(DataHT.class);
@@ -53,6 +45,15 @@ public class HomeFragment extends Fragment {
         // Bind the UI elements to the viewModel
         binding.setLastDataPM(dataPM);
         binding.setLastDataHT(dataHT);
+
+        // Init LineChart
+        mChart = rootView.findViewById(R.id.lineChart);
+        int backgroundColor = Color.WHITE;
+        int textColor = getResources().getColor(R.color.primaryTextColor);
+        int lineColor = getResources().getColor(R.color.secondaryDarkColor);
+        DataModel.setScale(DataModel.currentTableName, DataModel.currentNumberOfValues); // must be done before initChart
+        ChartHelper chartHelper = new ChartHelper();
+        chartHelper.initChart(mChart, backgroundColor, textColor);
 
         dataPM.pm10Entries.observe(this, pm10Entries -> {
             mChart.clearValues();
@@ -95,7 +96,7 @@ public class HomeFragment extends Fragment {
         mButtonTemp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataHT.fillGraph(getContext(), DataModel.currentTableName, DataHT.col_temperature);
+                dataHT.fillGraph(DataModel.currentTableName, DataHT.col_temperature);
             }
         });
 
@@ -103,7 +104,7 @@ public class HomeFragment extends Fragment {
         mButtonHum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataHT.fillGraph(getContext(), DataModel.currentTableName, DataHT.col_humidity);
+                dataHT.fillGraph(DataModel.currentTableName, DataHT.col_humidity);
             }
         });
 
@@ -111,7 +112,7 @@ public class HomeFragment extends Fragment {
         mButtonPM25.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataPM.fillGraph(getContext(), DataModel.currentTableName, DataPM.col_pm25);
+                dataPM.fillGraph(DataModel.currentTableName, DataPM.col_pm25);
             }
         });
 
@@ -119,7 +120,7 @@ public class HomeFragment extends Fragment {
         mButtonPM10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataPM.fillGraph(getContext(), DataModel.currentTableName, DataPM.col_pm10);
+                dataPM.fillGraph(DataModel.currentTableName, DataPM.col_pm10);
             }
         });
 
@@ -148,9 +149,7 @@ public class HomeFragment extends Fragment {
         });
 
         //load the data from the server
-        dataPM.loadLastData(getContext(), DataModel.currentTableName);
-        dataHT.loadLastData(getContext(), DataModel.currentTableName);
-        dataPM.fillGraph(getContext(), DataModel.currentTableName, DataPM.col_pm25);
+        dataPM.fillGraph(DataModel.currentTableName, DataModel.currentColumnName);
 
         return rootView;
     }
@@ -159,21 +158,21 @@ public class HomeFragment extends Fragment {
         String tempTableName = DataModel.currentTableName;
         String tempNum = DataModel.currentNumberOfValues;
         DataModel.setScale("AVG_HOUR", "24");
-        dataPM.loadLastData(getContext(), DataModel.currentTableName);
-        dataHT.loadLastData(getContext(), DataModel.currentTableName);
+        dataPM.loadLastData(DataModel.currentTableName);
+        dataHT.loadLastData(DataModel.currentTableName);
         changeGraphScale(tempTableName, tempNum, DataModel.currentColumnName);
     }
 
     private void changeGraphScale(String tableName, String numberOfValues, String columnName) {
         DataModel.setScale(tableName, numberOfValues);
         if (columnName == DataPM.col_pm10) {
-            dataPM.fillGraph(getContext(), tableName, DataPM.col_pm10);
+            dataPM.fillGraph(tableName, DataPM.col_pm10);
         } else if (columnName == DataPM.col_pm25){
-            dataPM.fillGraph(getContext(), tableName, DataPM.col_pm25);
+            dataPM.fillGraph(tableName, DataPM.col_pm25);
         } else if (columnName == DataHT.col_humidity) {
-            dataHT.fillGraph(getContext(), tableName, DataHT.col_humidity);
+            dataHT.fillGraph(tableName, DataHT.col_humidity);
         } else if (columnName == DataHT.col_temperature) {
-            dataHT.fillGraph(getContext(), tableName, DataHT.col_temperature );
+            dataHT.fillGraph(tableName, DataHT.col_temperature );
         }
     }
 

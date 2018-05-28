@@ -16,18 +16,21 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField 'int', 'PortHTTP', '8000'
-            buildConfigField 'int', 'PortDB', '8001'
+            buildConfigField 'String', 'IPADDR', '"192.168.2.118"'
+            buildConfigField 'int', 'PortHTTP', '7000'
+            buildConfigField 'int', 'PortDB', '7001'
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         env_dev {
+            buildConfigField 'String', 'IPADDR', '"192.168.2.118"'
             buildConfigField 'int', 'PortHTTP', '4000'
             buildConfigField 'int', 'PortDB', '4001'
         }
         env_test {
+            buildConfigField 'String', 'IPADDR', '"192.168.2.118"'
             buildConfigField 'String', 'PortHTTP', '80'
             buildConfigField 'String', 'PortDB', '3306'
         }

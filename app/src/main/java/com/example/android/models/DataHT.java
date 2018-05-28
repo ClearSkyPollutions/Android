@@ -25,6 +25,9 @@ public class DataHT extends DataModel{
     public static final String col_temperature = "temperature";
     public static final String col_date = "date";
 
+    public DataHT() {
+        this.loadLastData(DataModel.currentTableName);
+    }
 
     @Override
     protected void setLastData(JSONObject response, String tableName) {

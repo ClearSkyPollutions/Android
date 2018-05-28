@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DataPM extends DataModel{
 
     private static final String TAG =  DataHT.class.toString();
@@ -25,6 +24,10 @@ public class DataPM extends DataModel{
     public static final String col_pm25 = "pm25";
     public static final String col_pm10 = "pm10";
     public static final String col_date = "date";
+
+    public DataPM() {
+        this.loadLastData(DataModel.currentTableName);
+    }
 
     @Override
     protected void setLastData(JSONObject response, String tableName) {
@@ -50,7 +53,7 @@ public class DataPM extends DataModel{
                 Double dataValue = measure.getDouble(columnName);
                 String date = measure.getString(this.getColumnDateStr());
                 Timestamp ts = Timestamp.valueOf(date);
-                Float ts_f = Float.parseFloat("" + ts.getTime());
+                Float ts_f = (float) ts.getTime();
                 pmArray.add(new Float[]{ts_f, dataValue.floatValue()});
             }
             if (columnName == DataPM.col_pm10) {

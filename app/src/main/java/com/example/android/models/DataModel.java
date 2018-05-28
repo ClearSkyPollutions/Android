@@ -1,8 +1,6 @@
 package com.example.android.models;
 
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -12,26 +10,21 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.android.activities.BuildConfig;
 import com.example.android.network.RequestQueueSingleton;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public abstract class DataModel extends ViewModel {
 
-    private static final String ip_address = "192.168.2.69";
-    public static String currentTableName;
-    public static String currentColumnName;
-    public static String currentNumberOfValues;
+    private static final String ip_address = BuildConfig.IPADDR;
+    public static String currentTableName = "AVG_HOUR";
+    public static String currentColumnName = "pm25";
+    public static String currentNumberOfValues = "24";
 
-    public void loadLastData(Context mCtx, String tableName){
+
+    public void loadLastData(String tableName){
 
         String query = "order=date,desc&page=1,1&transform=1";
         URL url = buildUrl(query);
@@ -57,11 +50,11 @@ public abstract class DataModel extends ViewModel {
                     }
                 }
         );
-        RequestQueueSingleton.getInstance(mCtx).addToRequestQueue(jsonObjectRequest);
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
         Log.d(DataModel.class.toString(), "loadLastData: network request");
     }
 
-    public void fillGraph(Context mCtx, String tableName, String columnName){
+    public void fillGraph(String tableName, String columnName){
         currentColumnName = columnName;
         String query = "order=date,desc&page=1,"+currentNumberOfValues+"&columns=date,"+columnName+"&transform=1";
         URL url = buildUrl(query);
@@ -83,13 +76,17 @@ public abstract class DataModel extends ViewModel {
                     public void onErrorResponse(VolleyError e) { e.printStackTrace(); }
                 }
         );
-        RequestQueueSingleton.getInstance(mCtx).addToRequestQueue(jsonObjectRequest);
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
         Log.d(DataModel.class.toString(), "fillGraph: network request");
     }
 
     public static void setScale(String tableName, String numberOfValues) {
         currentTableName = tableName;
         currentNumberOfValues = numberOfValues;
+    }
+
+    public static void setPollutant(String columnName) {
+        currentColumnName = columnName;
     }
 
     protected abstract void setChartData(JSONObject response, String tableName, String columnName);
