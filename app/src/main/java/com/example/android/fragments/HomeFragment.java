@@ -25,7 +25,7 @@ public class HomeFragment extends Fragment {
 
     private DataHT dataHT;
     private DataPM dataPM;
-    private LineChart mChart;
+    private LineChart mChart1, mChart2, mChart3, mChart4;
 
     private static final String TAG = HomeFragment.class.toString();
 
@@ -46,43 +46,59 @@ public class HomeFragment extends Fragment {
         binding.setLastDataPM(dataPM);
         binding.setLastDataHT(dataHT);
 
-        // Init LineChart
-        mChart = rootView.findViewById(R.id.lineChart);
+        // Init charts
         int backgroundColor = Color.WHITE;
         int textColor = getResources().getColor(R.color.primaryTextColor);
         int lineColor = getResources().getColor(R.color.secondaryDarkColor);
-        DataModel.setScale(DataModel.currentTableName, DataModel.currentNumberOfValues); // must be done before initChart
+
+        mChart1 = rootView.findViewById(R.id.lineChart1);
+        mChart2 = rootView.findViewById(R.id.lineChart2);
+        mChart3 = rootView.findViewById(R.id.lineChart3);
+        mChart4 = rootView.findViewById(R.id.lineChart4);
+
         ChartHelper chartHelper = new ChartHelper();
-        chartHelper.initChart(mChart, backgroundColor, textColor);
+        chartHelper.initChart(mChart1, backgroundColor, textColor);
+        chartHelper.initChart(mChart2, backgroundColor, textColor);
+        chartHelper.initChart(mChart3, backgroundColor, textColor);
+        chartHelper.initChart(mChart4, backgroundColor, textColor);
 
         dataPM.pm10Entries.observe(this, pm10Entries -> {
-            mChart.clearValues();
+            mChart1.clearValues();
+            DataModel.currentColumnName = DataPM.col_pm10;
             for(Float[] pmEntry : pm10Entries) {
-                chartHelper.addEntry(mChart, pmEntry, lineColor);
+                chartHelper.addEntry(mChart1, pmEntry, lineColor);
             }
         });
+        dataHT.fillGraph(DataModel.currentTableName, DataHT.col_temperature );
 
         dataPM.pm25Entries.observe(this, pm25Entries -> {
-            mChart.clearValues();
+            mChart2.clearValues();
+            DataModel.currentColumnName = DataPM.col_pm25;
             for(Float[] pmEntry : pm25Entries) {
-                chartHelper.addEntry(mChart, pmEntry, lineColor);
+                chartHelper.addEntry(mChart2, pmEntry, lineColor);
             }
         });
+        dataHT.fillGraph(DataModel.currentTableName, DataHT.col_humidity );
 
         dataHT.humEntries.observe(this, humEntries -> {
-            mChart.clearValues();
+            mChart3.clearValues();
+            DataModel.currentColumnName = DataHT.col_humidity;
             for(Float[] pmEntry : humEntries) {
-                chartHelper.addEntry(mChart, pmEntry, lineColor);
+                chartHelper.addEntry(mChart3, pmEntry, lineColor);
             }
         });
+        dataPM.fillGraph(DataModel.currentTableName, DataPM.col_pm25 );
 
         dataHT.tempEntries.observe(this, tempEntries -> {
-            mChart.clearValues();
+            mChart4.clearValues();
+            DataModel.currentColumnName = DataHT.col_temperature;
             for(Float[] pmEntry : tempEntries) {
-                chartHelper.addEntry(mChart, pmEntry, lineColor);
+                chartHelper.addEntry(mChart4, pmEntry, lineColor);
             }
         });
+        dataPM.fillGraph(DataModel.currentTableName, DataPM.col_pm10 );
 
+        /*
         // Set listeners for the different buttons
         Button mButtonRefresh = rootView.findViewById(R.id.buttonRefresh);
         mButtonRefresh.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +146,7 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 changeGraphScale("AVG_HOUR", "24", DataModel.currentColumnName);
             }
-        });
+        });<
 
         Button mButtonMonth = rootView.findViewById(R.id.month_bt);
         mButtonMonth.setOnClickListener(new View.OnClickListener() {
@@ -147,9 +163,8 @@ public class HomeFragment extends Fragment {
                 changeGraphScale("AVG_MONTH", "12", DataModel.currentColumnName);
             }
         });
+*/
 
-        //load the data from the server
-        dataPM.fillGraph(DataModel.currentTableName, DataModel.currentColumnName);
 
         return rootView;
     }

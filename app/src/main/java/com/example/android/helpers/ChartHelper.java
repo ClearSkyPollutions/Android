@@ -68,9 +68,9 @@ public class ChartHelper implements IAxisValueFormatter {
         XAxis x1 = mChart.getXAxis();
         x1.setValueFormatter(this);
         x1.setTextColor(TextColor);
-        x1.setDrawGridLines(true);
+        x1.setDrawGridLines(false);
         x1.setAvoidFirstLastClipping(false);
-        x1.setEnabled(true);
+        x1.setEnabled(false);
 
         YAxis y1 = mChart.getAxisLeft();
         y1.setTextColor(TextColor);
@@ -127,7 +127,7 @@ public class ChartHelper implements IAxisValueFormatter {
         set.setValueTextColor(color);
         set.setValueTextSize(10f);
         // To show values of each point
-        set.setDrawValues(true);
+        set.setDrawValues(false);
 
         return set;
     }

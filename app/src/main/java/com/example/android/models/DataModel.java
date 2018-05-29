@@ -19,7 +19,7 @@ public abstract class DataModel extends ViewModel {
     private static final String ip_address = BuildConfig.IPADDR;
     public static String currentTableName = "AVG_HOUR";
     public static String currentColumnName = "pm25";
-    public static String currentNumberOfValues = "24";
+    public static String currentNumberOfValues = "10";
 
 
     public void loadLastData(String tableName){
