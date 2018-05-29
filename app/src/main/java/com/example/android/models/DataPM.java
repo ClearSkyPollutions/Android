@@ -29,6 +29,16 @@ public class DataPM extends DataModel{
         this.loadLastData(DataModel.currentTableName);
     }
 
+    public MutableLiveData<List<Float[]>> getEntries(String columnName){
+        switch (columnName){
+            case col_pm10:
+                return pm10Entries;
+            case col_pm25:
+                return pm25Entries;
+        }
+        return null;
+    }
+
     @Override
     protected void setLastData(JSONObject response, String tableName) {
         try {

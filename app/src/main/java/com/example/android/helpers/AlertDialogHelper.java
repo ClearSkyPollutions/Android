@@ -23,5 +23,4 @@ public class AlertDialogHelper {
 
        return alertDialogBuilder.create();
     }
-
 }

@@ -1,4 +1,5 @@
 package com.example.android.models;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 import com.android.volley.Request;
@@ -13,14 +14,16 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
 public abstract class DataModel extends ViewModel {
 
     private static final String ip_address = BuildConfig.IPADDR;
     public static String currentTableName = "AVG_HOUR";
     public static String currentColumnName = "pm25";
-    public static String currentNumberOfValues = "10";
+    public static String currentNumberOfValues = "24";
 
+    public abstract MutableLiveData<List<Float[]>> getEntries(String columnName);
 
     public void loadLastData(String tableName){
 
