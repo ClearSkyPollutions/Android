@@ -15,5 +15,5 @@
     <color name="secondaryTextLightColor">#005240</color>
     <color name="secondaryTextDarkColor">#003b0d</color>
 
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff4081</color>
 </resources>

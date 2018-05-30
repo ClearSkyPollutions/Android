@@ -4,6 +4,11 @@ android {
     dataBinding {
         enabled = true
     }
+    repositories {
+        maven {
+            url 'https://maven.google.com'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.android.androidapp"
@@ -56,4 +61,5 @@ dependencies {
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 }

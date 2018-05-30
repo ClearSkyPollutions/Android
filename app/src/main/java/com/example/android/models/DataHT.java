@@ -29,6 +29,16 @@ public class DataHT extends DataModel{
         this.loadLastData(DataModel.currentTableName);
     }
 
+    public MutableLiveData<List<Float[]>> getEntries(String columnName){
+        switch (columnName){
+            case col_humidity:
+                return humEntries;
+            case col_temperature:
+                return tempEntries;
+        }
+        return null;
+    }
+
     @Override
     protected void setLastData(JSONObject response, String tableName) {
         JSONArray array;
