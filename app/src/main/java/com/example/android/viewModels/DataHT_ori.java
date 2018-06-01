@@ -1,4 +1,4 @@
-package com.example.android.models;
+package com.example.android.viewModels;
 
 
 import android.arch.lifecycle.MutableLiveData;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DataHT extends DataModel{
+public class DataHT_ori extends DataModel{
 
-    private static final String TAG =  DataHT.class.toString();
+    private static final String TAG =  DataHT_ori.class.toString();
 
     public MutableLiveData<Double> temperature = new MutableLiveData<>();
     public MutableLiveData<Double> humidity = new MutableLiveData<>();
@@ -25,7 +25,7 @@ public class DataHT extends DataModel{
     public static final String col_temperature = "temperature";
     public static final String col_date = "date";
 
-    public DataHT() {
+    public DataHT_ori() {
         this.loadLastData(DataModel.currentTableName);
     }
 
@@ -66,9 +66,9 @@ public class DataHT extends DataModel{
                 Float ts_f = Float.parseFloat("" + ts.getTime());
                 pmArray.add(new Float[]{ts_f, dataValue.floatValue()});
             }
-            if (columnName == DataHT.col_humidity) {
+            if (columnName == DataHT_ori.col_humidity) {
                 this.humEntries.postValue(pmArray);
-            } else if (columnName == DataHT.col_temperature) {
+            } else if (columnName == DataHT_ori.col_temperature) {
                 this.tempEntries.postValue(pmArray);
             }
         } catch (JSONException e) {

@@ -7,12 +7,12 @@
     <data>
 
         <variable
-            name="lastDataPM"
-            type="com.example.android.models.DataPM" />
+            name="lastDataPMOri"
+            type="com.example.android.viewModels.DataPM_ori" />
 
         <variable
-            name="lastDataHT"
-            type="com.example.android.models.DataHT" />
+            name="lastDataHTOri"
+            type="com.example.android.viewModels.DataHT_ori" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -169,10 +169,12 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text='@{lastDataPM.dateMeasurement.toString(), default="2018-05-28 13:00:00"}'
+                    android:text = "2018-05-28 13:00:00"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ville" />
+                <!-- android:text='@{lastDataPMOri.dateMeasurement.toString(), default="2018-05-28 13:00:00"}' -->
+
 
                 <TextView
                     android:id="@+id/ica"
@@ -223,12 +225,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text='@{lastDataHT.temperature.toString(), default=0}'
                     android:textStyle="bold"
+                    android:text="25"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/ica"
                     app:layout_constraintTop_toBottomOf="@+id/date" />
+                <!-- android:text='@{lastDataHTOri.temperature.toString(), default=0}' -->
 
                 <TextView
                     android:id="@+id/labeltemp"
@@ -268,7 +271,7 @@
                 android:layout_height="match_parent">
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart1"
+                    android:id="@+id/lineChartpm10"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
@@ -315,7 +318,7 @@
                 android:layout_height="match_parent">
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart2"
+                    android:id="@+id/lineChartpm25"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
@@ -364,7 +367,7 @@
                 android:layout_height="match_parent">
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart3"
+                    android:id="@+id/lineCharthumidity"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
@@ -412,7 +415,7 @@
                 android:layout_height="match_parent">
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChart4"
+                    android:id="@+id/lineCharttemperature"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"

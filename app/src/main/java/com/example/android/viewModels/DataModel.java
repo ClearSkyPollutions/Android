@@ -1,4 +1,4 @@
-package com.example.android.models;
+package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
@@ -36,7 +36,7 @@ public abstract class DataModel extends ViewModel {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET,
-                 urlLastData,
+                urlLastData,
                 null,
                 new Response.Listener<JSONObject>() {
                     @Override

@@ -1,4 +1,4 @@
-package com.example.android.models;
+package com.example.android.viewModels;
 
 
 import android.arch.lifecycle.MutableLiveData;
@@ -12,9 +12,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataPM extends DataModel{
+public class DataPM_ori extends DataModel{
 
-    private static final String TAG =  DataHT.class.toString();
+    private static final String TAG =  DataHT_ori.class.toString();
 
     public MutableLiveData<String> dateMeasurement = new MutableLiveData<>();
     public MutableLiveData<Double> pm25 = new MutableLiveData<>();
@@ -25,7 +25,7 @@ public class DataPM extends DataModel{
     public static final String col_pm10 = "pm10";
     public static final String col_date = "date";
 
-    public DataPM() {
+    public DataPM_ori() {
         this.loadLastData(DataModel.currentTableName);
     }
 
@@ -66,9 +66,9 @@ public class DataPM extends DataModel{
                 Float ts_f = (float) ts.getTime();
                 pmArray.add(new Float[]{ts_f, dataValue.floatValue()});
             }
-            if (columnName == DataPM.col_pm10) {
+            if (columnName == DataPM_ori.col_pm10) {
                 this.pm10Entries.postValue(pmArray);
-            } else if (columnName == DataPM.col_pm25) {
+            } else if (columnName == DataPM_ori.col_pm25) {
                 this.pm25Entries.postValue(pmArray);
             }
         } catch (JSONException e) {

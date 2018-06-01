@@ -3,9 +3,7 @@ package com.example.android.helpers;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
 
-import android.speech.tts.TextToSpeech;
-import android.util.Log;
-import com.example.android.models.DataModel;
+import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -19,8 +17,6 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-
-import org.w3c.dom.Text;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
