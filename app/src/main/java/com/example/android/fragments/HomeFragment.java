@@ -4,8 +4,6 @@ package com.example.android.fragments;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
-import android.nfc.Tag;
-import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,19 +12,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
-import com.example.android.helpers.AlertDialogHelper;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.models.DataHT;
 import com.example.android.models.DataModel;
 import com.example.android.models.DataPM;
 import com.github.mikephil.charting.charts.LineChart;
-import com.google.android.gms.common.SignInButton;
+
+import java.sql.Timestamp;
 
 
 public class HomeFragment extends Fragment {
@@ -37,6 +34,7 @@ public class HomeFragment extends Fragment {
     private CardView mChartViewDialog;
     private View mCoverView;
     private TextView mDataView;
+    private TextView mLabelView;
 
     private static final String TAG = HomeFragment.class.toString();
 
@@ -47,7 +45,7 @@ public class HomeFragment extends Fragment {
             mChartDialog.clearValues();
             DataModel.currentColumnName = column;
             for (Float[] entries : data.getEntries(column).getValue()) {
-                chartHelper.addEntry(mChartDialog, entries, lineColor, true);
+                chartHelper.addEntry(mChartDialog, entries, lineColor, false);
             }
             mChartViewDialog.setVisibility(View.VISIBLE);
             mCoverView.setVisibility(View.VISIBLE);
@@ -56,7 +54,7 @@ public class HomeFragment extends Fragment {
                 mChartDialog.clearValues();
                     DataModel.currentColumnName = column;
                     for (Float[] pmEntry : entries) {
-                        chartHelper.addEntry(mChartDialog, pmEntry, lineColor, true);
+                        chartHelper.addEntry(mChartDialog, pmEntry, lineColor, false);
                     }
             });
         };
@@ -95,6 +93,7 @@ public class HomeFragment extends Fragment {
         mChartViewDialog = rootView.findViewById(R.id.graphDialog);
         mCoverView = rootView.findViewById(R.id.cover);
         mDataView = rootView.findViewById(R.id.data);
+        mLabelView = rootView.findViewById(R.id.labelData);
 
         ChartHelper chartHelper = new ChartHelper();
         chartHelper.initChart(mChart1, backgroundColor, textColor);
@@ -150,8 +149,12 @@ public class HomeFragment extends Fragment {
         });
         dataPM.fillGraph(DataModel.currentTableName, DataPM.col_pm10 );
 
-        chartHelper.getSelected().observe(this, selected -> {
+        chartHelper.getSelectedValue().observe(this, selected -> {
             mDataView.setText(selected.toString());
+        });
+
+        chartHelper.getSelectedLabel().observe(this, selected -> {
+            mLabelView.setText(selected);
         });
 
         chartHelper.initChartDialog(mChartDialog, backgroundColor, textColor);
