@@ -3,8 +3,6 @@ package com.example.android.helpers;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
 
-import android.speech.tts.TextToSpeech;
-import android.util.Log;
 import com.example.android.models.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -20,21 +18,27 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
-import org.w3c.dom.Text;
-
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedListener {
 
-    public MutableLiveData<Float> selected;
+    public MutableLiveData<Float> selectedValue;
+    public MutableLiveData<String> selectedLabel;
 
-    public MutableLiveData<Float> getSelected() {
-        if(selected == null){
-            selected = new MutableLiveData<>();
+    public MutableLiveData<Float> getSelectedValue() {
+        if(selectedValue == null){
+            selectedValue = new MutableLiveData<>();
         }
-        return selected;
+        return selectedValue;
+    }
+
+    public MutableLiveData<String> getSelectedLabel() {
+        if(selectedLabel == null){
+            selectedLabel = new MutableLiveData<>();
+        }
+        return selectedLabel;
     }
 
     private void initStandard(LineChart mChart, int BackgroundColor, int TextColor){
@@ -53,7 +57,7 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
 
         // enable scaling & dragging
         mChart.setDragEnabled(true);
-        mChart.setScaleEnabled(true);
+        mChart.setScaleEnabled(false);
 
         // enable pinch zoom to avoid scaling x and y axis separately
         mChart.setPinchZoom(false);
@@ -139,7 +143,8 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     }
 
     public void onValueSelected(Entry e, Highlight h){
-        selected.postValue(h.getY());
+        selectedValue.postValue(h.getY());
+        selectedLabel.postValue(getStringDate(h.getX()));
     }
     public void onNothingSelected(){
 
@@ -208,7 +213,15 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
             SimpleDateFormat ft = new SimpleDateFormat("MM", Locale.FRANCE);
             formattedValue = ft.format(ts);
         }
-        return formattedValue; // returns the corresponding time in the string format "HH:mm"
+        return formattedValue;
+    }
+
+    private String getStringDate(float value) {
+        Timestamp ts = new Timestamp((long) (value));
+        String stringValue = "";
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy/MM/dd", Locale.FRANCE);
+        stringValue = ft.format(ts);
+        return stringValue;
     }
 
 }
