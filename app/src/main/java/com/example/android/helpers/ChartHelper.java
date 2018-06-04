@@ -152,7 +152,7 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
             ILineDataSet set = data.getDataSetByIndex(0);
 
             if (set == null) {
-                set = createSet(DataModel.currentColumnName, lineColor);
+                set = createSet(lineColor);
                 data.addDataSet(set);
             }
             if(draw){
@@ -173,8 +173,8 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     }
 
 
-    private LineDataSet createSet(String label, int lineColor) {
-        LineDataSet set = new LineDataSet(null, label);
+    private LineDataSet createSet(int lineColor) {
+        LineDataSet set = new LineDataSet(null, "");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         Integer color = lineColor;
 
@@ -192,19 +192,20 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
+        int nb = axis.mEntryCount;
         Timestamp ts = new Timestamp((long) (value));
         String formattedValue = "";
-        if (DataModel.currentTableName == "AVG_HOUR") {
+        if (nb == 24) {
             SimpleDateFormat ft = new SimpleDateFormat("HH", Locale.FRANCE);
             formattedValue = " " + ft.format(ts) + "h ";
-        } else if (DataModel.currentTableName == "AVG_DAY") {
+        } else if (nb == 30) {
             SimpleDateFormat ft = new SimpleDateFormat(" dd ", Locale.FRANCE);
             formattedValue = ft.format(ts);
-        } else if (DataModel.currentTableName == "AVG_MONTH") {
+        } else if (nb == 12) {
             SimpleDateFormat ft = new SimpleDateFormat("MM", Locale.FRANCE);
             formattedValue = ft.format(ts);
         }
-        return formattedValue; // returns the corresponding time in the string format "HH:mm"
+        return formattedValue;
     }
 
 }

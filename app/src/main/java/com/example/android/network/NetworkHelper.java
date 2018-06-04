@@ -20,8 +20,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class NetworkHelper {
 
@@ -33,7 +35,7 @@ public class NetworkHelper {
                 return 24;
             case "AVG_DAY":
                 return 30;
-            case "AVG_YEAR":
+            case "AVG_MONTH":
                 return 12;
         }
         return 0;
@@ -64,10 +66,10 @@ public class NetworkHelper {
             for (int i = array.length() - 1; i >= 0; i--) {
 
                 JSONObject measure =  array.getJSONObject(i);
-                Float val = (float) measure.getDouble(data.getValue().scale);
+                Float val = (float) measure.getDouble(data.getValue().name);
                 String date = measure.getString(colDate);
 
-                // Change the date String in a float representing ms since 01/01/1970
+                // Change the date String to a float representing ms since 01/01/1970
                 Float ts_f = (float) Timestamp.valueOf(date).getTime();
 
                 vals.add(new Float[]{ts_f, val});
@@ -101,6 +103,8 @@ public class NetworkHelper {
         Log.d(DataModel.class.toString(), "fillGraph: network request");
     }
 
-
-
+    public static String dateStrFromTimeStamp(float date) {
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd hh--mm--ss", Locale.FRANCE);
+        return ft.format(new Timestamp((long) date));
+    }
 }

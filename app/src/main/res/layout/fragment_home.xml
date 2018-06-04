@@ -5,14 +5,9 @@
     tools:context="com.example.android.fragments.HomeFragment">
 
     <data>
-
         <variable
-            name="lastDataPMOri"
-            type="com.example.android.viewModels.DataPM_ori" />
-
-        <variable
-            name="lastDataHTOri"
-            type="com.example.android.viewModels.DataHT_ori" />
+            name="lastData"
+            type="com.example.android.viewModels.DataModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -169,11 +164,10 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text = "2018-05-28 13:00:00"
+                    android:text='@{lastData.getMeasurements("temperature").lastDateRcved, default="2018-05-28 13:00:00"}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ville" />
-                <!-- android:text='@{lastDataPMOri.dateMeasurement.toString(), default="2018-05-28 13:00:00"}' -->
 
 
                 <TextView
@@ -226,12 +220,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:textStyle="bold"
-                    android:text="25"
+                    android:text='@{lastData.getMeasurements("temperature").lastValRcved.toString(), default="25"}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/ica"
                     app:layout_constraintTop_toBottomOf="@+id/date" />
-                <!-- android:text='@{lastDataHTOri.temperature.toString(), default=0}' -->
 
                 <TextView
                     android:id="@+id/labeltemp"
