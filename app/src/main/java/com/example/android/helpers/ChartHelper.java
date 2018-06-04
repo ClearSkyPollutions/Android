@@ -3,7 +3,6 @@ package com.example.android.helpers;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
 
-import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -24,9 +23,9 @@ import java.util.Locale;
 
 public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedListener {
 
-    public MutableLiveData<Float> selected;
+    public MutableLiveData<Float[]> selected;
 
-    public MutableLiveData<Float> getSelected() {
+    public MutableLiveData<Float[]> getSelected() {
         if(selected == null){
             selected = new MutableLiveData<>();
         }
@@ -49,7 +48,7 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
 
         // enable scaling & dragging
         mChart.setDragEnabled(true);
-        mChart.setScaleEnabled(true);
+        mChart.setScaleEnabled(false);
 
         // enable pinch zoom to avoid scaling x and y axis separately
         mChart.setPinchZoom(false);
@@ -135,12 +134,10 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     }
 
     public void onValueSelected(Entry e, Highlight h){
-        selected.postValue(h.getY());
+        selected.postValue(new Float[] {h.getX(), h.getY()});
     }
     public void onNothingSelected(){
-
     }
-
 
     public void addEntry(LineChart mChart, Float[] entry, int lineColor, boolean draw) {
         LineData data = mChart.getData();
@@ -208,4 +205,18 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         return formattedValue;
     }
 
+     public static String getStringDate(float value, String scale) {
+        SimpleDateFormat ft;
+        switch(scale){
+            case "AVG_HOUR": ft = new SimpleDateFormat("EEE - hh'h'", Locale.FRANCE);
+                break;
+            case "AVG_DAY": ft = new SimpleDateFormat("dd/MM", Locale.FRANCE);
+                break;
+            case "AVG_MONTH": ft = new SimpleDateFormat("MMM", Locale.FRANCE);
+                break;
+            default: ft = new SimpleDateFormat("yy-MM-dd hh-mm-ss", Locale.FRANCE);
+                break;
+        }
+        return ft.format(value);
+    }
 }

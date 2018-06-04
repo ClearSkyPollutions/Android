@@ -19,6 +19,7 @@ import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.viewModels.DataModel;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.util.ArrayList;
@@ -33,10 +34,12 @@ public class HomeFragment extends Fragment {
     private LineChart mChartDialog;
     private CardView mChartViewDialog;
     private View mCoverView;
-    private TextView mSelectedView;
     private Button mButtonDay;
     private Button mButtonMonth;
     private Button mButtonYear;
+    private TextView mDataView;
+    private TextView mLabelView;
+
 
     // List of charts in the home page
     private List<LineChart> mCharts = new ArrayList<LineChart>();
@@ -65,6 +68,10 @@ public class HomeFragment extends Fragment {
             mButtonYear.setOnClickListener(v ->
                     mDataModel.loadData(dataType, "AVG_MONTH"));
 
+            chartHelper.getSelected().observe(this, selected -> {
+                mDataView.setText(selected[1].toString());
+                mLabelView.setText(ChartHelper.getStringDate(selected[0], mDataModel.getMeasurements(dataType).getValue().scale));
+            });
         };
     }
 
@@ -104,10 +111,6 @@ public class HomeFragment extends Fragment {
             ch.setOnClickListener(createPopupListener(type, chartHelper, color));
         }
 
-        // Associates a textView with the data selected in the graph
-        chartHelper.getSelected().observe(this, selected -> {
-            mSelectedView.setText(selected.toString());
-        });
 
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
@@ -140,8 +143,8 @@ public class HomeFragment extends Fragment {
 
         // Init popup
         mCoverView = rootView.findViewById(R.id.cover);
-        mSelectedView = rootView.findViewById(R.id.data);
-
+        mDataView = rootView.findViewById(R.id.data);
+        mLabelView = rootView.findViewById(R.id.labelData);
     }
 
 }

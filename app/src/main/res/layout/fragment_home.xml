@@ -54,7 +54,7 @@
                     android:layout_marginLeft="100dp"
                     android:layout_marginStart="100dp"
                     android:layout_marginTop="8dp"
-                    android:text="13µg"
+                    android:text="--"
                     app:layout_constraintEnd_toStartOf="@+id/labelData"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -68,7 +68,7 @@
                     android:layout_marginRight="100dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="8dp"
-                    android:text="Information importante"
+                    android:text='@{lastData.getMeasurements("temperature").lastDateRcved, default="2018-05-28 13:00:00"}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/data"
                     app:layout_constraintTop_toTopOf="parent" />
