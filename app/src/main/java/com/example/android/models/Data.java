@@ -1,34 +1,34 @@
 package com.example.android.models;
 
-import java.text.ParseException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+public class Data {
+    public final String name;
+    public final String unit;
+    public String scale = "AVG_HOUR";
+    public List<Float[]> values;
+    public Float lastValRcved;
+    public String lastDateRcved;
 
-public abstract class Data {
-
-    private int id;
-    private Date date;
-
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.FRANCE);
-
-    Data(int id, String date_mesure) {
-        this.id = id;
-        try {
-            setDate(date_mesure);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+    public Data(String name, String unit) {
+        this.name = name;
+        this.unit = unit;
+        this.values = new ArrayList<>();
     }
 
-    String getDate() {
-        return date.toString();
-    }
+    public Data(Data copy, List<Float[]> newValues) {
+        this.name = copy.name;
+        this.unit = copy.unit;
+        this.scale = copy.scale;
+        this.values = newValues;
+        this.lastValRcved = newValues.get(newValues.size()-1)[1];
 
-    private void setDate(String date_mesure) throws ParseException {
-        date = format.parse(date_mesure);
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd hh--mm--ss", Locale.FRANCE);
+        this.lastDateRcved = ft.format(new Timestamp(newValues.get(newValues.size()-1)[0].longValue()));
     }
 }
-
 

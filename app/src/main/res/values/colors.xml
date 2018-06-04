@@ -6,6 +6,7 @@
     <color name="primaryTextColor">#002647</color>
     <color name="primaryTextLightColor">#00434d</color>
     <color name="primaryTextDarkColor">#000f45</color>
+    <color name="white">#ffffff</color>
 
     <color name="secondaryColor">#00FF6D</color>
     <color name="secondaryLightColor">#0CE8B7</color>
@@ -14,5 +15,5 @@
     <color name="secondaryTextLightColor">#005240</color>
     <color name="secondaryTextDarkColor">#003b0d</color>
 
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff4081</color>
 </resources>
