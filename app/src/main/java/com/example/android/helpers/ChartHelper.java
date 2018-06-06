@@ -3,6 +3,7 @@ package com.example.android.helpers;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
 
+import com.example.android.models.Measure;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -139,10 +140,10 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     public void onNothingSelected(){
     }
 
-    public void addEntry(LineChart mChart, Float[] entry, int lineColor, boolean draw) {
+    public void addEntry(LineChart mChart, Measure entry, int lineColor, boolean draw) {
         LineData data = mChart.getData();
-        Float ts_f = entry[0];
-        Float dataValue = entry[1];
+        Float ts_f = entry.getDatetime();
+        Float dataValue = entry.getValue();
 
         if (data != null) {
 
@@ -152,6 +153,7 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
                 set = createSet(lineColor);
                 data.addDataSet(set);
             }
+
             if(draw){
                 set.setDrawValues(true);
             }
