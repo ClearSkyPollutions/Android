@@ -124,23 +124,24 @@ public class NetworkHelper {
         return 0;
     }
 
-    private void parseJSONResponse(JSONObject response, MutableLiveData<Graph> graph) {
+    private void parseJSONResponse(JSONObject response, MutableLiveData<Graph> liveGraph) {
+        Graph graph = liveGraph.getValue();
         try {
             List<Measure> values = new ArrayList<>();
-            JSONArray array = response.getJSONArray(graph.getValue().getScale());
+            JSONArray array = response.getJSONArray(graph.getScale());
 
             for (int i = array.length() - 1; i >= 0; i--) {
 
                 JSONObject measure =  array.getJSONObject(i);
-                Float val = (float) measure.getDouble(graph.getValue().getName());
+                Float val = (float) measure.getDouble(graph.getName());
                 String date = measure.getString(colDate);
 
                 // Change the date String to a float representing ms since 01/01/1970
                 Float ts_f = (float) Timestamp.valueOf(date).getTime();
 
-                values.add(new Measure(graph, ts_f, val));
+                values.add(new Measure(liveGraph, ts_f, val));
             }
-            graph.getValue().setMeasures(values);
+            liveGraph.postValue(new Graph(graph.getName(), graph.getUnit(), graph.getScale(), values));
         } catch (JSONException e) {
             e.printStackTrace();
         }

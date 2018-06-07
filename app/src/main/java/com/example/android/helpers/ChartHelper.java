@@ -210,13 +210,13 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
      public static String getStringDate(float value, String scale) {
         SimpleDateFormat ft;
         switch(scale){
-            case "AVG_HOUR": ft = new SimpleDateFormat("EEE - hh'h'", Locale.FRANCE);
+            case "AVG_HOUR": ft = new SimpleDateFormat("EEE hh'h'", Locale.FRANCE);
                 break;
             case "AVG_DAY": ft = new SimpleDateFormat("dd/MM", Locale.FRANCE);
                 break;
             case "AVG_MONTH": ft = new SimpleDateFormat("MMM", Locale.FRANCE);
                 break;
-            default: ft = new SimpleDateFormat("yy-MM-dd hh-mm-ss", Locale.FRANCE);
+            default: ft = new SimpleDateFormat("yy/MM/dd hh:mm:ss", Locale.FRANCE);
                 break;
         }
         return ft.format(value);

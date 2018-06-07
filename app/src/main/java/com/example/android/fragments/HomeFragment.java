@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
 import com.example.android.helpers.ChartHelper;
@@ -22,9 +21,10 @@ import com.example.android.models.Graph;
 import com.example.android.models.Measure;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class HomeFragment extends Fragment {
@@ -50,49 +50,47 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
         // Inflate using DataBinding library and set the lifeCycleOwner
         mFragmentHomeBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         mFragmentHomeBinding.setLifecycleOwner(this);
-
         // Init Charts and views
         initViews();
-
         // Create or get the ViewModel for our charts, and bind the xml variable lastData to it (DataBinding library)
         mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
-        mFragmentHomeBinding.setLastData(mDataModel.lastMeasuresReceived);
-
+        mFragmentHomeBinding.setLastData(mDataModel);
         // Associates each chart with one LiveData (pm10, pm25...) and with an onClickListener for displaying the popup view
         for (int i = 0; i < DataModel.GRAPH_NAMES.length; i++) {
             LineChart chartView = mCharts.get(i);
             int lineColor = DataModel.LINE_COLORS[i];
             MutableLiveData<Graph> liveChart = mDataModel.graphList.get(i);
-
+            liveChart.getValue().setScale(DataModel.AVG_HOUR);
             liveChart.observe(this, graph -> {
                 // The home charts should only show graph by hour
-                if (!graph.getScale().equals("AVG_HOUR"))
+                if (!graph.getScale().equals("AVG_HOUR")) {
                     return;
+                }
                 chartView.clearValues();
                 for (Measure measure : graph.getMeasures()) {
                     mChartHelper.addEntry(chartView, measure, lineColor , false);
                 }
             });
-
             // Set listener to display the popup when chart is clicked
             View.OnClickListener onClickChartListener = createPopupListener(liveChart, mChartHelper, lineColor);
             chartView.setOnClickListener(onClickChartListener);
-
             mDataModel.loadGraphData(liveChart);
-            mDataModel.loadLastData(mDataModel.lastMeasuresReceived);
+            mDataModel.lastMeasuresReceived.observe(this, measures -> {
+                mDataModel.lastTempValueReceived.postValue(measures.get(3).toString());
+                SimpleDateFormat ft = new SimpleDateFormat("EEE hh'h'", Locale.FRANCE);
+                mDataModel.lastDatetimeReceived.postValue(ft.format(measures.get(0)));
+            });
         }
-
+        mDataModel.loadLastData(mDataModel.lastMeasuresReceived);
         //Click event listener for hiding popup views
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
             mDialogView.setVisibility(View.GONE);
             mCoverView.setVisibility(View.GONE);
         });
-
 
         return mRootView;
     }
@@ -102,7 +100,6 @@ public class HomeFragment extends Fragment {
             //Popup effect
             mDialogView.setVisibility(View.VISIBLE);
             mCoverView.setVisibility(View.VISIBLE);
-
             // fill the popup dialog graph
             graph.observe(this, chart -> {
                 mChartDialog.clearValues();
@@ -110,12 +107,11 @@ public class HomeFragment extends Fragment {
                     chartHelper.addEntry(mChartDialog, measure, lineColor, true);
                 }
             });
-
             //Set buttons listeners to change the graph scale
             mButtonDay.setOnClickListener(v -> {
-                        graph.getValue().setScale(DataModel.AVG_HOUR);
-                        mDataModel.loadGraphData(graph);
-                    });
+                graph.getValue().setScale(DataModel.AVG_HOUR);
+                mDataModel.loadGraphData(graph);
+            });
             mButtonMonth.setOnClickListener(v -> {
                 graph.getValue().setScale(DataModel.AVG_DAY);
                 mDataModel.loadGraphData(graph);
@@ -124,7 +120,6 @@ public class HomeFragment extends Fragment {
                 graph.getValue().setScale(DataModel.AVG_MONTH);
                 mDataModel.loadGraphData(graph);
             });
-
             // Display value selected with the graph cursor
             chartHelper.getSelected().observe(this, selected -> {
                 mSelectedValueView.setText(selected[1].toString());
@@ -135,10 +130,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initViews() {
-
         mRootView = mFragmentHomeBinding.getRoot();
-
-
         // Init charts
         int chartTextColor = getResources().getColor(R.color.primaryTextColor);
         int chartBackgroundColor = Color.WHITE;
@@ -155,18 +147,15 @@ public class HomeFragment extends Fragment {
         }
         mChartDialog = mRootView.findViewById(R.id.lineChartDialog);
         mChartHelper.initChartDialog(mChartDialog, chartBackgroundColor, chartTextColor);
-
         //Init buttons
         mButtonDay = mRootView.findViewById(R.id.day_bt);
         mButtonMonth = mRootView.findViewById(R.id.month_bt);
         mButtonYear = mRootView.findViewById(R.id.year_bt);
-
         // Init popup
         mCoverView = mRootView.findViewById(R.id.cover);
         mSelectedValueView = mRootView.findViewById(R.id.data);
         mLabelView = mRootView.findViewById(R.id.labelData);
         mDialogView = mRootView.findViewById(R.id.viewDialog);
-
     }
 
 }

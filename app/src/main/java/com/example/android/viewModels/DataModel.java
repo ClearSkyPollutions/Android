@@ -27,13 +27,15 @@ public class DataModel extends ViewModel {
     public static final int[] LINE_COLORS = {0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081};
 
     public List<MutableLiveData<Graph>> graphList = new ArrayList<>();
-    public MutableLiveData<List<Float>> lastMeasuresReceived;
+    public MutableLiveData<List<Float>> lastMeasuresReceived = new MutableLiveData<>();
+    public MutableLiveData<String> lastTempValueReceived = new MutableLiveData<>();
+    public MutableLiveData<String> lastDatetimeReceived = new MutableLiveData<>();
 
     public DataModel() {
         mDb = Realm.getDefaultInstance();
         for (int i = 0; i< GRAPH_NAMES.length; i++) {
             MutableLiveData<Graph> graph = new MutableLiveData<>();
-            graph.setValue(new Graph(GRAPH_NAMES[i], DATA_UNITS[i], AVG_HOUR));
+            graph.setValue(new Graph(GRAPH_NAMES[i], DATA_UNITS[i], AVG_HOUR, new ArrayList<>()));
             this.graphList.add(graph);
         }
     }

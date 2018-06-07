@@ -12,16 +12,16 @@ import io.realm.annotations.Required;
  * Created by nrutemby on 06/06/2018.
  */
 
-public class Measure extends RealmObject {
+public class Measure /*extends RealmObject*/ {
 
-    @Required
-    @PrimaryKey
+    //@Required
+    //@PrimaryKey
     private UUID id;
-    @Required
+    //@Required
     private MutableLiveData<Graph> graph;
-    @Required
+    //@Required
     private Float datetime;
-    @Required
+    //@Required
     private Float value;
 
     public Measure(MutableLiveData<Graph> graph, Float datetime, Float value) {

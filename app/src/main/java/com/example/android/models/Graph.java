@@ -1,27 +1,22 @@
 package com.example.android.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.Required;
+public class Graph /*extends RealmObject*/ {
 
-public class Graph extends RealmObject {
-
-    @Required
-    @PrimaryKey
+    //@Required
+    //@PrimaryKey
     private String name;
-    @Required
+    //@Required
     private String unit;
     private String scale;
     private List<Measure> measures;
 
-    public Graph(String name, String unit, String scale) {
+    public Graph(String name, String unit, String scale, List<Measure> values) {
         this.name = name;
         this.unit = unit;
         this.scale = scale;
-        this.measures = new ArrayList<>();
+        this.measures = values;
     }
 
     public String getName() {
