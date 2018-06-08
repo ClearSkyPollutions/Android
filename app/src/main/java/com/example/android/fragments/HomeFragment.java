@@ -1,6 +1,7 @@
 package com.example.android.fragments;
 
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -8,143 +9,161 @@ import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
 import com.example.android.helpers.ChartHelper;
+import com.example.android.models.Data;
+import com.example.android.models.Graph;
 import com.example.android.viewModels.DataModel;
-import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class HomeFragment extends Fragment {
 
     private DataModel mDataModel;
+    private ChartHelper mChartHelper = new ChartHelper();
+    private FragmentHomeBinding mFragmentHomeBinding;
 
-    //XML view objects
+    //View objects
+    private View mRootView;
     private LineChart mChartDialog;
-    private CardView mChartViewDialog;
+    private CardView mDialogView;
     private View mCoverView;
     private Button mButtonDay;
     private Button mButtonMonth;
     private Button mButtonYear;
-    private TextView mDataView;
+    private TextView mSelectedValueView;
     private TextView mLabelView;
 
-
-    // List of charts in the home page
+    // List of charts in the home fragment
     private List<LineChart> mCharts = new ArrayList<LineChart>();
-
-    public View.OnClickListener createPopupListener(String dataType, ChartHelper chartHelper,
-                                                    int lineColor) {
-        // Creates and return the functions called when a chart is clicked on
-        return view -> {
-            //Popup effect
-            mChartViewDialog.setVisibility(View.VISIBLE);
-            mCoverView.setVisibility(View.VISIBLE);
-
-            // Get the correct LiveData(pm10, pm25...) and bind the graph to it
-            mDataModel.getMeasurements(dataType).observe(this, entries -> {
-                mChartDialog.clearValues();
-                for (Float[] pmEntry : entries.values) {
-                    chartHelper.addEntry(mChartDialog, pmEntry, lineColor, true);
-                }
-            });
-
-            //Change the buttons event according to dataType
-            mButtonDay.setOnClickListener(v ->
-                    mDataModel.loadData(dataType, "AVG_HOUR"));
-            mButtonMonth.setOnClickListener(v ->
-                    mDataModel.loadData(dataType, "AVG_DAY"));
-            mButtonYear.setOnClickListener(v ->
-                    mDataModel.loadData(dataType, "AVG_MONTH"));
-
-            chartHelper.getSelected().observe(this, selected -> {
-                mDataView.setText(selected[1].toString());
-                mLabelView.setText(ChartHelper.getStringDate(selected[0], mDataModel.getMeasurements(dataType).getValue().scale));
-            });
-        };
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
-        // Inflate using DataBinding library
-        FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
-        binding.setLifecycleOwner(this);
-        View rootView = binding.getRoot();
-
-        // Create or get the ViewModel for our date, and bind the xml variable lastData to it (Databinding library)
-        mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
-        binding.setLastData(mDataModel);
-
+        // Inflate using DataBinding library and set the lifeCycleOwner
+        mFragmentHomeBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
+        mFragmentHomeBinding.setLifecycleOwner(this);
         // Init Charts and views
-        ChartHelper chartHelper = new ChartHelper();
-        initViews(rootView, chartHelper);
-
-        // Associates each chart with one LiveData (pm10, pm25...)
-        for (int i = 0; i < DataModel.DATA_TYPES.length; i++) {
-            String type = DataModel.DATA_TYPES[i];
-            int color = DataModel.LINE_COLORS[i];
-            LineChart ch = mCharts.get(i);
-
-            mDataModel.getMeasurements(type).observe(this, data -> {
-                // The home charts should only show data by hour
-                if (!data.scale.equals("AVG_HOUR"))
+        initViews();
+        // Create or get the ViewModel for our charts, and bind the xml variable lastData to it (DataBinding library)
+        mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
+        mFragmentHomeBinding.setLastData(mDataModel);
+        // Bind each UI chart with one MutableLiveData<Graph> (pm10, pm25...) and set an onClickListener for displaying the chart in a popup view
+        for (int i = 0; i < DataModel.GRAPH_NAMES.length; i++) {
+            LineChart chartView = mCharts.get(i);
+            int lineColor = DataModel.LINE_COLORS[i];
+            MutableLiveData<Graph> liveChart = mDataModel.graphList.get(i);
+            liveChart.getValue().setScale(DataModel.AVG_HOUR);
+            liveChart.observe(this, graph -> {
+                // The home charts should only show graph by hour
+                if (!graph.getScale().equals("AVG_HOUR")) {
                     return;
-                ch.clearValues();
-                for (Float[] pmEntry : data.values) {
-                    chartHelper.addEntry(ch, pmEntry, color, false);
+                }
+                chartView.clearValues();
+                for (Data data : graph.getData()) {
+                    mChartHelper.addEntry(chartView, data, lineColor , false);
                 }
             });
-            mDataModel.loadData(type, "AVG_HOUR");
-            ch.setOnClickListener(createPopupListener(type, chartHelper, color));
+            // Set listener to display the popup when chart is clicked
+            View.OnClickListener onClickListener = createPopupListener(liveChart, mChartHelper, lineColor);
+            chartView.setOnClickListener(onClickListener);
+
+            mDataModel.loadGraphData(liveChart);
         }
 
+        // Bind the UI to the model to display last hour's data
+        mDataModel.lastDataReceived.observe(this, measures -> {
+            mDataModel.lastTempValueReceived.postValue(measures.get(3).toString());
+            SimpleDateFormat ft = new SimpleDateFormat("EEE hh'h'", Locale.FRANCE);
+            mDataModel.lastDatetimeReceived.postValue(ft.format(measures.get(0)));
+        });
+        mDataModel.loadLastData();
 
+        //Click event listener for hiding popup views
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
-            mChartViewDialog.setVisibility(View.GONE);
+            mDialogView.setVisibility(View.GONE);
             mCoverView.setVisibility(View.GONE);
         });
 
-        return rootView;
+        return mRootView;
     }
 
-    private void initViews(View rootView, ChartHelper chartHelper) {
+    private View.OnClickListener createPopupListener(MutableLiveData<Graph> graph, ChartHelper chartHelper, int lineColor) {
+        return view -> {
+            // Bind the popup dialog graph to the data from the clicked chart
+            graph.observe(this, chart -> {
+                mChartDialog.clearValues();
+                for (Data data : chart.getData()) {
+                    chartHelper.addEntry(mChartDialog, data, lineColor, true);
+                }
+            });
+            //Set buttons listeners to change the graph scale
+            mButtonDay.setOnClickListener(v -> {
+                graph.getValue().setScale(DataModel.AVG_HOUR);
+                mDataModel.loadGraphData(graph);
+            });
+            mButtonMonth.setOnClickListener(v -> {
+                graph.getValue().setScale(DataModel.AVG_DAY);
+                mDataModel.loadGraphData(graph);
+            });
+            mButtonYear.setOnClickListener(v -> {
+                graph.getValue().setScale(DataModel.AVG_MONTH);
+                mDataModel.loadGraphData(graph);
+            });
+            // Display value selected with the graph cursor
+            chartHelper.getSelected().observe(this, selected -> {
+                if (selected.length == 0) {
+                    mSelectedValueView.setText("");
+                    mLabelView.setText("");
+                } else {
+                    mSelectedValueView.setText(selected[1].toString());
+                    mLabelView.setText(ChartHelper.getStringDate(selected[0], graph.getValue().getScale()));
+                }
+            });
+            //Popup effect
+            mDialogView.setVisibility(View.VISIBLE);
+            mCoverView.setVisibility(View.VISIBLE);
+        };
+    }
 
-        int textColor = getResources().getColor(R.color.primaryTextColor);
-        int backgroundColor = Color.WHITE;
-
+    private void initViews() {
+        mRootView = mFragmentHomeBinding.getRoot();
         // Init charts
-        for (String i : DataModel.DATA_TYPES) {
-            String idChart = "lineChart" + i;
-            mCharts.add(rootView.findViewById(getResources().getIdentifier(idChart, "id", getContext().getPackageName())));
-            chartHelper.initChart(mCharts.get(mCharts.size() - 1), backgroundColor, textColor);
+        int chartTextColor = getResources().getColor(R.color.primaryTextColor);
+        int chartBackgroundColor = Color.WHITE;
+        for (String name : DataModel.GRAPH_NAMES) {
+            LineChart chart = mRootView.findViewById(
+                    getResources()
+                    .getIdentifier(
+                            "lineChart" + name,
+                            "id",
+                            getContext().getPackageName()
+                    ));
+            mChartHelper.initChart(chart, chartBackgroundColor, chartTextColor);
+            mCharts.add(chart);
         }
-        mChartDialog = rootView.findViewById(R.id.lineChartDialog);
-        chartHelper.initChartDialog(mChartDialog, backgroundColor, textColor);
-        mChartViewDialog = rootView.findViewById(R.id.graphDialog);
-
+        mChartDialog = mRootView.findViewById(R.id.lineChartDialog);
+        mChartHelper.initChartDialog(mChartDialog, chartBackgroundColor, chartTextColor);
         //Init buttons
-        mButtonDay = rootView.findViewById(R.id.day_bt);
-        mButtonMonth = rootView.findViewById(R.id.month_bt);
-        mButtonYear = rootView.findViewById(R.id.year_bt);
-
-        // Init popup
-        mCoverView = rootView.findViewById(R.id.cover);
-        mDataView = rootView.findViewById(R.id.data);
-        mLabelView = rootView.findViewById(R.id.labelData);
+        mButtonDay = mRootView.findViewById(R.id.day_bt);
+        mButtonMonth = mRootView.findViewById(R.id.month_bt);
+        mButtonYear = mRootView.findViewById(R.id.year_bt);
+        // Init popup views
+        mCoverView = mRootView.findViewById(R.id.cover);
+        mSelectedValueView = mRootView.findViewById(R.id.data);
+        mLabelView = mRootView.findViewById(R.id.labelData);
+        mDialogView = mRootView.findViewById(R.id.viewDialog);
     }
 
 }

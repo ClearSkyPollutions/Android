@@ -3,6 +3,7 @@ package com.example.android.helpers;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
 
+import com.example.android.models.Data;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -25,54 +26,7 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
 
     public MutableLiveData<Float[]> selected;
 
-    public MutableLiveData<Float[]> getSelected() {
-        if(selected == null){
-            selected = new MutableLiveData<>();
-        }
-        return selected;
-    }
 
-    private void initStandard(LineChart mChart, int BackgroundColor, int TextColor){
-
-        Description des = new Description();
-        des.setText("");
-        mChart.setDescription(des);
-
-        // enable value highlighting
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mChart.setDefaultFocusHighlightEnabled(true);
-        }
-
-        // enable touch gestures
-        mChart.setTouchEnabled(true);
-
-        // enable scaling & dragging
-        mChart.setDragEnabled(true);
-        mChart.setScaleEnabled(false);
-
-        // enable pinch zoom to avoid scaling x and y axis separately
-        mChart.setPinchZoom(false);
-
-        // alternative background color
-        mChart.setBackgroundColor(BackgroundColor);
-
-        // DATA
-        LineData data = new LineData();
-        data.setValueTextColor(TextColor);
-        // add data to line chart
-        mChart.setData(data);
-
-        // get legend object
-        Legend l = mChart.getLegend();
-        l.setEnabled(false);
-
-        /*
-        // customize legend
-        l.setForm(Legend.LegendForm.LINE);
-        l.setTextColor(TextColor);
-        */
-
-    }
     public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
 
         initStandard(mChart, BackgroundColor, TextColor);
@@ -133,16 +87,69 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         mChart.setOnChartValueSelectedListener(this);
     }
 
+    private void initStandard(LineChart mChart, int BackgroundColor, int TextColor){
+
+        Description des = new Description();
+        des.setText("");
+        mChart.setDescription(des);
+
+        // enable value highlighting
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mChart.setDefaultFocusHighlightEnabled(true);
+        }
+
+        // enable touch gestures
+        mChart.setTouchEnabled(true);
+
+        // enable scaling & dragging
+        mChart.setDragEnabled(true);
+        mChart.setScaleEnabled(false);
+
+        // enable pinch zoom to avoid scaling x and y axis separately
+        mChart.setPinchZoom(false);
+
+        // alternative background color
+        mChart.setBackgroundColor(BackgroundColor);
+
+        // DATA
+        LineData data = new LineData();
+        data.setValueTextColor(TextColor);
+        // add data to line chart
+        mChart.setData(data);
+
+        // get legend object
+        Legend l = mChart.getLegend();
+        l.setEnabled(false);
+
+        /*
+        // customize legend
+        l.setForm(Legend.LegendForm.LINE);
+        l.setTextColor(TextColor);
+        */
+
+    }
+
+    @Override
     public void onValueSelected(Entry e, Highlight h){
         selected.postValue(new Float[] {h.getX(), h.getY()});
     }
-    public void onNothingSelected(){
+
+    @Override
+    public void onNothingSelected() {
+        selected.postValue(new Float[] {});
     }
 
-    public void addEntry(LineChart mChart, Float[] entry, int lineColor, boolean draw) {
+    public MutableLiveData<Float[]> getSelected() {
+        if(selected == null){
+            selected = new MutableLiveData<>();
+        }
+        return selected;
+    }
+
+    public void addEntry(LineChart mChart, Data entry, int lineColor, boolean draw) {
         LineData data = mChart.getData();
-        Float ts_f = entry[0];
-        Float dataValue = entry[1];
+        Float ts_f = entry.getTimestamp();
+        Float dataValue = entry.getValue();
 
         if (data != null) {
 
@@ -152,6 +159,7 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
                 set = createSet(lineColor);
                 data.addDataSet(set);
             }
+
             if(draw){
                 set.setDrawValues(true);
             }
@@ -205,18 +213,18 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         return formattedValue;
     }
 
-     public static String getStringDate(float value, String scale) {
+    public static String getStringDate(float value, String scale) {
         SimpleDateFormat ft;
         switch(scale){
-            case "AVG_HOUR": ft = new SimpleDateFormat("EEE - hh'h'", Locale.FRANCE);
+            case "AVG_HOUR": ft = new SimpleDateFormat("EEE hh'h'", Locale.FRANCE);
                 break;
             case "AVG_DAY": ft = new SimpleDateFormat("dd/MM", Locale.FRANCE);
                 break;
             case "AVG_MONTH": ft = new SimpleDateFormat("MMM", Locale.FRANCE);
                 break;
-            default: ft = new SimpleDateFormat("yy-MM-dd hh-mm-ss", Locale.FRANCE);
+            default: ft = new SimpleDateFormat("yy/MM/dd hh:mm:ss", Locale.FRANCE);
                 break;
         }
-        return ft.format(value);
+        return ft.format(new Timestamp((long) value));
     }
 }

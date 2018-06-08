@@ -1,34 +1,62 @@
 package com.example.android.models;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
-public class Data {
-    public final String name;
-    public final String unit;
-    public String scale = "AVG_HOUR";
-    public List<Float[]> values;
-    public Float lastValRcved;
-    public String lastDateRcved;
+/**
+ * Created by nrutemby on 06/06/2018.
+ */
 
-    public Data(String name, String unit) {
-        this.name = name;
-        this.unit = unit;
-        this.values = new ArrayList<>();
+public class Data extends RealmObject {
+
+    @Required
+    @PrimaryKey
+    private String datetime;
+    @Required
+    private Float timestamp;
+    @Required
+    private Float value;
+    private DataType dataType;
+    private Scale scale;
+
+    public String getDatetime() {
+        return datetime;
     }
 
-    public Data(Data copy, List<Float[]> newValues) {
-        this.name = copy.name;
-        this.unit = copy.unit;
-        this.scale = copy.scale;
-        this.values = newValues;
-        this.lastValRcved = newValues.get(newValues.size()-1)[1];
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
+    }
 
-        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd hh--mm--ss", Locale.FRANCE);
-        this.lastDateRcved = ft.format(new Timestamp(newValues.get(newValues.size()-1)[0].longValue()));
+    public Float getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Float timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Float getValue() {
+        return value;
+    }
+
+    public void setValue(Float value) {
+        this.value = value;
+    }
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    public Scale getScale() {
+        return scale;
+    }
+
+    public void setScale(Scale scale) {
+        this.scale = scale;
     }
 }
-
