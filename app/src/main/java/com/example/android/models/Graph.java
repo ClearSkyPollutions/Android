@@ -2,21 +2,23 @@ package com.example.android.models;
 
 import java.util.List;
 
-public class Graph /*extends RealmObject*/ {
-
-    //@Required
-    //@PrimaryKey
+public class Graph {
     private String name;
-    //@Required
     private String unit;
     private String scale;
-    private List<Measure> measures;
+    private List<Data> data;
 
-    public Graph(String name, String unit, String scale, List<Measure> values) {
+    public Graph(String name, String unit, String scale) {
         this.name = name;
         this.unit = unit;
         this.scale = scale;
-        this.measures = values;
+    }
+
+    public Graph(Graph copy, List<Data> values) {
+        this.data = values;
+        this.name = copy.name;
+        this.unit = copy.unit;
+        this.scale = copy.scale;
     }
 
     public String getName() {
@@ -43,12 +45,12 @@ public class Graph /*extends RealmObject*/ {
         this.scale = scale;
     }
 
-    public List<Measure> getMeasures() {
-        return measures;
+    public List<Data> getData() {
+        return data;
     }
 
-    public void setMeasures(List<Measure> measures) {
-        this.measures = measures;
+    public void setData(List<Data> data) {
+        this.data = data;
     }
 }
 

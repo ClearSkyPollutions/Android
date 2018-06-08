@@ -1,9 +1,5 @@
 package com.example.android.models;
 
-import android.arch.lifecycle.MutableLiveData;
-
-import java.util.UUID;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -12,39 +8,32 @@ import io.realm.annotations.Required;
  * Created by nrutemby on 06/06/2018.
  */
 
-public class Measure /*extends RealmObject*/ {
+public class Data extends RealmObject {
 
-    //@Required
-    //@PrimaryKey
-    private UUID id;
-    //@Required
-    private MutableLiveData<Graph> graph;
-    //@Required
-    private Float datetime;
-    //@Required
+    @Required
+    @PrimaryKey
+    private String datetime;
+    @Required
+    private Float timestamp;
+    @Required
     private Float value;
+    private DataType dataType;
+    private Scale scale;
 
-    public Measure(MutableLiveData<Graph> graph, Float datetime, Float value) {
-        this.id = UUID.randomUUID();
-        this.graph = graph;
-        this.datetime = datetime;
-        this.value = value;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Float getDatetime() {
+    public String getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(Float datetime) {
+    public void setDatetime(String datetime) {
         this.datetime = datetime;
+    }
+
+    public Float getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Float timestamp) {
+        this.timestamp = timestamp;
     }
 
     public Float getValue() {
@@ -55,11 +44,19 @@ public class Measure /*extends RealmObject*/ {
         this.value = value;
     }
 
-    public MutableLiveData<Graph> getGraph() {
-        return graph;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setGraph(MutableLiveData<Graph> graph) {
-        this.graph = graph;
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    public Scale getScale() {
+        return scale;
+    }
+
+    public void setScale(Scale scale) {
+        this.scale = scale;
     }
 }
