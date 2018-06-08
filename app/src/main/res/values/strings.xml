@@ -10,6 +10,24 @@
     <string name="title_home">Home</string>
     <string name="title_map">Map</string>
     <string name="title_pollutants">Pollutants</string>
+    <string name="frag_cardNames">Sensors Settings</string>
+    <string name="frequency">Frequency</string>
+    <string name="unitfrequency">measurement/min</string>
+    <string name="wifisettings">Wifi Settings</string>
+    <string name="ssid">SSID</string>
+    <string name="security">Security</string>
+    <string name="password">Password</string>
+    <string name="sensorchoice">Sensor choice</string>
+    <string name="othersensors">Other Sensors</string>
+    <string name="writeNewSensors">Add Sensor</string>
+    <string name="add">ADD</string>
+    <string name="validate">Validate</string>
+    <string name="networkSecurity_prompt">Choose a Network Security</string>
+    <string-array name="networkSecurity">
+        <item>WEP</item>
+        <item>WAP</item>
+        <item>WAP2</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -25,12 +25,15 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     selectedFragment = new HomeFragment();
+                    setTitle(R.string.title_home);
                     break;
                 case R.id.navigation_map:
                     selectedFragment = new MapFragment();
+                    setTitle(R.string.title_map);
                     break;
                 case R.id.navigation_pollutants:
                     selectedFragment = new ListPollutantsFragment();
+                    setTitle(R.string.title_pollutants);
                     break;
             }
             loadFragment(selectedFragment);

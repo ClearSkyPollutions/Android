@@ -1,5 +1,6 @@
 package com.example.android.network;
 
+import android.app.Fragment;
 import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
@@ -41,44 +42,32 @@ public class NetworkHelper {
         return 0;
     }
 
-    private URL buildUrl(String type, String scale, int nb) {
-        String query = "order=date,desc&page=1," + nb + "&columns=date," + type + "&transform=1";
+    //TODO add ID and PORT in createURL
+    private URL createURL(String ipaddr, int port, String scale, String query){
         URI uri;
         URL url = null;
-
         try {
-            uri = new URI("http", null, BuildConfig.IPADDR, BuildConfig.PortHTTP,
+            uri = new URI("http", null, ipaddr, port,
                     "/"+scale, query, null);
             url = uri.toURL();
         } catch (URISyntaxException | MalformedURLException e) {
             System.out.println("Wrong URL");
             e.printStackTrace();
         }
+        return url;
+    }
+    private URL buildUrl(String type, String scale,  int nb) {
+        String query = "order=date,desc&page=1," + nb + "&columns=date," + type + "&transform=1";
+
+        URL url;
+
+        url = createURL(BuildConfig.IPADDR,BuildConfig.PortHTTP,scale,query);
+
         Log.d(DataModel.class.toString(), url.toString());
         return url;
     }
 
-    private void parseJSONResponse(JSONObject response, MutableLiveData<Data> data) {
-        try {
-            List<Float[]> vals = new ArrayList<>();
-            JSONArray array = response.getJSONArray(data.getValue().scale);
 
-            for (int i = array.length() - 1; i >= 0; i--) {
-
-                JSONObject measure =  array.getJSONObject(i);
-                Float val = (float) measure.getDouble(data.getValue().name);
-                String date = measure.getString(colDate);
-
-                // Change the date String to a float representing ms since 01/01/1970
-                Float ts_f = (float) Timestamp.valueOf(date).getTime();
-
-                vals.add(new Float[]{ts_f, val});
-            }
-            data.postValue(new Data(data.getValue(), vals));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void downloadData(MutableLiveData<Data> data){
         String type = data.getValue().name;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#0081E8</color>
-    <color name="primaryLightColor">#00E1FF</color>
+    <color name="primaryColor">#0081e8</color>
+    <color name="primaryLightColor">#00e1ff</color>
     <color name="primaryDarkColor">#0D45FF</color>
     <color name="primaryTextColor">#002647</color>
     <color name="primaryTextLightColor">#00434d</color>
@@ -9,11 +9,11 @@
     <color name="white">#ffffff</color>
 
     <color name="secondaryColor">#00FF6D</color>
-    <color name="secondaryLightColor">#0CE8B7</color>
+    <color name="secondaryLightColor">#0ce8b7</color>
     <color name="secondaryDarkColor">#00ca3c</color>
     <color name="secondaryTextColor">#004f1f</color>
     <color name="secondaryTextLightColor">#005240</color>
     <color name="secondaryTextDarkColor">#003b0d</color>
 
-    <color name="colorAccent">#ff4081</color>
+    <color name="colorAccent">#0d45ff</color>
 </resources>
