@@ -1,13 +1,10 @@
 package com.example.android.viewModels;
-
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-
 import com.example.android.models.DataType;
 import com.example.android.models.Graph;
 import com.example.android.models.Scale;
 import com.example.android.network.NetworkHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +15,6 @@ public class DataModel extends ViewModel {
 
     private Realm realm;
     private NetworkHelper network = new NetworkHelper();
-
 
     public static final String[] GRAPH_NAMES = {"pm10", "pm25", "temperature", "humidity"};
     public static final String[] DATA_UNITS = {"µg/m^3", "µg/m^3", "°C", "%"};
@@ -49,21 +45,41 @@ public class DataModel extends ViewModel {
             this.graphList.add(graph);
         }
         //Store scale object in database
+        String query = "";
         realm.executeTransactionAsync(realm -> {
             Scale scale = new Scale();
             scale.setName(AVG_HOUR);
             realm.copyToRealmOrUpdate(scale);
         });
+        query = "order=date,desc&page=1,"+getNbOfData(AVG_HOUR)+"&transform=1";
+        network.sendRequest("/"+AVG_HOUR, query, NetworkHelper.GET, NetworkHelper.STORE_GRAPH_DATA);
         realm.executeTransactionAsync(realm -> {
             Scale scale = new Scale();
             scale.setName(AVG_DAY);
             realm.copyToRealmOrUpdate(scale);
         });
+        query = "order=date,desc&page=1,"+getNbOfData(AVG_DAY)+"&transform=1";
+        network.sendRequest("/"+AVG_DAY, query, NetworkHelper.GET, NetworkHelper.STORE_GRAPH_DATA);
         realm.executeTransactionAsync(realm -> {
             Scale scale = new Scale();
             scale.setName(AVG_MONTH);
             realm.copyToRealmOrUpdate(scale);
         });
+        query = "order=date,desc&page=1,"+getNbOfData(AVG_MONTH)+"&transform=1";
+        network.sendRequest("/"+AVG_MONTH, query, NetworkHelper.GET, NetworkHelper.STORE_GRAPH_DATA);
+
+    }
+
+    private int getNbOfData(String scale){
+        switch(scale){
+            case "AVG_HOUR":
+                return 24;
+            case "AVG_DAY":
+                return 30;
+            case "AVG_MONTH":
+                return 12;
+        }
+        return 0;
     }
 
     public void loadGraphData(MutableLiveData<Graph> graph) {
