@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="Settings"
+            name="settings"
             type="com.example.android.viewModels.SettingsModel" />
     </data>
 
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="16dp"
-            android:background="@android:color/background_dark"
+            android:background="@android:color/darker_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +75,7 @@
             android:max="30"
             android:paddingBottom="12dp"
             android:paddingTop="12dp"
-            android:progress="15"
+            android:progress='@{settings.setting.Frequency}'
             android:progressTint="@color/primaryLightColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="8dp"
-            android:background="@android:color/background_dark"
+            android:background="@android:color/darker_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/seekBar" />
@@ -109,7 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="8dp"
-            android:background="@android:color/background_dark"
+            android:background="@android:color/darker_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/wifisettings" />
@@ -133,6 +133,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginTop="4dp"
             android:inputType="textPersonName"
+            android:text='@{settings.setting.Ssid}'
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trait3" />
@@ -142,7 +143,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="4dp"
-            android:background="@android:color/background_dark"
+            android:background="@android:color/darker_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/writeSSID"/>
@@ -161,7 +162,7 @@
 
         <Spinner
             android:id="@+id/listSecurityNetwork"
-            android:layout_width="100dp"
+            android:layout_width="150dp"
             android:layout_height="35dp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="4dp"
@@ -175,7 +176,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="4dp"
-            android:background="@android:color/background_dark"
+            android:background="@android:color/darker_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/listSecurityNetwork"/>
@@ -202,6 +203,7 @@
             android:inputType="textPassword"
             android:selectAllOnFocus="false"
             android:singleLine="false"
+            android:text='@{settings.setting.Password}'
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trait5" />
@@ -212,7 +214,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="4dp"
-            android:background="@android:color/background_dark"
+            android:background="@android:color/darker_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/writePassword" />
@@ -220,12 +222,12 @@
         <Button
             android:id="@+id/validate"
             style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
+            android:layout_width="150dp"
+            android:layout_height="55dp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/validate"
-            android:textColor="@color/primaryLightColor"
+            android:textColor="@android:color/white"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trait6" />

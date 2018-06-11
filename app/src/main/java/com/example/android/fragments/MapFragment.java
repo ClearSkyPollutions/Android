@@ -1,7 +1,8 @@
 package com.example.android.fragments;
 
-import android.arch.lifecycle.MutableLiveData;
+import android.app.DownloadManager;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,15 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.android.volley.Request;
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentMapBinding;
-import com.example.android.adapters.SensorsItemAdapter;
-import com.example.android.models.Data;
 import com.example.android.models.Settings;
 import com.example.android.viewModels.SettingsModel;
 
@@ -27,8 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -53,23 +52,11 @@ public class MapFragment extends Fragment {
 
         // Create or get the ViewModel for our date, and bind the xml variable lastData to it (Databinding library)
         mSettingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
-        mSettingsModel.loadData();
+        mSettingsModel.communication("config.json", Request.Method.GET,null);
+        binding.setSettings(mSettingsModel);
 
-        // Init SeekBar
-        mSeekBar = rootView.findViewById(R.id.seekBar);
-
-        // Init Text
-        mFrequency = rootView.findViewById(R.id.labelFrequency);
-
-        // Init EditText
-        mSSID = rootView.findViewById(R.id.writeSSID);
-        mPassword = rootView.findViewById(R.id.writePassword);
-
-        // Init Button
-        mValidate = rootView.findViewById(R.id.validate);
-
-        // Init Spinner
-        mlistSecurityNet = rootView.findViewById(R.id.listSecurityNetwork);
+        // Init views
+        initViews(rootView);
 
         //SeekBar
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -92,7 +79,6 @@ public class MapFragment extends Fragment {
 
         });
 
-        //
         mSSID.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -113,43 +99,65 @@ public class MapFragment extends Fragment {
             }
         });
 
-
         mValidate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Settings settings = mSettingsModel.getSetting().getValue();
 
                 settings.Ssid = mSSID.getText().toString();
-                settings.SecutityType = mlistSecurityNet.getSelectedItem().toString();
+                settings.SecurityType = mlistSecurityNet.getSelectedItem().toString();
                 settings.Password = mPassword.getText().toString();
+                settings.Sensors.add("SDS011");
+                settings.Sensors.add("DHT22");
+                settings.Sensors.add("MQ2");
 
+                JSONArray sensorsJson = new JSONArray(settings.Sensors);
+
+                JSONObject jsonSend = new JSONObject();
+                try {
+                    jsonSend.put("Sensors", sensorsJson);
+                    jsonSend.put("Frequency", settings.Frequency);
+                    jsonSend.put("SSID", settings.Ssid);
+                    jsonSend.put("SecutityType", settings.SecurityType);
+                    jsonSend.put("Password", settings.Password);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("debug",jsonSend.toString());
+                mSettingsModel.communication("config.php",Request.Method.PUT,jsonSend);
 
             }
         });
 
+        //Spinner for change position of list
+        List<String> mSecurityList = null;
+        if (mSecurityList == null) {
+            mSecurityList = Arrays.asList(getResources().getStringArray(R.array.networkSecurity));
+        }
+        int position = mSecurityList.indexOf(mSettingsModel.getSetting().getValue().SecurityType);
+        mlistSecurityNet.setSelection(position);
+
         return rootView;
     }
 
-    private void parseJSONResponse(JSONObject response, MutableLiveData<Settings> settings) {
-        try {
-            List<Float[]> vals = new ArrayList<>();
-            JSONArray array = response.getJSONArray(data.getValue().scale);
+    private void initViews(View rootView) {
+        // Init SeekBar
+        mSeekBar = rootView.findViewById(R.id.seekBar);
 
-            for (int i = array.length() - 1; i >= 0; i--) {
+        // Init Text
+        mFrequency = rootView.findViewById(R.id.labelFrequency);
 
-                JSONObject measure =  array.getJSONObject(i);
-                Float val = (float) measure.getDouble(data.getValue().name);
-                String date = measure.getString(colDate);
+        // Init EditText
+        mSSID = rootView.findViewById(R.id.writeSSID);
+        mPassword = rootView.findViewById(R.id.writePassword);
 
-                // Change the date String to a float representing ms since 01/01/1970
-                Float ts_f = (float) Timestamp.valueOf(date).getTime();
+        // Init Button
+        mValidate = rootView.findViewById(R.id.validate);
 
-                vals.add(new Float[]{ts_f, val});
-            }
-            data.postValue(new Data(data.getValue(), vals));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        // Init Spinner
+        mlistSecurityNet = rootView.findViewById(R.id.listSecurityNetwork);
     }
 
 }
+

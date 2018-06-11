@@ -4,11 +4,19 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.android.activities.R;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class SettingsModel extends ViewModel {
@@ -18,23 +26,67 @@ public class SettingsModel extends ViewModel {
     private NetworkHelper network = new NetworkHelper();
 
     public MutableLiveData<Settings> getSetting() {
-        if (setting == null){
+        if (setting == null) {
             setting = new MutableLiveData<>();
         }
         return setting;
     }
 
-    public void loadData() {
+    public void communication(String path, int method, JSONObject jsonObject) {
         MutableLiveData<Settings> settings = getSetting();
-        //TODO
-        ArrayList<String> tab = new ArrayList<>();
-        tab.add("SDS");
-        tab.add("DHT");
-        settings.postValue(new Settings(tab,15,"MSF_AP","WEP","efe548r"));
-        if (settings.getValue() == null){
+
+        URL requestURL = network.buildUrl(path, "");
+        Log.d("URL",requestURL.toString());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                method,
+                requestURL.toString(),
+                jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) { parseJSONResponse(response, settings);}
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError e) { e.printStackTrace(); }
+                }
+        );
+
+        network.sendRequest(jsonObjectRequest);
+
+        if (settings.getValue() == null) {
             Log.d("Download Data", "Wrong data type : ");
-            return;
+
+            ArrayList<String> tab = new ArrayList<>();
+            tab.add("SDS");
+            tab.add("DHT");
+            settings.postValue(new Settings(tab, 15, "MSF_AP", "WEP", "efe548r"));
+
         }
+
         //network.downloadData(settings);
+    }
+
+    private void parseJSONResponse(JSONObject response, MutableLiveData<Settings> setting) {
+        try {
+
+            ArrayList<String> sensors = new ArrayList<>();
+
+            JSONArray arraySensors = response.getJSONArray("Sensors");
+
+            for (int i = 0; i >= arraySensors.length() - 1; i++) {
+                sensors.add(arraySensors.getJSONObject(i).toString());
+            }
+
+            int frequency = response.getInt("Frequency");
+            String ssid = response.getString("SSID");
+            String securitytype = response.getString("SecurityType");
+            String password = response.getString("Password");
+
+            Settings newsettings = new Settings(sensors,frequency,ssid,securitytype,password);
+            setting.postValue(newsettings);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

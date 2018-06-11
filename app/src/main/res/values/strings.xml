@@ -25,10 +25,16 @@
     <string name="networkSecurity_prompt">Choose a Network Security</string>
     <string-array name="networkSecurity">
         <item>WEP</item>
-        <item>WAP</item>
-        <item>WAP2</item>
+        <item>WPA_PSK</item>
+        <item>WPA2</item>
+        <item>WPA Enterprise</item>
+        <item>WPA2 Enterprise</item>
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="temperature">Temperature</string>
+    <string name="humidity">Humidity</string>
+    <string name="pm25">PM 2.5</string>
+    <string name="pm10">PM 10</string>
 </resources>

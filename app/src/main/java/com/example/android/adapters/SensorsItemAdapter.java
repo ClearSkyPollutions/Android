@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.example.android.activities.R;
 
 import com.example.android.activities.R;
 import com.example.android.models.Pollutant;
+import com.github.mikephil.charting.charts.LineChart;
 
 import java.util.ArrayList;
 
@@ -28,9 +30,11 @@ public class SensorsItemAdapter extends ArrayAdapter<String> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.activity_sensors_item_adapter, parent, false);
         }
 
-        TextView sensors_name = convertView.findViewById(R.id.switchSensorsView);
+        TextView graphtitle = convertView.findViewById(R.id.graphtitle);
+        LineChart lineChart = convertView.findViewById(R.id.lineChart);
 
-        sensors_name.setText(sensors);
+        graphtitle.setText(sensors);
+
 
         return convertView;
     }

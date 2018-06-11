@@ -22,8 +22,8 @@ android {
     buildTypes {
         debug {
             buildConfigField 'String', 'IPADDR', '"192.168.2.118"'
-            buildConfigField 'int', 'PortHTTP', '7000'
-            buildConfigField 'int', 'PortDB', '7001'
+            buildConfigField 'int', 'PortHTTP', '9000'
+            buildConfigField 'int', 'PortDB', '9001'
         }
         release {
             minifyEnabled false
