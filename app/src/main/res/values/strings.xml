@@ -25,7 +25,7 @@
     <string name="networkSecurity_prompt">Choose a Network Security</string>
     <string-array name="networkSecurity">
         <item>WEP</item>
-        <item>WPA_PSK</item>
+        <item>WPA-PSK</item>
         <item>WPA2</item>
         <item>WPA Enterprise</item>
         <item>WPA2 Enterprise</item>

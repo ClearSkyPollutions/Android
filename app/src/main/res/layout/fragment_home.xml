@@ -5,7 +5,6 @@
     tools:context="com.example.android.fragments.HomeFragment">
 
     <data>
-
         <variable
             name="lastData"
             type="com.example.android.viewModels.DataModel" />
@@ -22,15 +21,13 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="@dimen/margins_graph"
-            android:layout_marginEnd="24dp"
-            android:layout_marginStart="24dp"
             android:layout_marginTop="110dp"
             android:visibility="gone"
             app:cardCornerRadius="12dp"
             app:cardElevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/graph2"
+            app:layout_constraintStart_toStartOf="@+id/graph1"
             app:layout_constraintTop_toTopOf="@+id/Card">
 
             <android.support.constraint.ConstraintLayout
@@ -222,8 +219,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text='@{lastData.getMeasurements("temperature").lastValRcved.toString(), default="25"}'
                     android:textStyle="bold"
+                    android:text='@{lastData.getMeasurements("temperature").lastValRcved.toString(), default="25"}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/ica"
@@ -242,7 +239,6 @@
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.CardView>
 
-
         <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/graph1"
@@ -256,7 +252,6 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp"
             android:clickable="true"
-            android:focusable="true"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             app:layout_constraintBottom_toTopOf="@+id/graph3"
@@ -283,7 +278,7 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text="@string/pm10"
+                    android:text="pm10"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -330,7 +325,7 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text="@string/pm25"
+                    android:text="pm25"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -379,7 +374,7 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text="@string/humidity"
+                    android:text="humidity"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -427,7 +422,7 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text="@string/temperature"
+                    android:text="temperature"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -461,13 +456,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <ListView
-            android:layout_width="120dp"
-            android:layout_height="77dp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="120dp" />
 
 
     </android.support.constraint.ConstraintLayout>

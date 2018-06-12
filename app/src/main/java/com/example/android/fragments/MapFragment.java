@@ -1,8 +1,6 @@
 package com.example.android.fragments;
 
-import android.app.DownloadManager;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,7 +24,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +31,8 @@ import java.util.List;
 public class MapFragment extends Fragment {
 
     private SettingsModel mSettingsModel;
+
+    private List<String> mSecurityList = null;
 
     //XML view objects
     private SeekBar mSeekBar;
@@ -118,7 +117,7 @@ public class MapFragment extends Fragment {
                     jsonSend.put("Sensors", sensorsJson);
                     jsonSend.put("Frequency", settings.Frequency);
                     jsonSend.put("SSID", settings.Ssid);
-                    jsonSend.put("SecutityType", settings.SecurityType);
+                    jsonSend.put("SecurityType", settings.SecurityType);
                     jsonSend.put("Password", settings.Password);
 
                 } catch (JSONException e) {
@@ -131,12 +130,10 @@ public class MapFragment extends Fragment {
         });
 
         //Spinner for change position of list
-        List<String> mSecurityList = null;
-        if (mSecurityList == null) {
-            mSecurityList = Arrays.asList(getResources().getStringArray(R.array.networkSecurity));
-        }
-        int position = mSecurityList.indexOf(mSettingsModel.getSetting().getValue().SecurityType);
-        mlistSecurityNet.setSelection(position);
+        mSettingsModel.getSetting().observe(this, entries -> {
+            int position = mSecurityList.indexOf(mSettingsModel.getSetting().getValue().SecurityType);
+            mlistSecurityNet.setSelection(position);
+        });
 
         return rootView;
     }
@@ -157,6 +154,10 @@ public class MapFragment extends Fragment {
 
         // Init Spinner
         mlistSecurityNet = rootView.findViewById(R.id.listSecurityNetwork);
+
+        if (mSecurityList == null) {
+            mSecurityList = Arrays.asList(getResources().getStringArray(R.array.networkSecurity));
+        }
     }
 
 }

@@ -7,7 +7,6 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.android.activities.R;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
 
@@ -28,12 +27,12 @@ public class SettingsModel extends ViewModel {
     public MutableLiveData<Settings> getSetting() {
         if (setting == null) {
             setting = new MutableLiveData<>();
+            setting.postValue(new Settings(new ArrayList<>(), 15, "", "WEP", ""));
         }
         return setting;
     }
 
     public void communication(String path, int method, JSONObject jsonObject) {
-        MutableLiveData<Settings> settings = getSetting();
 
         URL requestURL = network.buildUrl(path, "");
         Log.d("URL",requestURL.toString());
@@ -43,30 +42,20 @@ public class SettingsModel extends ViewModel {
                 jsonObject,
                 new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONObject response) { parseJSONResponse(response, settings);}
+                    public void onResponse(JSONObject response) { parseJSONResponse(response);}
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError e) { e.printStackTrace(); }
                 }
         );
-
         network.sendRequest(jsonObjectRequest);
 
-        if (settings.getValue() == null) {
-            Log.d("Download Data", "Wrong data type : ");
-
-            ArrayList<String> tab = new ArrayList<>();
-            tab.add("SDS");
-            tab.add("DHT");
-            settings.postValue(new Settings(tab, 15, "MSF_AP", "WEP", "efe548r"));
-
-        }
 
         //network.downloadData(settings);
     }
 
-    private void parseJSONResponse(JSONObject response, MutableLiveData<Settings> setting) {
+    private void parseJSONResponse(JSONObject response) {
         try {
 
             ArrayList<String> sensors = new ArrayList<>();
@@ -81,9 +70,8 @@ public class SettingsModel extends ViewModel {
             String ssid = response.getString("SSID");
             String securitytype = response.getString("SecurityType");
             String password = response.getString("Password");
-
             Settings newsettings = new Settings(sensors,frequency,ssid,securitytype,password);
-            setting.postValue(newsettings);
+            getSetting().postValue(newsettings);
 
         } catch (JSONException e) {
             e.printStackTrace();
