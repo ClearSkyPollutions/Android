@@ -50,7 +50,6 @@ public class ListPollutantsFragment extends Fragment {
                         listPollutant.get(position).getName(),
                         listPollutant.get(position).getDesc(),
                          getActivity()).show();
-
             }
         });
 

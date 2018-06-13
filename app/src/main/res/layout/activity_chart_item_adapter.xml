@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="com.example.android.adapters.SensorsItemAdapter">
+    tools:context="com.example.android.adapters.ChartItemAdapter">
 
     <android.support.v7.widget.CardView
         android:id="@+id/graph"
@@ -14,8 +14,11 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:focusable="true"
-        app:cardCornerRadius="16dp"
+        android:alpha="0.85"
+        android:animateLayoutChanges="true"
+        app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
+        app:contentPadding="16dp"
         >
 
         <android.support.constraint.ConstraintLayout
@@ -27,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="8" />
+                android:layout_weight="8"/>
 
             <TextView
                 android:id="@+id/graphtitle"
@@ -42,7 +45,7 @@
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.CardView>

@@ -8,14 +8,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
+import com.example.android.adapters.ChartItemAdapter;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
@@ -37,6 +41,8 @@ public class HomeFragment extends Fragment {
     private Button mButtonYear;
     private TextView mDataView;
     private TextView mLabelView;
+    private GridView mGridView;
+    private ChartItemAdapter chartItemAdapter;
 
 
     // List of charts in the home page
@@ -90,11 +96,14 @@ public class HomeFragment extends Fragment {
         ChartHelper chartHelper = new ChartHelper();
         initViews(rootView, chartHelper);
 
+        /*
         // Associates each chart with one LiveData (pm10, pm25...)
-        for (int i = 0; i < DataModel.DATA_TYPES.length; i++) {
-            String type = DataModel.DATA_TYPES[i];
+        for (int i = 1; i < chartItemAdapter.getCount(); i++) {
+            String type = chartItemAdapter.getItem(i);
+            Log.d("test",type);
             int color = DataModel.LINE_COLORS[i];
-            LineChart ch = mCharts.get(i);
+            LineChart ch = chartItemAdapter.getLineChart(i);
+
 
             mDataModel.getMeasurements(type).observe(this, data -> {
                 // The home charts should only show data by hour
@@ -107,13 +116,12 @@ public class HomeFragment extends Fragment {
             });
             mDataModel.loadData(type, "AVG_HOUR");
             ch.setOnClickListener(createPopupListener(type, chartHelper, color));
-        }
-
+        }*/
 
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
-            mChartViewDialog.setVisibility(View.GONE);
-            mCoverView.setVisibility(View.GONE);
+        mChartViewDialog.setVisibility(View.GONE);
+        mCoverView.setVisibility(View.GONE);
         });
 
         return rootView;
@@ -124,12 +132,19 @@ public class HomeFragment extends Fragment {
         int textColor = getResources().getColor(R.color.primaryTextColor);
         int backgroundColor = Color.WHITE;
 
+        // Create the adapter to convert the array to views
+        chartItemAdapter = new ChartItemAdapter(getActivity(),DataModel.DATA_TYPES,chartHelper);
+
+        // Attach the adapter to the GridView
+        mGridView = rootView.findViewById(R.id.chartlist);
+        mGridView.setAdapter(chartItemAdapter);
+        /*
         // Init charts
         for (String i : DataModel.DATA_TYPES) {
             String idChart = "lineChart" + i;
             mCharts.add(rootView.findViewById(getResources().getIdentifier(idChart, "id", getContext().getPackageName())));
             chartHelper.initChart(mCharts.get(mCharts.size() - 1), backgroundColor, textColor);
-        }
+        }*/
         mChartDialog = rootView.findViewById(R.id.lineChartDialog);
         chartHelper.initChartDialog(mChartDialog, backgroundColor, textColor);
         mChartViewDialog = rootView.findViewById(R.id.graphDialog);

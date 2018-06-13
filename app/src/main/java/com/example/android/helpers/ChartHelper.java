@@ -2,6 +2,7 @@ package com.example.android.helpers;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
+import android.util.Log;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -102,7 +103,7 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         y1.setEnabled(false);
         YAxis y2 = mChart.getAxisRight();
         y2.setEnabled(false);
-
+        Log.d("debbbb","init fini");
     }
 
     public void initChartDialog(LineChart mChart, int BackgroundColor, int TextColor) {
