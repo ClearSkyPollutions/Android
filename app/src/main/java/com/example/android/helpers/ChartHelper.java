@@ -103,7 +103,6 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         y1.setEnabled(false);
         YAxis y2 = mChart.getAxisRight();
         y2.setEnabled(false);
-        Log.d("debbbb","init fini");
     }
 
     public void initChartDialog(LineChart mChart, int BackgroundColor, int TextColor) {

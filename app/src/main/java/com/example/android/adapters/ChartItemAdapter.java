@@ -1,10 +1,9 @@
 package com.example.android.adapters;
 
 import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,36 +16,25 @@ import com.example.android.models.Data;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class ChartItemAdapter extends BaseAdapter {
 
     private final Context mContext;
-    private String[] chartType;
-    private ChartHelper chartHelper;
-    private LineChart lineChart;
+    private DataModel mDataModel;
 
-    public ChartItemAdapter(Context mContext, String[] chartType, ChartHelper chartHelper) {
-
+    public ChartItemAdapter(Context mContext,DataModel mdataModel) {
         this.mContext = mContext;
-        this.chartType = chartType;
-        this.chartHelper = chartHelper;
-
+        this.mDataModel = mdataModel;
     }
 
-    public LineChart getLineChart() {
-        return lineChart;
-    }
 
     @Override
     public int getCount() {
-        return chartType.length;
+        return mDataModel.DATA_TYPES.length;
     }
 
     @Override
-    public String getItem(int position) {
-        return null;
+    public MutableLiveData<Data> getItem(int position) {
+        return mDataModel.getMeasurements(mDataModel.DATA_TYPES[position]);
     }
 
     @Override
@@ -56,24 +44,38 @@ public class ChartItemAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d("position",""+position);
-        Log.d("Tableau", Arrays.toString(chartType));
 
-        int textColor = R.color.primaryTextColor;
         int backgroundColor =  Color.WHITE;
+        int textColor = R.color.primaryTextColor;
+        String type = mDataModel.DATA_TYPES[position];
+        int color = mDataModel.LINE_COLORS[position];
 
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             convertView = layoutInflater.inflate(R.layout.activity_chart_item_adapter, null);
+
         }
 
-        TextView chartTitle = convertView.findViewById(R.id.graphtitle);
-        lineChart = convertView.findViewById(R.id.lineChart);
+        TextView chartTitle = convertView.findViewById(R.id.chartTitle);
+        ChartHelper chartHelper = new ChartHelper();
+        LineChart lineChart = convertView.findViewById(R.id.lineChart);
 
-        chartTitle.setText(chartType[position]);
-        Log.d("debb"," Type "+chartType[position]);
-        Log.d("debbb","Avant init");
+        chartTitle.setText(mDataModel.DATA_TYPES[position]);
+
         chartHelper.initChart(lineChart, backgroundColor, textColor);
+
+        lineChart.setTouchEnabled(false);
+
+        mDataModel.getMeasurements(type).observe((LifecycleOwner) mContext, data -> {
+            // The home charts should only show data by hour
+            if (!data.scale.equals("AVG_HOUR"))
+                return;
+            lineChart.clearValues();
+            for (Float[] pmEntry : data.values) {
+                chartHelper.addEntry(lineChart, pmEntry, color, false);
+            }
+        });
+        mDataModel.loadData(type, "AVG_HOUR");
 
         return convertView;
     }

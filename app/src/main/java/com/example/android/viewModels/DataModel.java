@@ -24,9 +24,9 @@ import java.util.List;
 
 public class DataModel extends ViewModel {
 
-    public static final String[] DATA_TYPES = {"pm10", "pm25", "temperature", "humidity"};
-    public static final String[] DATA_UNITS = {"µg/m^3", "µg/m^3", "°C", "%"};
-    public static final int[] LINE_COLORS = {0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081};
+    public String[] DATA_TYPES = {"pm10", "pm25", "temperature", "humidity"};
+    public String[] DATA_UNITS = {"µg/m^3", "µg/m^3", "°C", "%"};
+    public int[] LINE_COLORS = {0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081};
 
     private List<MutableLiveData<Data>> measurements = new ArrayList<>();
 
