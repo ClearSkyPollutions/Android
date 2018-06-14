@@ -37,4 +37,8 @@
     <string name="humidity">Humidity</string>
     <string name="pm25">PM 2.5</string>
     <string name="pm10">PM 10</string>
+
+    //Integer
+    <integer name="anim_length">1000</integer>
+    <integer name="anim_length_half">500</integer>
 </resources>

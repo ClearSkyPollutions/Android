@@ -19,23 +19,29 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
 public class DataModel extends ViewModel {
 
-    public String[] DATA_TYPES = {"pm10", "pm25", "temperature", "humidity"};
-    public String[] DATA_UNITS = {"µg/m^3", "µg/m^3", "°C", "%"};
-    public int[] LINE_COLORS = {0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081};
+    public ArrayList<String> DATA_TYPES;     //{"pm10", "pm25", "temperature", "humidity"}
+    public ArrayList<String> DATA_UNITS;     //{"µg/m^3", "µg/m^3", "°C", "%"};
+    public ArrayList<Integer> LINE_COLORS;       //{0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081}
+
 
     private List<MutableLiveData<Data>> measurements = new ArrayList<>();
 
     private NetworkHelper network = new NetworkHelper();
 
-    public DataModel() {
-        for (int i = 0; i<DATA_TYPES.length; i++) {
+    public DataModel(ArrayList<String> dataType, ArrayList<String> dataUnits, ArrayList<Integer> lineColors) {
+        this.DATA_TYPES = dataType;
+        this.DATA_UNITS = dataUnits;
+        this.LINE_COLORS = lineColors;
+
+        for (int i = 0; i < dataType.size(); i++) {
             this.measurements.add(new MutableLiveData<>());
-            this.measurements.get(i).setValue(new Data(DATA_TYPES[i], DATA_UNITS[i]));
+            this.measurements.get(i).setValue(new Data(dataType.get(i), dataUnits.get(i)));
         }
     }
 
