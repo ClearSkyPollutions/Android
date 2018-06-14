@@ -104,6 +104,7 @@ public class HomeFragment extends Fragment {
         //Click event listener for hiding popup views
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
+            mChartHelper.selected.removeObservers(this);
             mDialogView.setVisibility(View.GONE);
             mCoverView.setVisibility(View.GONE);
         });
@@ -122,6 +123,7 @@ public class HomeFragment extends Fragment {
                         Float value = chart.getYAxis().get(index);
                         Float[] entry = new Float[] {ts_f, value};
                         mChartHelper.addEntry(mChartDialog, entry, lineColor , false);
+                        Log.d(HomeFragment.class.toString(),  "new entry for "+chart.getName()+" : "+ts_f+", "+value);
                     }
                 }
             });
@@ -151,6 +153,7 @@ public class HomeFragment extends Fragment {
                         mSelectedValueView.setText("");
                         mLabelView.setText("");
                     } else {
+                        Log.d(HomeFragment.class.toString(), "graph size : "+graph.getValue().getYAxis().size());
                         mSelectedValueView.setText(graph.getValue().getYAxis().get(selected).toString());
                         Log.d(HomeFragment.class.toString(),selected.toString() + ", " + graph.getValue().getYAxis().get(selected) );
                         mLabelView.setText(getStringDate(graph.getValue().getXAxis().get(selected), graph.getValue().getScale()));
