@@ -1,5 +1,7 @@
 package com.example.android.models;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -12,28 +14,30 @@ public class Data extends RealmObject {
 
     @Required
     @PrimaryKey
-    private String datetime;
+    private String id;
     @Required
-    private Float timestamp;
+    private Date date;
     @Required
     private Float value;
-    private DataType dataType;
-    private Scale scale;
+    @Required
+    private String dataType;
+    @Required
+    private String scale;
 
-    public String getDatetime() {
-        return datetime;
+    public String getId() {
+        return id;
     }
 
-    public void setDatetime(String datetime) {
-        this.datetime = datetime;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public Float getTimestamp() {
-        return timestamp;
+    public Date getDate() {
+        return date;
     }
 
-    public void setTimestamp(Float timestamp) {
-        this.timestamp = timestamp;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public Float getValue() {
@@ -44,19 +48,19 @@ public class Data extends RealmObject {
         this.value = value;
     }
 
-    public DataType getDataType() {
+    public String getDataType() {
         return dataType;
     }
 
-    public void setDataType(DataType dataType) {
+    public void setDataType(String dataType) {
         this.dataType = dataType;
     }
 
-    public Scale getScale() {
+    public String getScale() {
         return scale;
     }
 
-    public void setScale(Scale scale) {
+    public void setScale(String scale) {
         this.scale = scale;
     }
 }

@@ -2,8 +2,8 @@ package com.example.android.helpers;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
+import android.util.Log;
 
-import com.example.android.models.Data;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -20,11 +20,13 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedListener {
 
-    public MutableLiveData<Float[]> selected;
+    public MutableLiveData<Integer> selected;
+    private ArrayList<Float> entries = new ArrayList<>();
 
 
     public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
@@ -131,25 +133,26 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
 
     @Override
     public void onValueSelected(Entry e, Highlight h){
-        selected.postValue(new Float[] {h.getX(), h.getY()});
+        selected.postValue(entries.indexOf(e.getX()));
+        Log.d(ChartHelper.class.toString(), "" + entries.indexOf(e.getX()));
     }
 
     @Override
     public void onNothingSelected() {
-        selected.postValue(new Float[] {});
+        selected.postValue(-1);
     }
 
-    public MutableLiveData<Float[]> getSelected() {
+    public MutableLiveData<Integer> getSelected() {
         if(selected == null){
             selected = new MutableLiveData<>();
         }
         return selected;
     }
 
-    public void addEntry(LineChart mChart, Data entry, int lineColor, boolean draw) {
+    public void addEntry(LineChart mChart, Float[] entry, int lineColor, boolean draw) {
         LineData data = mChart.getData();
-        Float ts_f = entry.getTimestamp();
-        Float dataValue = entry.getValue();
+        Float ts_f = entry[0];
+        Float dataValue = entry[1];
 
         if (data != null) {
 
@@ -165,6 +168,8 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
             }
 
             set.addEntry(new Entry(ts_f, dataValue));
+            entries.add(ts_f);
+
 
             // let the chart know it's data has changed
             data.notifyDataChanged();
@@ -185,10 +190,16 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
 
         set.setColors(color);
         set.setCircleColor(color);
-        set.setLineWidth(2f);
-        set.setCircleRadius(4f);
+        set.setLineWidth(1.5f);
+        set.setCircleRadius(2.5f);
         set.setValueTextColor(color);
         set.setValueTextSize(10f);
+        set.setDrawCircleHole(false);
+        set.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+        set.setCubicIntensity(1f);
+        set.setDrawHorizontalHighlightIndicator(false);
+        set.setHighlightLineWidth(2f);
+        set.setHighLightColor(color);
         // To show values of each point
         set.setDrawValues(false);
 
@@ -213,18 +224,9 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         return formattedValue;
     }
 
-    public static String getStringDate(float value, String scale) {
-        SimpleDateFormat ft;
-        switch(scale){
-            case "AVG_HOUR": ft = new SimpleDateFormat("EEE hh'h'", Locale.FRANCE);
-                break;
-            case "AVG_DAY": ft = new SimpleDateFormat("dd/MM", Locale.FRANCE);
-                break;
-            case "AVG_MONTH": ft = new SimpleDateFormat("MMM", Locale.FRANCE);
-                break;
-            default: ft = new SimpleDateFormat("yy/MM/dd hh:mm:ss", Locale.FRANCE);
-                break;
-        }
-        return ft.format(new Timestamp((long) value));
+    public void reset(LineChart chart) {
+        chart.clearValues();
+        entries.clear();
+
     }
 }
