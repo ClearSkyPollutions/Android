@@ -19,6 +19,7 @@ import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.models.Graph;
+import com.example.android.viewModels.AQIModel;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
@@ -33,6 +34,7 @@ import java.util.Locale;
 public class HomeFragment extends Fragment {
 
     private DataModel mDataModel;
+    private AQIModel aqiModel;
     private ChartHelper mChartHelper = new ChartHelper();
     private FragmentHomeBinding mFragmentHomeBinding;
 
@@ -66,6 +68,10 @@ public class HomeFragment extends Fragment {
         // Display last hour's data
         mDataModel.loadLastData();
         Log.d(HomeFragment.class.toString(), "loadLastData()");
+
+        aqiModel = ViewModelProviders.of(getActivity()).get(AQIModel.class);
+        mFragmentHomeBinding.setAqiUI(aqiModel);
+        aqiModel.loadAQI();
 
         // Bind each UI chart with one MutableLiveData<Graph> (pm10, pm25...) and set an onClickListener for displaying the chart in a popup view
         for (int i = 0; i < DataModel.GRAPH_NAMES.length; i++) {
