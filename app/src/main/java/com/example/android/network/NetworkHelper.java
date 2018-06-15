@@ -1,4 +1,5 @@
 package com.example.android.network;
+import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -56,4 +57,26 @@ public class NetworkHelper implements Request.Method {
             }
         };
     }
+
+    public void getAQI(String path, MutableLiveData<Integer> aqi, MutableLiveData<String> level ){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                buildUrl(path, null).toString(),
+                null,
+                (JSONObject response) -> {
+                    try {
+                        Integer aqiRcv = response.getInt("index");
+                        String levelRcv = response.getString("level");
+                        aqi.postValue(aqiRcv);
+                        level.postValue(levelRcv);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                Throwable::printStackTrace
+        );
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+        Log.d(NetworkHelper.class.toString(), buildUrl(path, null).toString());
+    }
+
 }
