@@ -122,7 +122,7 @@ public class HomeFragment extends Fragment {
                         Float ts_f = (float) Timestamp.valueOf(dateString).getTime();
                         Float value = chart.getYAxis().get(index);
                         Float[] entry = new Float[] {ts_f, value};
-                        mChartHelper.addEntry(mChartDialog, entry, lineColor , false);
+                        mChartHelper.addEntry(mChartDialog, entry, lineColor , true);
                         Log.d(HomeFragment.class.toString(),  "new entry for "+chart.getName()+" : "+ts_f+", "+value);
                     }
                 }

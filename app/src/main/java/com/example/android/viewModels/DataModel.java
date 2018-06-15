@@ -3,9 +3,17 @@ package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
+
+import com.example.android.helpers.HashHelper;
 import com.example.android.models.Data;
 import com.example.android.models.Graph;
 import com.example.android.network.NetworkHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -120,7 +128,6 @@ public class DataModel extends ViewModel{
         });
     }
 
-
     private int getNbOfData(String scale){
         switch(scale == null ? "" : scale){
             case "AVG_HOUR":
@@ -133,7 +140,32 @@ public class DataModel extends ViewModel{
         return 0;
     }
 
-
+    public static void  storeGraphData(JSONObject response, String scale) {
+        Realm realm = Realm.getDefaultInstance();
+        Data data = new Data();
+        realm.executeTransaction(realmDb -> {
+            try {
+                JSONArray jsonArray = response.getJSONArray(scale);
+                for (int i = jsonArray.length() - 1; i >= 0; i--) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String dateString = jsonObject.getString("date");
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date date = ft.parse(dateString);
+                    for(String type : DataModel.GRAPH_NAMES) {
+                        Float val = (float) jsonObject.getDouble(type);
+                        data.setId(HashHelper.generateMD5(dateString+type+scale));
+                        data.setDate(date);
+                        data.setValue(val);
+                        data.setDataType(type);
+                        data.setScale(scale);
+                        realmDb.copyToRealmOrUpdate(data);
+                        Log.d("storeGraphData", data.getDataType() + ", " + data.getScale() +", " + data.getValue());
+                    }
+                }
+            } catch (JSONException | ParseException e) {e.printStackTrace();}
+        });
+        realm.close();
+    }
 
     @Override
     protected void onCleared() {

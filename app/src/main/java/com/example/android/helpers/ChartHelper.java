@@ -159,12 +159,8 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
             ILineDataSet set = data.getDataSetByIndex(0);
 
             if (set == null) {
-                set = createSet(lineColor);
+                set = createSet(lineColor, draw);
                 data.addDataSet(set);
-            }
-
-            if(draw){
-                set.setDrawValues(true);
             }
 
             set.addEntry(new Entry(ts_f, dataValue));
@@ -183,25 +179,23 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     }
 
 
-    private LineDataSet createSet(int lineColor) {
+    private LineDataSet createSet(int lineColor, boolean draw) {
         LineDataSet set = new LineDataSet(null, "");
-        set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        Integer color = lineColor;
 
-        set.setColors(color);
-        set.setCircleColor(color);
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColors(lineColor);
+        set.setCircleColor(lineColor);
         set.setLineWidth(1.5f);
         set.setCircleRadius(2.5f);
-        set.setValueTextColor(color);
+        set.setValueTextColor(lineColor);
         set.setValueTextSize(10f);
         set.setDrawCircleHole(false);
         set.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
         set.setCubicIntensity(1f);
-        set.setDrawHorizontalHighlightIndicator(false);
-        set.setHighlightLineWidth(2f);
-        set.setHighLightColor(color);
-        // To show values of each point
+        set.setHighlightLineWidth(1f);
         set.setDrawValues(false);
+        set.setDrawHighlightIndicators(draw);
+        set.setDrawHorizontalHighlightIndicator(false);
 
         return set;
     }
