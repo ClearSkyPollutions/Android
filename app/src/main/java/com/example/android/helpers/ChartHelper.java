@@ -128,13 +128,12 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         l.setForm(Legend.LegendForm.LINE);
         l.setTextColor(TextColor);
         */
-
     }
 
     @Override
     public void onValueSelected(Entry e, Highlight h){
         selected.postValue(entries.indexOf(e.getX()));
-        Log.d(ChartHelper.class.toString(), "" + entries.indexOf(e.getX()));
+        Log.d(ChartHelper.class.toString(), "" +  entries.indexOf(e.getX()));
     }
 
     @Override

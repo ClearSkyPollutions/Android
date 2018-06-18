@@ -3,14 +3,15 @@ package com.example.android.models;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Graph {
+public class Chart {
     private String name;
     private String unit;
     private String scale;
     private ArrayList<Date> xAxis;
     private ArrayList<Float> yAxis;
 
-    public Graph(String name, String unit, String scale, ArrayList<Date> xAxis, ArrayList<Float> yAxis) {
+    public Chart(String name, String unit, String scale, ArrayList<Date> xAxis,
+                 ArrayList<Float> yAxis) {
         this.name = name;
         this.unit = unit;
         this.scale = scale;
@@ -18,7 +19,7 @@ public class Graph {
         this.yAxis = yAxis;
     }
 
-    public Graph(Graph copy, ArrayList<Date> xAxis, ArrayList<Float> yAxis) {
+    public Chart(Chart copy, ArrayList<Date> xAxis, ArrayList<Float> yAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
         this.name = copy.name;

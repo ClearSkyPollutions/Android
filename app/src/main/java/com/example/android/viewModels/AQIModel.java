@@ -5,27 +5,41 @@ import android.arch.lifecycle.ViewModel;
 
 import com.example.android.network.NetworkHelper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class AQIModel extends ViewModel {
 
     public MutableLiveData<String> label;
     public MutableLiveData<Integer> aqi;
 
     public MutableLiveData<Integer> getAqi() {
-        if(aqi == null) {
+        if (aqi == null) {
             aqi = new MutableLiveData<>();
         }
         return aqi;
     }
 
-    public MutableLiveData<String> getLabel(){
-        if(label == null) {
+    public MutableLiveData<String> getLabel() {
+        if (label == null) {
             label = new MutableLiveData<>();
         }
         return label;
     }
 
-    public void loadAQI(){
-        NetworkHelper a = new NetworkHelper();
-        a.getAQI("aqi.php", getAqi(), getLabel());
+    public void loadAQI() {
+        NetworkHelper netHelper = new NetworkHelper();
+        netHelper.sendRequest("aqi.php", null, NetworkHelper.GET, storeAQI);
     }
+
+    private JSONParser<JSONObject> storeAQI = (JSONObject response) -> {
+        try {
+            Integer aqiRcv = response.getInt("index");
+            String levelRcv = response.getString("level");
+            aqi.postValue(aqiRcv);
+            label.postValue(levelRcv);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    };
 }
