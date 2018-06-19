@@ -16,7 +16,7 @@ public class NetworkHelper {
 
     public void sendRequest(JsonObjectRequest jsonObjectRequest) {
         RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-        //Log.d(SettingsModel.class.toString(), "fillGraph: network request");
+
     }
 
     public URL buildUrl(String path, String params) {

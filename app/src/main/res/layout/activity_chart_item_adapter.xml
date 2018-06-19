@@ -20,8 +20,10 @@
         android:id="@+id/chart_card_back"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="false"
         android:gravity="center"
-        android:clickable="false">
+        android:alpha="0">
+
         <include layout="@layout/small_chart_card_back" />
 
     </FrameLayout>

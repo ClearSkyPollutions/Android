@@ -7,7 +7,7 @@
         android:duration="@integer/anim_length" />
 
     <objectAnimator
-        android:valueFrom="1.0"
+        android:valueFrom="0.85"
         android:valueTo="0.0"
         android:propertyName="alpha"
         android:startOffset="@integer/anim_length_half"

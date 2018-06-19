@@ -37,7 +37,7 @@ public class MapFragment extends Fragment {
     //XML view objects
     private SeekBar mSeekBar;
     private TextView mFrequency;
-    private EditText mSSID,  mPassword;
+    private EditText mSSID, mPassword;
     private Button mValidate;
     private Spinner mlistSecurityNet;
 

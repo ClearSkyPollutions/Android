@@ -8,33 +8,38 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.activities.R;
+import com.example.android.fragments.HomeFragment;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.models.Data;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ChartItemAdapter extends BaseAdapter {
 
     private final Context mContext;
     private DataModel mDataModel;
-    private View mSmallChartCardFront;
-    private View mSmallChartCardBack;
 
-    public ArrayList<View> viewFront = new ArrayList<>();
-    public ArrayList<View> viewBack = new ArrayList<>();
-    public ArrayList<AnimatorSet> mChartSetRightOut = new ArrayList<>();
-    public ArrayList<AnimatorSet> mChartSetLeftIn = new ArrayList<>();
+    public ArrayList<FrameLayout> mChartCardFront = new ArrayList<>();
+    public ArrayList<FrameLayout> mChartCardBack = new ArrayList<>();
+    private ImageButton mButtonDeletes;
+    private ImageButton mButtonFavors;
+
+    public ArrayList<String> Favor  = new ArrayList<>();
+
 
     public ChartItemAdapter(Context mContext,DataModel mdataModel) {
         this.mContext = mContext;
@@ -60,15 +65,11 @@ public class ChartItemAdapter extends BaseAdapter {
     @SuppressLint("ResourceType")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
+        Log.d("deb","position "+mDataModel.DATA_TYPES.get(position));
         int backgroundColor =  Color.WHITE;
         int textColor = R.color.primaryTextColor;
         String type = mDataModel.DATA_TYPES.get(position);
         int color = mDataModel.LINE_COLORS.get(position);
-        ImageButton mButtonDelete;
-        ImageButton mButtonFavori;
-        CardView mSmallCardFront;
-        ViewHolder holder;
 
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
@@ -77,9 +78,12 @@ public class ChartItemAdapter extends BaseAdapter {
 
         TextView chartTitleFront = convertView.findViewById(R.id.chartTitleFront);
         TextView chartTitleBack = convertView.findViewById(R.id.chartTitleBack);
-        mButtonDelete = convertView.findViewById(R.id.buttonDelete);
-        mButtonFavori = convertView.findViewById(R.id.buttonFavori);
-        mSmallCardFront = convertView.findViewById(R.id.smallCardFront);
+
+        // Init FrameLayout
+        mChartCardFront.add(convertView.findViewById(R.id.chart_card_front));
+        mChartCardBack.add(convertView.findViewById(R.id.chart_card_back));
+        mButtonDeletes = convertView.findViewById(R.id.buttonDelete);
+        mButtonFavors = convertView.findViewById(R.id.buttonFavori);
 
         ChartHelper chartHelper = new ChartHelper();
         LineChart lineChart = convertView.findViewById(R.id.lineChart);
@@ -102,62 +106,41 @@ public class ChartItemAdapter extends BaseAdapter {
         });
         mDataModel.loadData(type, "AVG_HOUR");
 
-        mSmallChartCardFront = convertView.findViewById(R.id.chart_card_front);
-        mSmallChartCardBack = convertView.findViewById(R.id.chart_card_back);
 
-        changeCameraDistance();
+        mButtonFavors.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Favor.contains(mDataModel.DATA_TYPES.get(position))){
+                    Favor.remove(mDataModel.DATA_TYPES.get(position));
+                    mButtonFavors.setImageResource(R.drawable.ic_star_border_black_24dp);
+                }else{
+                    Favor.add(mDataModel.DATA_TYPES.get(position));
+                    mButtonFavors.setImageResource(R.drawable.ic_star_black_24dp);
+                }
+                Log.d("Favor", Arrays.toString(new ArrayList[]{Favor}));
+            }
+        });
+        mButtonDeletes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("click on","Delete " + position);
 
-        Log.d("chartIt","new add "+getItem(position));
-        viewFront.add(mSmallChartCardFront);
-        viewBack.add(mSmallChartCardBack);
-        mChartSetRightOut.add((AnimatorSet) AnimatorInflater.loadAnimator(mContext, R.anim.out_animation));
-        mChartSetLeftIn.add((AnimatorSet) AnimatorInflater.loadAnimator(mContext, R.anim.in_animation));
+                if(mDataModel.DATA_TYPES.contains(mDataModel.DATA_TYPES.get(position))) {
+                    Log.d("Delete","Existe "+mDataModel.DATA_TYPES.get(position));
+                    mDataModel.DATA_TYPES.remove(mDataModel.DATA_TYPES.get(position));
+                    mDataModel.DATA_UNITS.remove(mDataModel.DATA_UNITS.get(position));
+                    mDataModel.LINE_COLORS.remove(mDataModel.LINE_COLORS.get(position));
+                }
 
-        holder = new ViewHolder(mButtonDelete,mButtonFavori, mSmallCardFront);
+                Log.d("DataModel", Arrays.toString(mDataModel.DATA_TYPES.toArray()));
+                Log.d("DataModel", Arrays.toString(mDataModel.DATA_UNITS.toArray()));
+                Log.d("DataModel", Arrays.toString(mDataModel.LINE_COLORS.toArray()));
+
+                notifyDataSetChanged();
+
+            }
+        });
+
         return convertView;
     }
-
-    private static class ViewHolder {
-        public ImageButton mButDelete;
-        public ImageButton mButFavor;
-        public CardView mCardFront;
-
-
-        public ViewHolder(ImageButton delete, ImageButton Favor, CardView Card) {
-            mButDelete = delete;
-            mButFavor = Favor;
-            mCardFront = Card;
-            mButDelete.setOnClickListener(mButtonDeleteClickListener);
-            mButFavor.setOnClickListener(mButtonFavorClickListener);
-            mCardFront.setOnClickListener(mButtonCardFrontClickListener);
-        }
-
-        private View.OnClickListener mButtonDeleteClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Click","Delete");
-            }
-        };
-        private View.OnClickListener mButtonFavorClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Click","Favor");
-            }
-        };
-        private View.OnClickListener mButtonCardFrontClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Click","Front");
-            }
-        };
-    }
-
-    private void changeCameraDistance() {
-        int distance = 8000;
-        float scale = mContext.getResources().getDisplayMetrics().density * distance;
-        mSmallChartCardFront.setCameraDistance(scale);
-        mSmallChartCardBack.setCameraDistance(scale);
-    }
-
-
 }

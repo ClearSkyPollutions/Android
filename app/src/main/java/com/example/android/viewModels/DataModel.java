@@ -27,7 +27,7 @@ public class DataModel extends ViewModel {
 
     public ArrayList<String> DATA_TYPES;     //{"pm10", "pm25", "temperature", "humidity"}
     public ArrayList<String> DATA_UNITS;     //{"µg/m^3", "µg/m^3", "°C", "%"};
-    public ArrayList<Integer> LINE_COLORS;       //{0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081}
+    public ArrayList<Integer> LINE_COLORS;   //{0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081}
 
 
     private List<MutableLiveData<Data>> measurements = new ArrayList<>();
@@ -39,17 +39,25 @@ public class DataModel extends ViewModel {
         this.DATA_UNITS = dataUnits;
         this.LINE_COLORS = lineColors;
 
-        for (int i = 0; i < dataType.size(); i++) {
+        for (int i = 0; i < DATA_TYPES.size(); i++) {
             this.measurements.add(new MutableLiveData<>());
             this.measurements.get(i).setValue(new Data(dataType.get(i), dataUnits.get(i)));
         }
     }
 
     public MutableLiveData<Data> getMeasurements(String type){
+
         for (MutableLiveData<Data> i : measurements) {
             if (i.getValue() != null && i.getValue().name.equals(type)){
                 return i;
             }
+        }
+        int index = DATA_TYPES.indexOf(type);
+        if (index != -1) {
+            MutableLiveData<Data> newdata = new MutableLiveData<>();
+            newdata.setValue(new Data(DATA_TYPES.get(index), DATA_UNITS.get(index)));
+            this.measurements.add(newdata);
+            return this.getMeasurements(type);
         }
         return null;
     }
@@ -73,6 +81,29 @@ public class DataModel extends ViewModel {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) { parseJSONResponse(response, data);}
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError e) { e.printStackTrace(); }
+                }
+        );
+
+        network.sendRequest(jsonObjectRequest);
+    }
+
+    public void loadDataTypeUnits(){
+        String tableName = "AVG_HOUR";
+        String query = "?columns&filter=date,eq,0";
+        //TODO TO make
+        URL requestURL = network.buildUrl(tableName, query);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                requestURL.toString(),
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) { parseJSONResponseDataTypeUnit(response, tableName);}
                 },
                 new Response.ErrorListener() {
                     @Override
@@ -112,6 +143,23 @@ public class DataModel extends ViewModel {
                 vals.add(new Float[]{ts_f, val});
             }
             data.postValue(new Data(data.getValue(), vals));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void parseJSONResponseDataTypeUnit(JSONObject response,String table) {
+        try {
+            JSONObject jsonObject = response.getJSONObject(table);
+            JSONArray dataType = jsonObject.getJSONArray("columns");
+            for (int i = 0; i <= dataType.length() - 1; i++) {
+                if (!(dataType.getString(i).equals("date")))
+                {
+                    Log.d("pas","date");
+                    DATA_TYPES.add(dataType.getString(i));
+                    Log.d("columns",dataType.getString(i) + " " + dataType.length());
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
