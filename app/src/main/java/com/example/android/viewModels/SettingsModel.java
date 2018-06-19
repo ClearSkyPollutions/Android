@@ -32,49 +32,28 @@ public class SettingsModel extends ViewModel {
         return setting;
     }
 
-    public void communication(String path, int method, JSONObject jsonObject) {
-
-        URL requestURL = network.buildUrl(path, "");
-        Log.d("URL",requestURL.toString());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                method,
-                requestURL.toString(),
-                jsonObject,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) { parseJSONResponse(response);}
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError e) { e.printStackTrace(); }
-                }
-        );
-        network.sendRequest(jsonObjectRequest);
-
-
-        //network.downloadData(settings);
-    }
-
-    private void parseJSONResponse(JSONObject response) {
+    private JSONParser<JSONObject> parseSettings = (JSONObject response) -> {
         try {
-
             ArrayList<String> sensors = new ArrayList<>();
 
             JSONArray arraySensors = response.getJSONArray("Sensors");
 
-            for (int i = 0; i >= arraySensors.length() - 1; i++) {
+            for (int i = 0; i <= arraySensors.length(); i++) {
                 sensors.add(arraySensors.getJSONObject(i).toString());
             }
 
             int frequency = response.getInt("Frequency");
             String ssid = response.getString("SSID");
-            String securitytype = response.getString("SecurityType");
+            String securityType = response.getString("SecurityType");
             String password = response.getString("Password");
-            Settings newsettings = new Settings(sensors,frequency,ssid,securitytype,password);
-            getSetting().postValue(newsettings);
 
+            getSetting().postValue(new Settings(sensors, frequency, ssid, securityType, password));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    };
+
+    public void communication(String path, int method, JSONObject configToSend) {
+        network.sendRequest(path, null, method, parseSettings, configToSend);
     }
 }

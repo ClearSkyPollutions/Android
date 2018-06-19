@@ -20,60 +20,16 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedListener {
 
-    public MutableLiveData<Float[]> selected;
+    public MutableLiveData<Integer> selected;
+    private ArrayList<Float> entries = new ArrayList<>();
 
-    public MutableLiveData<Float[]> getSelected() {
-        if(selected == null){
-            selected = new MutableLiveData<>();
-        }
-        return selected;
-    }
 
-    private void initStandard(LineChart mChart, int BackgroundColor, int TextColor){
-
-        Description des = new Description();
-        des.setText("");
-        mChart.setDescription(des);
-
-        // enable value highlighting
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mChart.setDefaultFocusHighlightEnabled(true);
-        }
-
-        // enable touch gestures
-        mChart.setTouchEnabled(true);
-
-        // enable scaling & dragging
-        mChart.setDragEnabled(true);
-        mChart.setScaleEnabled(false);
-
-        // enable pinch zoom to avoid scaling x and y axis separately
-        mChart.setPinchZoom(false);
-
-        // alternative background color
-        mChart.setBackgroundColor(BackgroundColor);
-
-        // DATA
-        LineData data = new LineData();
-        data.setValueTextColor(TextColor);
-        // add data to line chart
-        mChart.setData(data);
-
-        // get legend object
-        Legend l = mChart.getLegend();
-        l.setEnabled(false);
-
-        /*
-        // customize legend
-        l.setForm(Legend.LegendForm.LINE);
-        l.setTextColor(TextColor);
-        */
-
-    }
     public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
 
         initStandard(mChart, BackgroundColor, TextColor);
@@ -133,10 +89,63 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         mChart.setOnChartValueSelectedListener(this);
     }
 
-    public void onValueSelected(Entry e, Highlight h){
-        selected.postValue(new Float[] {h.getX(), h.getY()});
+    private void initStandard(LineChart mChart, int BackgroundColor, int TextColor){
+
+        Description des = new Description();
+        des.setText("");
+        mChart.setDescription(des);
+
+        // enable value highlighting
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mChart.setDefaultFocusHighlightEnabled(true);
+        }
+
+        // enable touch gestures
+        mChart.setTouchEnabled(true);
+
+        // enable scaling & dragging
+        mChart.setDragEnabled(true);
+        mChart.setScaleEnabled(false);
+
+        // enable pinch zoom to avoid scaling x and y axis separately
+        mChart.setPinchZoom(false);
+
+        // alternative background color
+        mChart.setBackgroundColor(BackgroundColor);
+
+        // DATA
+        LineData data = new LineData();
+        data.setValueTextColor(TextColor);
+        // add data to line chart
+        mChart.setData(data);
+
+        // get legend object
+        Legend l = mChart.getLegend();
+        l.setEnabled(false);
+
+        /*
+        // customize legend
+        l.setForm(Legend.LegendForm.LINE);
+        l.setTextColor(TextColor);
+        */
     }
-    public void onNothingSelected(){
+
+    @Override
+    public void onValueSelected(Entry e, Highlight h){
+        selected.postValue(entries.indexOf(e.getX()));
+        Log.d(ChartHelper.class.toString(), "" +  entries.indexOf(e.getX()));
+    }
+
+    @Override
+    public void onNothingSelected() {
+        selected.postValue(-1);
+    }
+
+    public MutableLiveData<Integer> getSelected() {
+        if(selected == null){
+            selected = new MutableLiveData<>();
+        }
+        return selected;
     }
 
     public void addEntry(LineChart mChart, Float[] entry, int lineColor, boolean draw) {
@@ -149,14 +158,13 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
             ILineDataSet set = data.getDataSetByIndex(0);
 
             if (set == null) {
-                set = createSet(lineColor);
+                set = createSet(lineColor, draw);
                 data.addDataSet(set);
-            }
-            if(draw){
-                set.setDrawValues(true);
             }
 
             set.addEntry(new Entry(ts_f, dataValue));
+            entries.add(ts_f);
+
 
             // let the chart know it's data has changed
             data.notifyDataChanged();
@@ -170,19 +178,23 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     }
 
 
-    private LineDataSet createSet(int lineColor) {
+    private LineDataSet createSet(int lineColor, boolean draw) {
         LineDataSet set = new LineDataSet(null, "");
-        set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        Integer color = lineColor;
 
-        set.setColors(color);
-        set.setCircleColor(color);
-        set.setLineWidth(2f);
-        set.setCircleRadius(4f);
-        set.setValueTextColor(color);
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColors(lineColor);
+        set.setCircleColor(lineColor);
+        set.setLineWidth(1.5f);
+        set.setCircleRadius(2.5f);
+        set.setValueTextColor(lineColor);
         set.setValueTextSize(10f);
-        // To show values of each point
+        set.setDrawCircleHole(false);
+        set.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+        set.setCubicIntensity(1f);
+        set.setHighlightLineWidth(1f);
         set.setDrawValues(false);
+        set.setDrawHighlightIndicators(draw);
+        set.setDrawHorizontalHighlightIndicator(false);
 
         return set;
     }
@@ -205,18 +217,28 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         return formattedValue;
     }
 
-     public static String getStringDate(float value, String scale) {
+    public void reset(LineChart chart) {
+        chart.clearValues();
+        entries.clear();
+
+    }
+
+    public static String getStringDate(Date date, String scale) {
         SimpleDateFormat ft;
-        switch(scale){
-            case "AVG_HOUR": ft = new SimpleDateFormat("EEE - hh'h'", Locale.FRANCE);
+        switch (scale) {
+            case "AVG_HOUR":
+                ft = new SimpleDateFormat("EEE HH'h'", Locale.FRANCE);
                 break;
-            case "AVG_DAY": ft = new SimpleDateFormat("dd/MM", Locale.FRANCE);
+            case "AVG_DAY":
+                ft = new SimpleDateFormat("EEE dd", Locale.FRANCE);
                 break;
-            case "AVG_MONTH": ft = new SimpleDateFormat("MMM", Locale.FRANCE);
+            case "AVG_MONTH":
+                ft = new SimpleDateFormat("MMM", Locale.FRANCE);
                 break;
-            default: ft = new SimpleDateFormat("yy-MM-dd hh-mm-ss", Locale.FRANCE);
+            default:
+                ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.FRANCE);
                 break;
         }
-        return ft.format(value);
+        return ft.format(date);
     }
 }

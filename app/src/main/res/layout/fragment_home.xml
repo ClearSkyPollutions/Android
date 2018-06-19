@@ -9,6 +9,10 @@
         <variable
             name="lastData"
             type="com.example.android.viewModels.DataModel" />
+        <variable
+            name="aqiUI"
+            type="com.example.android.viewModels.AQIModel" />
+
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -17,7 +21,7 @@
         android:layout_marginBottom="54dp">
 
         <android.support.v7.widget.CardView
-            android:id="@+id/graphDialog"
+            android:id="@+id/viewDialog"
             style="@style/CardView.Light"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -57,7 +61,7 @@
                     android:layout_marginLeft="100dp"
                     android:layout_marginStart="100dp"
                     android:layout_marginTop="8dp"
-                    android:text="--"
+                    android:text=""
                     app:layout_constraintEnd_toStartOf="@+id/labelData"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -71,7 +75,7 @@
                     android:layout_marginRight="100dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="8dp"
-                    android:text='@{lastData.getMeasurements("temperature").lastDateRcved, default="2018-05-28 13:00:00"}'
+                    android:text='@{lastData.lastDatetimeReceived, default=""}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/data"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -173,7 +177,8 @@
                     app:layout_constraintBottom_toBottomOf="@+id/EditCities"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/EditCities"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginLeft="32dp" />
 
                 <ImageButton
                     android:id="@+id/buttonAddBack"
@@ -185,11 +190,12 @@
                     android:background="@null"
                     android:clickable="true"
                     android:scaleType="fitXY"
-                    android:src="@drawable/ic_add_circle_black_24dp"
+                    app:srcCompat="@drawable/ic_add_circle_black_24dp"
                     app:layout_constraintBottom_toBottomOf="@+id/EditCities"
                     app:layout_constraintEnd_toStartOf="@+id/EditCities"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginRight="32dp" />
 
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.CardView>
@@ -237,7 +243,7 @@
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
-                    android:text='@{lastData.getMeasurements("temperature").lastDateRcved, default="2018-05-28 13:00:00"}'
+                    android:text='@{lastData.lastDatetimeReceived, default="2018-05-28 13:00:00"}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ville" />
@@ -248,7 +254,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="22"
+                    android:text='@{aqiUI.aqi.toString(), default="0"}'
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -270,7 +276,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_marginTop="16dp"
-                    android:text="Good"
+                    android:text='@{aqiUI.label, default="No Connection"}'
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@+id/ica"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -292,8 +298,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text='@{lastData.getMeasurements("temperature").lastValRcved.toString(), default="25"}'
+
                     android:textStyle="bold"
+                    android:text='@{lastData.lastTempValueReceived, default="25"}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/ica"
@@ -323,7 +330,8 @@
                     app:layout_constraintBottom_toTopOf="@+id/date"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ville"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginLeft="32dp" />
 
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.CardView>
@@ -437,7 +445,8 @@
                     android:text="@string/add"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/SPdataUnits" />
+                    app:layout_constraintTop_toBottomOf="@+id/SPdataUnits"
+                    android:layout_marginRight="8dp" />
 
             </android.support.constraint.ConstraintLayout>
         </android.support.v7.widget.CardView>

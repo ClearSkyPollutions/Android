@@ -1,12 +1,7 @@
 package com.example.android.models;
 
-
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+
 
 public class Settings {
 
