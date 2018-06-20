@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.example.android.activities.R;
-import com.example.android.activities.databinding.FragmentMapBinding;
+import com.example.android.activities.databinding.FragmentSettingsBinding;
 import com.example.android.models.Settings;
 import com.example.android.viewModels.SettingsModel;
 
@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MapFragment extends Fragment {
+public class SettingsFragment extends Fragment {
 
     private SettingsModel mSettingsModel;
 
@@ -45,7 +45,7 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate using DataBinding library
-        FragmentMapBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false);
+        FragmentSettingsBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false);
         binding.setLifecycleOwner(this);
         View rootView = binding.getRoot();
 

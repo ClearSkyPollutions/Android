@@ -63,4 +63,5 @@ dependencies {
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'org.osmdroid:osmdroid-android:6.0.1'
 }

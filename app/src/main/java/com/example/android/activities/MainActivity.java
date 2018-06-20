@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import com.example.android.fragments.HomeFragment;
 import com.example.android.fragments.ListPollutantsFragment;
 import com.example.android.fragments.MapFragment;
+import com.example.android.fragments.SettingsFragment;
 import com.example.android.network.RequestQueueSingleton;
 
 
@@ -34,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_pollutants:
                     selectedFragment = new ListPollutantsFragment();
                     setTitle(R.string.title_pollutants);
+                    break;
+                case R.id.navigation_settings:
+                    selectedFragment = new SettingsFragment();
+                    setTitle(R.string.title_settings);
                     break;
             }
             loadFragment(selectedFragment);
