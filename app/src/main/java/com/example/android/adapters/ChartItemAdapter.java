@@ -2,6 +2,7 @@ package com.example.android.adapters;
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
@@ -27,6 +28,7 @@ public class ChartItemAdapter extends BaseAdapter {
 
     private final Context mContext;
     private DataModel mDataModel;
+    private ChartHelper mChartHelper;
 
     public ArrayList<FrameLayout> mChartCardFront = new ArrayList<>();
     public ArrayList<FrameLayout> mChartCardBack = new ArrayList<>();
@@ -36,9 +38,10 @@ public class ChartItemAdapter extends BaseAdapter {
     public ArrayList<String> favorite  = new ArrayList<>();
 
 
-    public ChartItemAdapter(Context mContext,DataModel dataModel) {
+    public ChartItemAdapter(Context mContext,DataModel dataModel, ChartHelper chartHelper) {
         this.mContext = mContext;
         this.mDataModel = dataModel;
+        mChartHelper = chartHelper;
     }
 
     @Override
@@ -53,7 +56,7 @@ public class ChartItemAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
@@ -66,63 +69,70 @@ public class ChartItemAdapter extends BaseAdapter {
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             convertView = layoutInflater.inflate(R.layout.activity_chart_item_adapter, null);
+
+            LineChart lineChart = convertView.findViewById(R.id.lineChart);
+            mChartHelper.initChart(lineChart, backgroundColor, textColor);
+
+            lineChart.setTouchEnabled(false);
+
+            // Init FrameLayout
+            mChartCardFront.add(convertView.findViewById(R.id.chart_card_front));
+            mChartCardBack.add(convertView.findViewById(R.id.chart_card_back));
+            mButtonDelete = convertView.findViewById(R.id.buttonDelete);
+            mButtonFavorite = convertView.findViewById(R.id.buttonFavori);
+            mChartCardFront.get(position).setVisibility(View.VISIBLE);
+            mChartCardBack.get(position).setVisibility(View.GONE);
+
+            getItem(position).observe((LifecycleOwner) mContext, chart -> {
+                // The home charts should only show data by hour
+                if (!chart.getScale().equals(DataModel.AVG_HOUR))
+                    return;
+                lineChart.clearValues();
+
+                for (int index = 0; index < chart.getXAxis().size(); index++) {
+                    Float ts_f = (float) chart.getXAxis().get(index).getTime();
+                    Float value = chart.getYAxis().get(index);
+                    Float[] entry = new Float[]{ts_f, value};
+                    mChartHelper.addEntry(lineChart, entry, color, false);
+                }
+            });
+
+            mDataModel.loadChartData(type, DataModel.AVG_HOUR);
+
+            mButtonFavorite.setOnClickListener(v -> {
+                if (favorite.contains(mDataModel.data_types.get(position))) {
+                    favorite.remove(mDataModel.data_types.get(position));
+                    mButtonFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
+                } else {
+                    favorite.add(mDataModel.data_types.get(position));
+                    mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
+                }
+                Log.d("Favorite",Arrays.toString(new ArrayList[]{favorite}));
+            });
+
+            mButtonDelete.setOnClickListener(v -> {
+                Log.d("Position dans delete", "" + position);
+                getItem(position).removeObservers((LifecycleOwner) mContext);
+
+                mDataModel.data_types.remove(mDataModel.data_types.get(position));
+                mDataModel.data_units.remove(mDataModel.data_units.get(position));
+                mDataModel.line_colors.remove(mDataModel.line_colors.get(position));
+
+                notifyDataSetChanged();
+            });
+
         }
+
 
         TextView chartTitleFront = convertView.findViewById(R.id.chartTitleFront);
         TextView chartTitleBack = convertView.findViewById(R.id.chartTitleBack);
 
-        // Init FrameLayout
-        mChartCardFront.add(convertView.findViewById(R.id.chart_card_front));
-        mChartCardBack.add(convertView.findViewById(R.id.chart_card_back));
-        mButtonDelete = convertView.findViewById(R.id.buttonDelete);
-        mButtonFavorite = convertView.findViewById(R.id.buttonFavori);
-
-        ChartHelper chartHelper = new ChartHelper();
-        LineChart lineChart = convertView.findViewById(R.id.lineChart);
-
         chartTitleFront.setText(mDataModel.data_types.get(position));
         chartTitleBack.setText(mDataModel.data_types.get(position));
 
-        chartHelper.initChart(lineChart, backgroundColor, textColor);
-
-        lineChart.setTouchEnabled(false);
-
-        mDataModel.getChart(type).observe((LifecycleOwner) mContext, chart -> {
-            // The home charts should only show data by hour
-            if (!chart.getScale().equals(DataModel.AVG_HOUR))
-                return;
-            lineChart.clearValues();
-            for (int index = 0; index < chart.getXAxis().size(); index++) {
-                Float ts_f = (float) chart.getXAxis().get(index).getTime();
-                Float value = chart.getYAxis().get(index);
-                Float[] entry = new Float[]{ts_f, value};
-                Log.d("Log", "" + position);
-                Log.d("Log", "" + Arrays.toString(new ArrayList[]{mDataModel.line_colors}));
-                chartHelper.addEntry(lineChart, entry, mDataModel.line_colors.get(position), false);
-            }
-        });
-        mDataModel.loadChartData(type, DataModel.AVG_HOUR);
 
 
-        mButtonFavorite.setOnClickListener(v -> {
-            if(favorite.contains(mDataModel.data_types.get(position))){
-                favorite.remove(mDataModel.data_types.get(position));
-                mButtonFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
-            }else{
-                favorite.add(mDataModel.data_types.get(position));
-                mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
-            }
-        });
 
-        mButtonDelete.setOnClickListener(v -> {
-
-            if(mDataModel.data_types.contains(mDataModel.data_types.get(position))) {
-                mDataModel.data_types.remove(mDataModel.data_types.get(position));
-                mDataModel.data_units.remove(mDataModel.data_units.get(position));
-                mDataModel.line_colors.remove(mDataModel.line_colors.get(position));
-            }
-            notifyDataSetChanged();
-        });
 
         return convertView;
     }

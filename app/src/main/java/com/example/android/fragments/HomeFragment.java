@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,7 @@ public class HomeFragment extends Fragment {
     private GridView mGridView;
     private ImageButton mImageButtonFront;
     private ImageButton mImageButtonBack;
-    private ImageButton mImageButtonAdddChart;
+    private ImageButton mImageButtonAddChart;
     private Spinner mSpinnerNameSensors;
     private Spinner mSpinnerDataType;
     private Spinner mSpinnerDataUnits;
@@ -69,7 +70,6 @@ public class HomeFragment extends Fragment {
     private boolean mIsBackCardVisible = false;
 
     private ChartItemAdapter chartItemAdapter;
-    private ChartHelper chartHelper = new ChartHelper();
 
     public HomeFragment() {
     }
@@ -127,7 +127,7 @@ public class HomeFragment extends Fragment {
         //Click event listener for hiding popup views
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
-            mChartHelper.selected.removeObservers(this);
+            mChartHelper.getSelected().removeObservers(this);
             mChartViewDialog.setVisibility(View.GONE);
             mCoverView.setVisibility(View.GONE);
             mCardAddChart.setVisibility(View.GONE);
@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment {
 
             // Get the correct LiveData(pm10, pm25...) and bind the graph to it
             chartItemAdapter.getItem(position).observe((LifecycleOwner) getContext(), entries -> {
-                mChartDialog.clearValues();
+                mChartHelper.reset(mChartDialog);
                 for (int index = 0; index < entries.getXAxis().size(); index++) {
                     String dateString = ChartHelper.getStringDate(entries.getXAxis().get(index), "");
                     Float ts_f = (float) Timestamp.valueOf(dateString).getTime();
@@ -164,7 +164,7 @@ public class HomeFragment extends Fragment {
                             DataModel.AVG_MONTH));
 
             // Display the values selected with the chart cursor
-            chartHelper.getSelected().observe(this, (Integer selected) -> {
+            mChartHelper.getSelected().observe(this, (Integer selected) -> {
                 // -1 for error in selection, null if mutableLiveData not set
                 if (selected == null || selected == -1) {
                     mSelectedValueView.setText("");
@@ -191,7 +191,7 @@ public class HomeFragment extends Fragment {
         mImageButtonFront.setOnClickListener(this::flipCard);
         mImageButtonBack.setOnClickListener(this::flipCard);
 
-        mImageButtonAdddChart.setOnClickListener(v -> {
+        mImageButtonAddChart.setOnClickListener(v -> {
             mCardAddChart.setVisibility(View.VISIBLE);
             mCoverView.setVisibility(View.VISIBLE);
             mButtonAddChart.setClickable(true);
@@ -209,12 +209,11 @@ public class HomeFragment extends Fragment {
 
                 //Change item in GridView
                 chartItemAdapter.notifyDataSetChanged();
-                mGridView.setAdapter(chartItemAdapter);
 
                 //Leave Card Add Chart
                 mCardAddChart.setVisibility(View.GONE);
                 mCoverView.setVisibility(View.GONE);
-                flipCard(v);
+
             }
         });
         return mRootView;
@@ -227,14 +226,14 @@ public class HomeFragment extends Fragment {
         int chartBackgroundColor = Color.WHITE;
 
         // Create the adapter to convert the array to views
-        chartItemAdapter = new ChartItemAdapter(getActivity(), mDataModel);
+        chartItemAdapter = new ChartItemAdapter(getActivity(), mDataModel, mChartHelper);
 
         // Attach the adapter to the GridView
         mGridView = mRootView.findViewById(R.id.chartlist);
         mGridView.setAdapter(chartItemAdapter);
 
         mChartDialog = mRootView.findViewById(R.id.lineChartDialog);
-        chartHelper.initChartDialog(mChartDialog, chartBackgroundColor, chartTextColor);
+        mChartHelper.initChartDialog(mChartDialog, chartBackgroundColor, chartTextColor);
         mChartViewDialog = mRootView.findViewById(R.id.viewDialog);
 
         // Init CardView
@@ -259,7 +258,7 @@ public class HomeFragment extends Fragment {
         // Init ImageButton
         mImageButtonFront = mRootView.findViewById(R.id.buttonEditFront);
         mImageButtonBack = mRootView.findViewById(R.id.buttonEditBack);
-        mImageButtonAdddChart = mRootView.findViewById(R.id.buttonAddBack);
+        mImageButtonAddChart = mRootView.findViewById(R.id.buttonAddBack);
 
         // Init Spinner
         mSpinnerNameSensors = mRootView.findViewById(R.id.SPnameSensors);
@@ -275,9 +274,8 @@ public class HomeFragment extends Fragment {
         if (!mIsBackCardVisible) {
             mSetRightOut.setTarget(mCardCitiesFront);
             mSetLeftIn.setTarget(mCardCitiesBack);
+
             for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
-                chartItemAdapter.mChartCardFront.get(i).setAlpha(0);
-                chartItemAdapter.mChartCardBack.get(i).setAlpha(1);
                 chartItemAdapter.mChartCardFront.get(i).setVisibility(View.GONE);
                 chartItemAdapter.mChartCardBack.get(i).setVisibility(View.VISIBLE);
             }
@@ -287,15 +285,13 @@ public class HomeFragment extends Fragment {
             mImageButtonFront.setClickable(false);
             mImageButtonBack.setClickable(true);
             mButtonAddChart.setClickable(true);
-            mImageButtonAdddChart.setClickable(true);
+            mImageButtonAddChart.setClickable(true);
             mIsBackCardVisible = true;
         } else {
             mSetRightOut.setTarget(mCardCitiesBack);
             mSetLeftIn.setTarget(mCardCitiesFront);
 
             for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
-                chartItemAdapter.mChartCardFront.get(i).setAlpha(1);
-                chartItemAdapter.mChartCardBack.get(i).setAlpha(0);
                 chartItemAdapter.mChartCardFront.get(i).setVisibility(View.VISIBLE);
                 chartItemAdapter.mChartCardBack.get(i).setVisibility(View.GONE);
             }
@@ -305,7 +301,7 @@ public class HomeFragment extends Fragment {
             mImageButtonFront.setClickable(true);
             mImageButtonBack.setClickable(false);
             mButtonAddChart.setClickable(false);
-            mImageButtonAdddChart.setClickable(false);
+            mImageButtonAddChart.setClickable(false);
             mCardAddChart.setVisibility(View.GONE);
             mIsBackCardVisible = false;
         }

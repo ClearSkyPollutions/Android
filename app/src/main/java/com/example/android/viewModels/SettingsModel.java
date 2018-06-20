@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class SettingsModel extends ViewModel {
@@ -38,9 +39,10 @@ public class SettingsModel extends ViewModel {
 
             JSONArray arraySensors = response.getJSONArray("Sensors");
 
-            for (int i = 0; i <= arraySensors.length(); i++) {
-                sensors.add(arraySensors.getJSONObject(i).toString());
+            for (int i = 0; i < arraySensors.length(); i++) {
+                sensors.add(arraySensors.getString(i));
             }
+            Log.d("Sens", Arrays.toString(new ArrayList[]{sensors}));
 
             int frequency = response.getInt("Frequency");
             String ssid = response.getString("SSID");
