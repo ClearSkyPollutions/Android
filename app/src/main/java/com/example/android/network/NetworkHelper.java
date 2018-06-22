@@ -17,24 +17,24 @@ import java.net.URL;
 
 public class NetworkHelper implements Request.Method {
 
-    public void sendRequest(String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+    public void sendRequest(String ipAddress, int portHTTP,  String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 method,
-                buildUrl(path, query).toString(),
+                buildUrl(ipAddress, portHTTP, path, query).toString(),
                 dataToSend,
                 f::apply,
                 Throwable::printStackTrace
         );
         RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-        Log.d(NetworkHelper.class.toString(), buildUrl(path, query).toString());
+        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, path, query).toString());
     }
 
-    private URL buildUrl(String path, String query) {
+    private URL buildUrl(String ipAddress, int portHTTP, String path, String query) {
 
         URI uri;
         URL url = null;
         try {
-            uri = new URI("http", null, BuildConfig.IPADDR, BuildConfig.PortHTTP,
+            uri = new URI("http", null, ipAddress, portHTTP,
                     "/" + path, query, null);
             url = uri.toURL();
         } catch (URISyntaxException | MalformedURLException e) {

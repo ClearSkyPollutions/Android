@@ -4,6 +4,8 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
+import com.example.android.activities.BuildConfig;
+import com.example.android.helpers.ChartHelper;
 import com.example.android.helpers.HashHelper;
 import com.example.android.models.Chart;
 import com.example.android.models.Data;
@@ -18,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -31,6 +32,7 @@ public class DataModel extends ViewModel {
     public ArrayList<String> data_types; // = new ArrayList<>(Arrays.asList("pm10","pm25", ""));
     public ArrayList<String> data_units;     //{"µg/m^3", "µg/m^3", "°C", "%"};
     public ArrayList<Integer> line_colors;   //{0xff00ffff, 0xff00ff00, 0xffff00ff, 0xFFFF4081}
+    public ArrayList<Chart> charts;
 
     private Realm realm;
     private NetworkHelper network = new NetworkHelper();
@@ -43,9 +45,6 @@ public class DataModel extends ViewModel {
     public MutableLiveData<String> lastTempValueReceived = new MutableLiveData<>();
     public MutableLiveData<String> lastDatetimeReceived = new MutableLiveData<>();
     private String lastDateUrlParam;
-
-    private SimpleDateFormat ft =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.FRANCE);
 
 
     public DataModel() {
@@ -87,11 +86,11 @@ public class DataModel extends ViewModel {
                     .sort("date", Sort.DESCENDING)
                     .findFirst();
             if (lastData != null) {
-                lastDateUrlParam = ft.format(lastData.getDate());
+                lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
             }
         }, () -> {
             String query = "filter=date,gt," + lastDateUrlParam + "&order=date,desc&transform=1";
-            network.sendRequest(scale, query, NetworkHelper.GET, parseChartData, null);
+            network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, scale, query, NetworkHelper.GET, parseChartData, null);
             Log.d(DataModel.class.toString(), "sync " + scale + " data");
         });
     }
@@ -106,7 +105,7 @@ public class DataModel extends ViewModel {
                     .findFirst();
             if (lastData != null) {
                 lastTempValueReceived.postValue(lastData.getValue().toString());
-                lastDatetimeReceived.postValue(ft.format(lastData.getDate()));
+                lastDatetimeReceived.postValue(ChartHelper.getStringDate(lastData.getDate(),"CardCities"));
                 Log.d("loadLastData", lastData.getDataType() + ", "
                         + lastData.getScale() + ", " + lastData.getValue());
             }
@@ -157,7 +156,7 @@ public class DataModel extends ViewModel {
     public void loadDataTypeUnits() {
         String query = "?columns&filter=date,eq,0";
 
-        network.sendRequest(AVG_HOUR, query, NetworkHelper.GET, parseDataTypes, null);
+        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, AVG_HOUR, query, NetworkHelper.GET, parseDataTypes, null);
     }
 
     private JSONParser<JSONObject> parseDataTypes = (JSONObject response) -> {
@@ -185,6 +184,7 @@ public class DataModel extends ViewModel {
                 for (int i = jsonArray.length() - 1; i >= 0; i--) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     String dateString = jsonObject.getString("date");
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date date = ft.parse(dateString);
                     for (String type : data_types) {
                         Float val = (float) jsonObject.getDouble(type);

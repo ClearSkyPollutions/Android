@@ -110,6 +110,9 @@ public class HomeFragment extends Fragment {
         // Create or get the ViewModel for our charts. Bind the xml variable lastData
         mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
 
+        Log.d(HomeFragment.class.toString(), " "+mDataModel.data_types.size()+" "+
+        mDataModel.data_units.size()+" "+mDataModel.line_colors.size());
+
         // Load data types
         initDefaultTypes();
 
@@ -124,7 +127,7 @@ public class HomeFragment extends Fragment {
         // Init Charts and views
         initViews();
 
-        //Click event listener for hiding popup views
+        //Click event listener closing popup views
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
             mChartHelper.getSelected().removeObservers(this);
@@ -142,6 +145,7 @@ public class HomeFragment extends Fragment {
 
             // Get the correct LiveData(pm10, pm25...) and bind the graph to it
             chartItemAdapter.getItem(position).observe((LifecycleOwner) getContext(), entries -> {
+                Log.d(HomeFragment.class.toString(), ""+position);
                 mChartHelper.reset(mChartDialog);
                 for (int index = 0; index < entries.getXAxis().size(); index++) {
                     String dateString = ChartHelper.getStringDate(entries.getXAxis().get(index), "");
@@ -150,18 +154,26 @@ public class HomeFragment extends Fragment {
                     Float[] entry = new Float[]{ts_f, value};
                     mChartHelper.addEntry(mChartDialog, entry, mDataModel.line_colors.get(position), true);
                 }
+                mChartHelper.getSelected().setValue(mChartHelper.getEntries().size()-1);
             });
 
             //Change the buttons event according to dataType
-            mButtonDay.setOnClickListener(v ->
-                    mDataModel.loadChartData(mDataModel.data_types.get(position),
-                            DataModel.AVG_HOUR));
-            mButtonMonth.setOnClickListener(v ->
-                    mDataModel.loadChartData(mDataModel.data_types.get(position),
-                            DataModel.AVG_DAY));
-            mButtonYear.setOnClickListener(v ->
-                    mDataModel.loadChartData(mDataModel.data_types.get(position),
-                            DataModel.AVG_MONTH));
+            mButtonDay.setOnClickListener(v -> {
+                mChartHelper.getSelected().setValue(-1);
+                mDataModel.loadChartData(mDataModel.data_types.get(position),
+                        DataModel.AVG_HOUR);
+            });
+            mButtonMonth.setOnClickListener(v -> {
+                mChartHelper.getSelected().setValue(-1);
+                mDataModel.loadChartData(mDataModel.data_types.get(position),
+                        DataModel.AVG_DAY);
+            });
+            mButtonYear.setOnClickListener(v -> {
+                mChartHelper.getSelected().setValue(-1);
+                mDataModel.loadChartData(mDataModel.data_types.get(position),
+                                DataModel.AVG_MONTH);
+            });
+
 
             // Display the values selected with the chart cursor
             mChartHelper.getSelected().observe(this, (Integer selected) -> {
@@ -182,9 +194,7 @@ public class HomeFragment extends Fragment {
                     mLabelView.setText(dateString);
                 }
             });
-            if (mIsBackCardVisible) {
-                chartItemAdapter.notifyDataSetChanged();
-            }
+
         });
 
         // Functions Onclick on ImageButton
@@ -197,24 +207,21 @@ public class HomeFragment extends Fragment {
             mButtonAddChart.setClickable(true);
         });
 
-        mButtonAddChart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Random rnd = new Random();
-                if (!mDataModel.data_types.contains(mSpinnerDataType.getSelectedItem())) {
-                    mDataModel.data_types.add(mSpinnerDataType.getSelectedItem().toString());
-                    mDataModel.data_units.add(mSpinnerDataUnits.getSelectedItem().toString());
-                    mDataModel.line_colors.add(Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
-                }
-
-                //Change item in GridView
-                chartItemAdapter.notifyDataSetChanged();
-
-                //Leave Card Add Chart
-                mCardAddChart.setVisibility(View.GONE);
-                mCoverView.setVisibility(View.GONE);
-
+        mButtonAddChart.setOnClickListener(v -> {
+            Random rnd = new Random();
+            if (!mDataModel.data_types.contains(mSpinnerDataType.getSelectedItem())) {
+                mDataModel.data_types.add(mSpinnerDataType.getSelectedItem().toString());
+                mDataModel.data_units.add(mSpinnerDataUnits.getSelectedItem().toString());
+                mDataModel.line_colors.add(Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
             }
+
+            //Change item in GridView
+            chartItemAdapter.notifyDataSetChanged();
+
+            //Leave Card Add Chart
+            mCardAddChart.setVisibility(View.GONE);
+            mCoverView.setVisibility(View.GONE);
+
         });
         return mRootView;
     }
@@ -277,6 +284,7 @@ public class HomeFragment extends Fragment {
 
             for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
                 chartItemAdapter.mChartCardFront.get(i).setVisibility(View.GONE);
+                Log.d(HomeFragment.class.toString(), "True: " + i );
                 chartItemAdapter.mChartCardBack.get(i).setVisibility(View.VISIBLE);
             }
 
@@ -293,6 +301,7 @@ public class HomeFragment extends Fragment {
 
             for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
                 chartItemAdapter.mChartCardFront.get(i).setVisibility(View.VISIBLE);
+                Log.d(HomeFragment.class.toString(), "True: " + i);
                 chartItemAdapter.mChartCardBack.get(i).setVisibility(View.GONE);
             }
 

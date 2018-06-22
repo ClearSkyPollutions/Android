@@ -1,9 +1,11 @@
 package com.example.android.fragments;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.InputDevice;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -11,12 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.example.android.models.SharedData;
+import com.example.android.viewModels.MapModel;
+
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
 
+
 public class MapFragment extends Fragment {
    private MapView map = null;
+   private MapModel mapModel;
+   private SharedData[] sharedDataList = {};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,6 +37,23 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
 
        map = new MapView(inflater.getContext());
+
+       mapModel = ViewModelProviders.of(getActivity()).get(MapModel.class);
+
+       mapModel.lastHour.observe(this, s -> {
+           mapModel.syncMapData();
+       });
+       mapModel.getLastHour();
+
+
+       mapModel.liveSharedDataArrayList.observe(this, arrayList -> {
+           arrayList.toArray(sharedDataList);
+           for (int i = 0; i < sharedDataList.length; i++) {
+               SharedData sharedData = sharedDataList[i];
+               Log.d(MapFragment.class.toString(), "SharedData: "+sharedData.getType()+", "+sharedData.getLatitude()+
+                       ", "+sharedData.getLongitude()+", "+sharedData.getDate()+", "+sharedData.getValue());
+           }
+       });
 
        map.setOnGenericMotionListener(new View.OnGenericMotionListener() {
            /**
