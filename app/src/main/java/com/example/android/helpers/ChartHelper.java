@@ -56,7 +56,6 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         y1.setSpaceTop(percent);
         y1.setSpaceBottom(percent);
         y1.setDrawGridLines(false);
-        y1.setEnabled(false);
         YAxis y2 = mChart.getAxisRight();
         y2.setEnabled(false);
     }
@@ -165,16 +164,16 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
             set.addEntry(new Entry(ts_f, dataValue));
             entries.add(ts_f);
 
-
             // let the chart know it's data has changed
             data.notifyDataChanged();
             mChart.notifyDataSetChanged();
 
-
-
             // move to the latest entry
             mChart.moveViewToX(ts_f);
         }
+
+        YAxis y1 = mChart.getAxisLeft();
+        y1.setEnabled(draw);
     }
 
 
@@ -219,26 +218,39 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
 
     public void reset(LineChart chart) {
         chart.clearValues();
-        entries.clear();
-
+        getEntries().clear();
+        getSelected().setValue(-1);
     }
 
     public static String getStringDate(Date date, String scale) {
         SimpleDateFormat ft;
         switch (scale) {
             case "AVG_HOUR":
-                ft = new SimpleDateFormat("EEE HH'h'", Locale.FRANCE);
+                ft = new SimpleDateFormat("EEEE, MMM d, yyyy HH'h'");
                 break;
             case "AVG_DAY":
-                ft = new SimpleDateFormat("EEE dd", Locale.FRANCE);
+                ft = new SimpleDateFormat("EEEE, MMM d, yyyy");
                 break;
             case "AVG_MONTH":
-                ft = new SimpleDateFormat("MMM", Locale.FRANCE);
+                ft = new SimpleDateFormat("MMMM yyyy");
+                break;
+            case "AVG_YEAR":
+                ft = new SimpleDateFormat("yyyy");
+                break;
+            case "CardCities":
+                ft = new SimpleDateFormat("EEEE, MMM d, yyyy HH:mm");
                 break;
             default:
-                ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.FRANCE);
+                ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 break;
         }
         return ft.format(date);
+    }
+
+    public ArrayList<Float> getEntries() {
+        if(entries == null){
+            entries = new ArrayList<>();
+        }
+        return entries;
     }
 }

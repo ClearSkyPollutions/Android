@@ -4,19 +4,26 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import com.example.android.activities.R;
+
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 public class CircleOverlay extends Overlay {
     private Drawable circleIcon;
     private GeoPoint location;
+    private String title;
+    private String informations;
 
-    public CircleOverlay(Drawable icon, GeoPoint pos) {
+    public CircleOverlay(Drawable icon, GeoPoint pos, String name, String infos) {
         super();
         circleIcon = icon;
         location = pos;
+        title = name;
+        informations = infos;
     }
 
     @Override
@@ -39,12 +46,11 @@ public class CircleOverlay extends Overlay {
                 location.setLatitude(-85.05112877980659);
 
             Marker m = new Marker(map);
+            m.setInfoWindow(new MarkerInfoWindow(R.layout.infowindow_map, map));
             m.setPosition(location);
             m.setIcon(circleIcon);
-            m.setImage(circleIcon);
-            m.setTitle("A demo title");
-            m.setSubDescription("A demo sub description\n" + location.getLatitude() + "," + location.getLongitude());
-            m.setSnippet("a snippet of information");
+            m.setTitle(title);
+            m.setSnippet(informations);
             map.getOverlayManager().add(m);
             map.invalidate();
         }

@@ -1,12 +1,16 @@
 package com.example.android.models;
 
+import android.app.IntentService;
+
 import java.util.ArrayList;
 import java.util.Date;
 
 public class Chart {
+
     private String name;
     private String unit;
     private String scale;
+    private Integer color;
     private ArrayList<Date> xAxis;
     private ArrayList<Float> yAxis;
 
@@ -16,6 +20,14 @@ public class Chart {
         this.scale = scale;
         this.xAxis = new ArrayList<>();
         this.yAxis = new ArrayList<>();
+    }
+
+    public Chart(String dataType, String dataUnit, Integer lineColor) {
+        name = dataType;
+        unit = dataUnit;
+        color = lineColor;
+        xAxis = new ArrayList<>();
+        yAxis = new ArrayList<>();
     }
 
     public Chart(Chart copy, ArrayList<Date> xAxis, ArrayList<Float> yAxis) {

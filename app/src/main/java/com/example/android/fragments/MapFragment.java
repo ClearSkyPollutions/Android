@@ -1,7 +1,7 @@
 package com.example.android.fragments;
 
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -17,20 +17,26 @@ import com.example.android.activities.BuildConfig;
 import com.example.android.activities.R;
 
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
+
+import com.example.android.models.RPI;
+import com.example.android.models.SharedData;
+import com.example.android.viewModels.MapModel;
+
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
 import org.osmdroid.views.overlay.MinimapOverlay;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
-import org.osmdroid.views.overlay.mylocation.SimpleLocationOverlay;
 
-public class MapFragment extends Fragment implements View.OnLongClickListener  {
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+public class MapFragment extends Fragment {
 
     private Context mContext;
     DisplayMetrics dm;
@@ -45,6 +51,8 @@ public class MapFragment extends Fragment implements View.OnLongClickListener  {
     private RotationGestureOverlay mRotationGestureOverlay;
     private CircleOverlay mcircleOverlay;
 
+    private MapModel mapModel;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +63,9 @@ public class MapFragment extends Fragment implements View.OnLongClickListener  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Log.d("Map", "OnCreateView");
+        mapModel = ViewModelProviders.of(getActivity()).get(MapModel.class);
+        mapModel.syncMapData();
+
         map = new MapView(inflater.getContext());
 
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
@@ -79,6 +89,8 @@ public class MapFragment extends Fragment implements View.OnLongClickListener  {
             }
             return false;
         });
+
+
         map.setTileSource(TileSourceFactory.MAPNIK);
         return map;
     }
@@ -117,10 +129,33 @@ public class MapFragment extends Fragment implements View.OnLongClickListener  {
             final double longitude = Double.valueOf(longitudeString);
             map.setExpectedCenter(new GeoPoint(latitude, longitude));
         }
+
         addOverlays();
 
+        mapModel.liveRpiArrayList.observe(this, rpiArrayList -> {
+            map.getOverlays().clear();
+            for (RPI rpi : rpiArrayList) {
+                StringBuilder txt  = new StringBuilder();
+
+                for (SharedData sharedData : rpi.getSharedDataArrayList()) {
+                    txt.append(sharedData.getType().toUpperCase())
+                            .append(" : ")
+                            .append(sharedData.getValue())
+                            .append("<br>");
+                }
+                txt.append("<br><div align=\"right\">")
+                        .append(rpi.getSharedDataArrayList().get(0).getDate())
+                        .append("</div>");
+
+                CircleOverlay circleOverlay = new CircleOverlay(
+                        this.getResources().getDrawable(R.drawable.ic_home_black_24dp),
+                        rpi.getPosition(), rpi.getName(), txt.toString());
+                map.getOverlays().add(circleOverlay);
+            }
+        });
+
         setHasOptionsMenu(true);
-        }
+    }
 
     @Override
     public void onPause() {
@@ -157,12 +192,6 @@ public class MapFragment extends Fragment implements View.OnLongClickListener  {
     }
 
     @Override
-    public boolean onLongClick(View v) {
-        map.invalidate();
-        return true;
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (map != null)
@@ -187,18 +216,9 @@ public class MapFragment extends Fragment implements View.OnLongClickListener  {
         //map scale
         mScaleBarOverlay = new ScaleBarOverlay(map);
         mScaleBarOverlay.setCentred(true);
-        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 100);
         map.getOverlays().add(this.mScaleBarOverlay);
 
-        //support for map rotation
-        mRotationGestureOverlay = new RotationGestureOverlay(map);
-        mRotationGestureOverlay.setEnabled(true);
-        map.getOverlays().add(this.mRotationGestureOverlay);
-
-        //@TODO : Observe viewmodel, clear map.getoverlays, ajouter tout les nouveaux systemes
-        GeoPoint a = new GeoPoint(45.188529, 5.724523999999974);
-        mcircleOverlay = new CircleOverlay(this.getResources().getDrawable(R.drawable.ic_home_black_24dp), a);
-        map.getOverlays().add(this.mcircleOverlay);
     }
 }
 

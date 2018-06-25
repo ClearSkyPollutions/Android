@@ -7,6 +7,7 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.android.activities.BuildConfig;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
 
@@ -56,6 +57,6 @@ public class SettingsModel extends ViewModel {
     };
 
     public void communication(String path, int method, JSONObject configToSend) {
-        network.sendRequest(path, null, method, parseSettings, configToSend);
+        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, path, null, method, parseSettings, configToSend);
     }
 }
