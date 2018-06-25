@@ -1,5 +1,17 @@
 <resources>
     <string name="app_name">ClearSky</string>
+
+    <string name="preference_file_key">com.example.android.preferences</string>
+    <string name="prefs_zoom_level_double">zoomLevelDouble</string>
+    <string name="prefs_zoom_level">zoomLevel</string>
+    <string name="prefs_orientation">orientation</string>
+    <string name="prefs_latitude_string">latitudeString</string>
+    <string name="prefs_longitude_string">longitudeString</string>
+    <string name="prefs_scroll_x">scrollX</string>
+    <string name="prefs_scroll_y">scrollY</string>
+    <string name="prefs_tile_source">tilesource</string>
+
+
     <string name="refresh">Refresh</string>
     <string name="title_activity_tabs">TabsActivity</string>
     <string name="action_settings">Settings</string>
