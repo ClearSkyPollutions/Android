@@ -5,12 +5,14 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import com.example.android.activities.BuildConfig;
+import com.example.android.models.RPI;
 import com.example.android.models.SharedData;
 import com.example.android.network.NetworkHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 
@@ -23,71 +25,69 @@ public class MapModel extends ViewModel {
 
     private NetworkHelper networkHelper;
     public MutableLiveData<String> lastHour;
-    public MutableLiveData<ArrayList<SharedData>> liveSharedDataArrayList;
-    private static final String AVG_HOUR = "AVG_HOUR";
-    private static final String TYPE = "Type";
-    private static final String SYSTEM = "System";
-    private static final String DATE = "Date";
-    private static final String VALUE = "Value";
-    private static final String LATITUDE = "Latitude";
-    private static final String LONGITUDE = "Longitude";
-    private static final String NAME = "Name";
-
-
+    public MutableLiveData<ArrayList<RPI>> liveRpiArrayList;
+    private static final String MAP = "MAP";
+    private static final String POLLUTANT = "pollutant";
+    private static final String SYSTEM = "system";
+    private static final String DATE = "date";
+    private static final String VALUE = "value";
+    private static final String LATITUDE = "latitude";
+    private static final String LONGITUDE = "longitude";
 
 
     public MapModel() {
         networkHelper = new NetworkHelper();
         lastHour = new MutableLiveData<>();
-        liveSharedDataArrayList = new MutableLiveData<>();
+        liveRpiArrayList = new MutableLiveData<ArrayList<RPI>>();
     }
-
-    public void getLastHour() {
-        String query = "order="+DATE+",desc&page=1,1&columns="+DATE+"&transform=1";
-        networkHelper.sendRequest(BuildConfig.IPADDR_SERVER, BuildConfig.PortHTTP_SERVER, AVG_HOUR, query, NetworkHelper.GET, parseLastHour, null);
-    }
-
 
     public void syncMapData() {
-        String query = "filter="+DATE+",eq,"+lastHour.getValue()+"&include="+SYSTEM+","+TYPE+"&columns="+DATE+","+VALUE+","+SYSTEM+
-                "."+LATITUDE+","+SYSTEM+"."+LONGITUDE+","+TYPE+"."+NAME+"&transform=1";
-        networkHelper.sendRequest(BuildConfig.IPADDR_SERVER, BuildConfig.PortHTTP_SERVER, AVG_HOUR, query, NetworkHelper.GET, parseMapData, null);
+        String query = "order=system,asc&transform=1";
+        networkHelper.sendRequest(BuildConfig.IPADDR_SERVER, BuildConfig.PortHTTP_SERVER, MAP, query, NetworkHelper.GET, parseMapData, null);
     }
 
     private JSONParser<JSONObject> parseMapData = (JSONObject response) -> {
-        ArrayList<SharedData> sharedDataArrayList = new ArrayList<>();
+        ArrayList<RPI> rpiArrayList = new ArrayList<>();
         try {
             String tableName = response.keys().next();
             JSONArray jsonArray = response.getJSONArray(tableName);
+            String systemName = "";
+            RPI rpi = null;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
+                if (!systemName.equals(jsonObject.getString(SYSTEM))) {
+                    systemName = jsonObject.getString(SYSTEM);
+                    String latitude = jsonObject.getString(LATITUDE);
+                    Double lat_d = Double.parseDouble(latitude);
+                    String longitude = jsonObject.getString(LONGITUDE);
+                    Double long_d = Double.parseDouble(longitude);
+                    rpi = new RPI(systemName, new GeoPoint(lat_d, long_d));
+                    rpiArrayList.add(rpi);
+                }
                 String date = jsonObject.getString(DATE);
                 Double value = jsonObject.getDouble(VALUE);
-                JSONObject system = jsonObject.getJSONArray(SYSTEM).getJSONObject(0);
-                String latitude = system.getString(LATITUDE);
-                String longitude = system.getString(LONGITUDE);
-                JSONObject type = jsonObject.getJSONArray(TYPE).getJSONObject(0);
-                String typeName = type.getString(NAME);
-                SharedData sharedData = new SharedData();
-                sharedData.setType(typeName);
-                sharedData.setLatitude(latitude);
-                sharedData.setLongitude(longitude);
-                sharedData.setDate(date);
-                sharedData.setValue(value);
-                sharedDataArrayList.add(sharedData);
+                String pollutantName = jsonObject.getString(POLLUTANT);
+                SharedData sharedData = new SharedData(pollutantName, date, value);
+                if (rpi != null)
+                    rpi.getSharedDataArrayList().add(sharedData);
             }
-            liveSharedDataArrayList.postValue(sharedDataArrayList);
+            liveRpiArrayList.postValue(rpiArrayList);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     };
+
+    public void getLastHour() {
+        String query = "order=" + DATE + ",desc&page=1,1&columns=" + DATE + "&transform=1";
+        networkHelper.sendRequest(BuildConfig.IPADDR_SERVER, BuildConfig.PortHTTP_SERVER, MAP, query, NetworkHelper.GET, parseLastHour, null);
+    }
 
     JSONParser<JSONObject> parseLastHour = (JSONObject response) -> {
         try {
             String tableName = response.keys().next();
             JSONArray jsonArray = response.getJSONArray(tableName);
             String hour = jsonArray.getJSONObject(0).getString(DATE);
-            Log.d(MapModel.class.toString(), "Last Hour: "+hour);
+            Log.d(MapModel.class.toString(), "Last Hour: " + hour);
             if (lastHour.getValue() == null) lastHour.postValue(hour);
             else if (!hour.equals(lastHour.getValue())) lastHour.postValue(hour);
             ;

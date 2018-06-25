@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.example.android.models.RPI;
 import com.example.android.models.SharedData;
 import com.example.android.viewModels.MapModel;
 
@@ -20,11 +21,12 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
 
+import java.util.ArrayList;
+
 
 public class MapFragment extends Fragment {
    private MapView map = null;
    private MapModel mapModel;
-   private SharedData[] sharedDataList = {};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,18 +42,17 @@ public class MapFragment extends Fragment {
 
        mapModel = ViewModelProviders.of(getActivity()).get(MapModel.class);
 
-       mapModel.lastHour.observe(this, s -> {
-           mapModel.syncMapData();
-       });
-       mapModel.getLastHour();
+       mapModel.syncMapData();
 
 
-       mapModel.liveSharedDataArrayList.observe(this, arrayList -> {
-           arrayList.toArray(sharedDataList);
-           for (int i = 0; i < sharedDataList.length; i++) {
-               SharedData sharedData = sharedDataList[i];
-               Log.d(MapFragment.class.toString(), "SharedData: "+sharedData.getType()+", "+sharedData.getLatitude()+
-                       ", "+sharedData.getLongitude()+", "+sharedData.getDate()+", "+sharedData.getValue());
+       mapModel.liveRpiArrayList.observe(this, rpiArrayList -> {
+           Log.d(MapFragment.class.toString(), "True");
+           for (RPI rpi: rpiArrayList) {
+               for(SharedData sharedData : rpi.getSharedDataArrayList()) {
+                   Log.d(MapFragment.class.toString(), rpi.getName()+" "+rpi.getPosition().getLongitude()
+                           +" "+rpi.getPosition().getLatitude()+" "+ sharedData.getType()
+                   +" "+sharedData.getDate()+" "+sharedData.getValue());
+               }
            }
        });
 

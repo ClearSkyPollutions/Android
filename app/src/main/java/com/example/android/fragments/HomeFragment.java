@@ -190,7 +190,7 @@ public class HomeFragment extends Fragment {
                     // Formatting of the date depends on the scale of the chart
                     String dateString = ChartHelper.getStringDate(date, ch.getScale());
 
-                    mSelectedValueView.setText(val);
+                    mSelectedValueView.setText(val+" "+mDataModel.data_units.get(position));
                     mLabelView.setText(dateString);
                 }
             });

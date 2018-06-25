@@ -8,23 +8,18 @@ import java.util.ArrayList;
  * Created by nrutemby on 21/06/2018.
  */
 
-public class System {
+public class RPI {
 
-    private String id;
     private String name;
     private GeoPoint position;
     private ArrayList<SharedData> sharedDataArrayList;
 
-    public System(String id, String name, GeoPoint position) {
-        this.id = id;
+    public RPI(String name, GeoPoint position) {
         this.name = name;
         this.position = position;
         sharedDataArrayList = new ArrayList<>();
     }
 
-    public String getId() {
-        return id;
-    }
 
     public String getName() {
         return name;
@@ -40,5 +35,13 @@ public class System {
 
     public void setSharedDataArrayList(ArrayList<SharedData> sharedDataArrayList) {
         this.sharedDataArrayList = sharedDataArrayList;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPosition(GeoPoint position) {
+        this.position = position;
     }
 }
