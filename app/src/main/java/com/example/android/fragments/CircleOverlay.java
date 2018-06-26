@@ -17,13 +17,16 @@ public class CircleOverlay extends Overlay {
     private GeoPoint location;
     private String title;
     private String informations;
+    private String date;
+    private Marker m = null;
 
-    public CircleOverlay(Drawable icon, GeoPoint pos, String name, String infos) {
+    public CircleOverlay(Drawable icon, GeoPoint pos, String name, String infos, String d) {
         super();
         circleIcon = icon;
         location = pos;
         title = name;
         informations = infos;
+        date = d;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class CircleOverlay extends Overlay {
             return;
         }
 
-        if (circleIcon != null) {
+        if (m == null && circleIcon != null) {
 
             //just in case the point is off the map, let's fix the coordinates
             if (location.getLongitude() < -180)
@@ -45,12 +48,14 @@ public class CircleOverlay extends Overlay {
             if (location.getLatitude() < -85.05112877980659)
                 location.setLatitude(-85.05112877980659);
 
-            Marker m = new Marker(map);
+            m = new Marker(map);
+            Log.d("Mem",m.toString());
             m.setInfoWindow(new MarkerInfoWindow(R.layout.infowindow_map, map));
             m.setPosition(location);
             m.setIcon(circleIcon);
             m.setTitle(title);
             m.setSnippet(informations);
+            m.setSubDescription(date);
             map.getOverlayManager().add(m);
             map.invalidate();
         }

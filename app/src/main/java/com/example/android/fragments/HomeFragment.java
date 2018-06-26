@@ -249,7 +249,7 @@ public class HomeFragment extends Fragment {
         mCardAddChart = mRootView.findViewById(R.id.addElement);
 
         //For animation change the distance
-        changeCameraDistance();
+        //changeCameraDistance();
 
         //Init buttons
         mButtonDay = mRootView.findViewById(R.id.day_bt);

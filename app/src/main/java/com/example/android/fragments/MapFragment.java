@@ -135,21 +135,17 @@ public class MapFragment extends Fragment {
         mapModel.liveRpiArrayList.observe(this, rpiArrayList -> {
             map.getOverlays().clear();
             for (RPI rpi : rpiArrayList) {
-                StringBuilder txt  = new StringBuilder();
-
+                StringBuilder txt = new StringBuilder();
+                txt.append("<br>");
                 for (SharedData sharedData : rpi.getSharedDataArrayList()) {
                     txt.append(sharedData.getType().toUpperCase())
                             .append(" : ")
                             .append(sharedData.getValue())
                             .append("<br>");
                 }
-                txt.append("<br><div align=\"right\">")
-                        .append(rpi.getSharedDataArrayList().get(0).getDate())
-                        .append("</div>");
-
                 CircleOverlay circleOverlay = new CircleOverlay(
                         this.getResources().getDrawable(R.drawable.ic_home_black_24dp),
-                        rpi.getPosition(), rpi.getName(), txt.toString());
+                        rpi.getPosition(), rpi.getName(), txt.toString(), rpi.getSharedDataArrayList().get(0).getDate());
                 map.getOverlays().add(circleOverlay);
             }
         });
