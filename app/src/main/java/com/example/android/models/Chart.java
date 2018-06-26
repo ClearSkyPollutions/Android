@@ -1,31 +1,22 @@
 package com.example.android.models;
 
-import android.app.IntentService;
-
 import java.util.ArrayList;
 import java.util.Date;
 
 public class Chart {
 
-    private String name;
+    private String type;
     private String unit;
     private String scale;
     private Integer color;
     private ArrayList<Date> xAxis;
     private ArrayList<Float> yAxis;
 
-    public Chart(String name, String unit, String scale) {
-        this.name = name;
-        this.unit = unit;
-        this.scale = scale;
-        this.xAxis = new ArrayList<>();
-        this.yAxis = new ArrayList<>();
-    }
-
-    public Chart(String dataType, String dataUnit, Integer lineColor) {
-        name = dataType;
+    public Chart(String dataType, String dataUnit, Integer lineColor, String scale) {
+        type = dataType;
         unit = dataUnit;
         color = lineColor;
+        this.scale = scale;
         xAxis = new ArrayList<>();
         yAxis = new ArrayList<>();
     }
@@ -33,17 +24,18 @@ public class Chart {
     public Chart(Chart copy, ArrayList<Date> xAxis, ArrayList<Float> yAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
-        this.name = copy.name;
+        this.type = copy.type;
         this.unit = copy.unit;
+        this.color = copy.color;
         this.scale = copy.scale;
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUnit() {
@@ -76,6 +68,14 @@ public class Chart {
 
     public void setXAxis(ArrayList<Date> xAxis) {
         this.xAxis = xAxis;
+    }
+
+    public Integer getColor() {
+        return color;
+    }
+
+    public void setColor(Integer color) {
+        this.color = color;
     }
 }
 
