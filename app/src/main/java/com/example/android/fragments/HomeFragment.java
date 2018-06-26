@@ -145,7 +145,6 @@ public class HomeFragment extends Fragment {
                                 DataModel.AVG_MONTH);
             });
 
-
             // Display the values selected with the chart cursor
             mChartHelper.getSelected().observe(this, (Integer selected) -> {
                 // -1 for error in selection, null if mutableLiveData not set
@@ -229,7 +228,7 @@ public class HomeFragment extends Fragment {
         mCardAddChart = mRootView.findViewById(R.id.addElement);
 
         //For animation change the distance
-        changeCameraDistance();
+        //changeCameraDistance();
 
         //Init buttons
         mButtonDay = mRootView.findViewById(R.id.day_bt);

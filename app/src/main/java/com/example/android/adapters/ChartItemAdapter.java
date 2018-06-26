@@ -78,9 +78,6 @@ public class ChartItemAdapter extends BaseAdapter {
             mChartCardFront.get(position).setVisibility(View.VISIBLE);
             mChartCardBack.get(position).setVisibility(View.GONE);
 
-            mDataModel.loadChartData(position, DataModel.AVG_HOUR);
-            Log.d(ChartItemAdapter.class.toString(), "loadChartData");
-
             mButtonFavorite.setOnClickListener(v -> {
                 if (favorite.contains(type)) {
                     favorite.remove(type);

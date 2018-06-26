@@ -82,7 +82,7 @@ public class DataModel extends ViewModel {
     }
 
     private void syncChartData(String scale) {
-        realm.executeTransactionAsync(realmDb -> {
+        realm.executeTransaction(realmDb -> {
             Data lastData = realmDb
                     .where(Data.class)
                     .equalTo("scale", scale)
@@ -91,7 +91,6 @@ public class DataModel extends ViewModel {
             if (lastData != null) {
                 lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
             }
-        }, () -> {
             String query = "filter=date,gt," + lastDateUrlParam + "&order=date,desc&transform=1";
             network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, scale, query, NetworkHelper.GET, parseChartData, null);
             Log.d(DataModel.class.toString(), "sync " + scale + " data");
@@ -102,7 +101,7 @@ public class DataModel extends ViewModel {
     private JSONParser<JSONObject> parseChartData = (JSONObject response) -> {
         Realm realm = Realm.getDefaultInstance();
         Data data = new Data();
-        realm.executeTransaction(realmDb -> {
+        realm.executeTransactionAsync(realmDb -> {
             try {
                 String scale = response.keys().next();
                 JSONArray jsonArray = response.getJSONArray(scale);
@@ -126,6 +125,11 @@ public class DataModel extends ViewModel {
                 }
             } catch (JSONException | ParseException e) {
                 e.printStackTrace();
+            }
+        }, () -> {
+            for (int position = 0; position < charts.size(); position++){
+                loadChartData(position, AVG_HOUR);
+                loadLastData();
             }
         });
         realm.close();
@@ -167,6 +171,8 @@ public class DataModel extends ViewModel {
                     Data data = dataList.get(i);
                     xAxis.add(data.getDate());
                     yAxis.add(data.getValue());
+                    Log.d("loadChartData", data.getDataType() + ", "
+                            + data.getScale() + ", " + data.getValue());
                     i--;
                 }
                 liveChart.getValue().setScale(scale);
