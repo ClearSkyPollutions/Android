@@ -43,6 +43,10 @@ public class DataModel extends ViewModel {
     public MutableLiveData<String> lastTempValueReceived = new MutableLiveData<>();
     public MutableLiveData<String> lastDatetimeReceived = new MutableLiveData<>();
     private String lastDateUrlParam;
+    private static final String POLLUTANT = "POLLUTANT";
+    private static final String DATE = "date";
+    private static final String VALUE = "value";
+    private static final String POLLUTANT_NAME = "name";
 
 
     public DataModel() {
@@ -91,7 +95,7 @@ public class DataModel extends ViewModel {
             if (lastData != null) {
                 lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
             }
-            String query = "filter=date,gt," + lastDateUrlParam + "&order=date,desc&transform=1";
+            String query = "filter="+DATE+",gt," + lastDateUrlParam + "&order="+DATE+",desc&include="+POLLUTANT+"&transform=1";
             network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, scale, query, NetworkHelper.GET, parseChartData, null);
             Log.d(DataModel.class.toString(), "sync " + scale + " data");
         });
@@ -107,21 +111,20 @@ public class DataModel extends ViewModel {
                 JSONArray jsonArray = response.getJSONArray(scale);
                 for (int i = jsonArray.length() - 1; i >= 0; i--) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    String dateString = jsonObject.getString("date");
+                    String dateString = jsonObject.getString(DATE);
                     SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date date = ft.parse(dateString);
-                    for (Chart chart : charts) {
-                        String type = chart.getType();
-                        Float val = (float) jsonObject.getDouble(type);
-                        data.setId(HashHelper.generateMD5(dateString + type + scale));
-                        data.setDate(date);
-                        data.setValue(val);
-                        data.setDataType(type);
-                        data.setScale(scale);
-                        realmDb.copyToRealmOrUpdate(data);
-                        Log.d("parseChartData", data.getDataType() + ", "
-                                + data.getScale() + ", " + data.getValue());
-                    }
+                    JSONArray pollutant = jsonObject.getJSONArray(POLLUTANT);
+                    String type = pollutant.getJSONObject(0).getString(POLLUTANT_NAME);
+                    Float val = (float) jsonObject.getDouble(VALUE);
+                    data.setId(HashHelper.generateMD5(dateString + type + scale));
+                    data.setDate(date);
+                    data.setValue(val);
+                    data.setDataType(type);
+                    data.setScale(scale);
+                    realmDb.copyToRealmOrUpdate(data);
+                    Log.d("parseChartData", data.getDataType() + ", "
+                            + data.getScale() + ", " + data.getValue());
                 }
             } catch (JSONException | ParseException e) {
                 e.printStackTrace();
