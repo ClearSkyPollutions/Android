@@ -71,32 +71,6 @@ public class HomeFragment extends Fragment {
 
     private ChartItemAdapter chartItemAdapter;
 
-    public HomeFragment() {
-    }
-
-    // @TODO : Remplacer par un download des types depuis la RPI
-    private void initDefaultTypes() {
-        if(mDataModel.data_types.isEmpty()) {
-            mDataModel.data_types.add("pm10");
-            mDataModel.data_units.add("µg/m^3");
-            mDataModel.line_colors.add(0xff00ffff);
-
-            mDataModel.data_types.add("pm25");
-            mDataModel.data_units.add("µg/m^3");
-            mDataModel.line_colors.add(0xff00ff00);
-
-            mDataModel.data_types.add("humidity");
-            mDataModel.data_units.add("%");
-            mDataModel.line_colors.add(0xffff00ff);
-
-            mDataModel.data_types.add("temperature");
-            mDataModel.data_units.add("°C");
-            mDataModel.line_colors.add(0xFFFF4081);
-
-            mDataModel.syncAll();
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -110,11 +84,8 @@ public class HomeFragment extends Fragment {
         // Create or get the ViewModel for our charts. Bind the xml variable lastData
         mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
 
-        Log.d(HomeFragment.class.toString(), " "+mDataModel.data_types.size()+" "+
-        mDataModel.data_units.size()+" "+mDataModel.line_colors.size());
-
-        // Load data types
-        initDefaultTypes();
+        // sync all data
+        mDataModel.syncAll();
 
         binding.setLastData(mDataModel);
         mDataModel.loadLastData();
@@ -143,16 +114,16 @@ public class HomeFragment extends Fragment {
             mChartViewDialog.setVisibility(View.VISIBLE);
             mCoverView.setVisibility(View.VISIBLE);
 
-            // Get the correct LiveData(pm10, pm25...) and bind the graph to it
-            chartItemAdapter.getItem(position).observe((LifecycleOwner) getContext(), entries -> {
-                Log.d(HomeFragment.class.toString(), ""+position);
+            // Get the correct LiveData(pm10, pm25...) to fill chartDialog with data
+            chartItemAdapter.getItem(position).observe((LifecycleOwner) getContext(), newChart -> {
                 mChartHelper.reset(mChartDialog);
-                for (int index = 0; index < entries.getXAxis().size(); index++) {
-                    String dateString = ChartHelper.getStringDate(entries.getXAxis().get(index), "");
+                for (int index = 0; index < newChart.getXAxis().size(); index++) {
+                    String dateString = ChartHelper.getStringDate(newChart.getXAxis().get(index), "");
                     Float ts_f = (float) Timestamp.valueOf(dateString).getTime();
-                    Float value = entries.getYAxis().get(index);
+                    Float value = newChart.getYAxis().get(index);
                     Float[] entry = new Float[]{ts_f, value};
-                    mChartHelper.addEntry(mChartDialog, entry, mDataModel.line_colors.get(position), true);
+                    mChartHelper.addEntry(mChartDialog, entry, newChart.getColor(), true);
+                    Log.d(HomeFragment.class.toString(), "add new entry");
                 }
                 mChartHelper.getSelected().setValue(mChartHelper.getEntries().size()-1);
             });
@@ -160,20 +131,19 @@ public class HomeFragment extends Fragment {
             //Change the buttons event according to dataType
             mButtonDay.setOnClickListener(v -> {
                 mChartHelper.getSelected().setValue(-1);
-                mDataModel.loadChartData(mDataModel.data_types.get(position),
+                mDataModel.loadChartData(position,
                         DataModel.AVG_HOUR);
             });
             mButtonMonth.setOnClickListener(v -> {
                 mChartHelper.getSelected().setValue(-1);
-                mDataModel.loadChartData(mDataModel.data_types.get(position),
+                mDataModel.loadChartData(position,
                         DataModel.AVG_DAY);
             });
             mButtonYear.setOnClickListener(v -> {
                 mChartHelper.getSelected().setValue(-1);
-                mDataModel.loadChartData(mDataModel.data_types.get(position),
+                mDataModel.loadChartData(position,
                                 DataModel.AVG_MONTH);
             });
-
 
             // Display the values selected with the chart cursor
             mChartHelper.getSelected().observe(this, (Integer selected) -> {
@@ -182,7 +152,7 @@ public class HomeFragment extends Fragment {
                     mSelectedValueView.setText("");
                     mLabelView.setText("");
                 } else {
-                    Chart ch = mDataModel.getChart(mDataModel.data_types.get(position)).getValue();
+                    Chart ch = mDataModel.getLiveChart(position).getValue();
 
                     String val = ch.getYAxis().get(selected).toString();
                     Date date = ch.getXAxis().get(selected);
@@ -190,7 +160,7 @@ public class HomeFragment extends Fragment {
                     // Formatting of the date depends on the scale of the chart
                     String dateString = ChartHelper.getStringDate(date, ch.getScale());
 
-                    mSelectedValueView.setText(val+" "+mDataModel.data_units.get(position));
+                    mSelectedValueView.setText(val+" "+ch.getUnit());
                     mLabelView.setText(dateString);
                 }
             });
@@ -209,10 +179,19 @@ public class HomeFragment extends Fragment {
 
         mButtonAddChart.setOnClickListener(v -> {
             Random rnd = new Random();
-            if (!mDataModel.data_types.contains(mSpinnerDataType.getSelectedItem())) {
-                mDataModel.data_types.add(mSpinnerDataType.getSelectedItem().toString());
-                mDataModel.data_units.add(mSpinnerDataUnits.getSelectedItem().toString());
-                mDataModel.line_colors.add(Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
+            boolean existing = false;
+            int i = 0;
+            while (!existing && i < mDataModel.charts.size()) {
+                existing = mDataModel.charts.get(i).getType().equals(mSpinnerDataType.getSelectedItem());
+                i++;
+            }
+            if (!existing) {
+                Chart chart = new Chart(mSpinnerDataType.getSelectedItem().toString(),
+                        mSpinnerDataUnits.getSelectedItem().toString(),
+                        Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)),
+                        DataModel.AVG_HOUR);
+
+                mDataModel.charts.add(chart);
             }
 
             //Change item in GridView
@@ -283,7 +262,7 @@ public class HomeFragment extends Fragment {
             mSetLeftIn.setTarget(mCardCitiesBack);
 
             for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
-                chartItemAdapter.mChartCardFront.get(i).setVisibility(View.GONE);
+                chartItemAdapter.mChartCardFront.get(i).setVisibility(View.INVISIBLE);
                 Log.d(HomeFragment.class.toString(), "True: " + i );
                 chartItemAdapter.mChartCardBack.get(i).setVisibility(View.VISIBLE);
             }
@@ -296,15 +275,15 @@ public class HomeFragment extends Fragment {
             mImageButtonAddChart.setClickable(true);
             mIsBackCardVisible = true;
         } else {
-            mSetRightOut.setTarget(mCardCitiesBack);
-            mSetLeftIn.setTarget(mCardCitiesFront);
 
             for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
                 chartItemAdapter.mChartCardFront.get(i).setVisibility(View.VISIBLE);
-                Log.d(HomeFragment.class.toString(), "True: " + i);
-                chartItemAdapter.mChartCardBack.get(i).setVisibility(View.GONE);
+                Log.d(HomeFragment.class.toString(), "True: " + i );
+                chartItemAdapter.mChartCardBack.get(i).setVisibility(View.INVISIBLE);
             }
 
+            mSetRightOut.setTarget(mCardCitiesBack);
+            mSetLeftIn.setTarget(mCardCitiesFront);
             mSetRightOut.start();
             mSetLeftIn.start();
             mImageButtonFront.setClickable(true);
