@@ -89,7 +89,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
                     android:paddingTop="1dp"
-                    android:text="Day"
+                    android:text="@string/hour"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/lineChartDialog" />
@@ -105,7 +105,7 @@
                     android:layout_marginRight="24dp"
                     android:layout_marginStart="24dp"
                     android:paddingTop="1dp"
-                    android:text="Month"
+                    android:text="@string/day"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/year_bt"
                     app:layout_constraintStart_toEndOf="@+id/day_bt"
@@ -120,7 +120,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
                     android:paddingTop="1dp"
-                    android:text="Year"
+                    android:text="@string/month"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/month_bt" />

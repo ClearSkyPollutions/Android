@@ -118,7 +118,7 @@ public class ChartItemAdapter extends BaseAdapter {
                 Float ts_f = (float) newChart.getXAxis().get(index).getTime();
                 Float value = newChart.getYAxis().get(index);
                 Float[] entry = new Float[]{ts_f, value};
-                mChartHelper.addEntry(lineChart, entry, newChart.getColor(), false);
+                mChartHelper.addEntry(lineChart, entry, mDataModel.charts.get(position).getColor(), false);
             }
         });
 

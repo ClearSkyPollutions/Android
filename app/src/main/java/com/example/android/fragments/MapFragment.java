@@ -199,11 +199,6 @@ public class MapFragment extends Fragment {
      * An appropriate place to override and add overlays.
      */
     protected void addOverlays() {
-        //Mini map
-        mMinimapOverlay = new MinimapOverlay(mContext, map.getTileRequestCompleteHandler());
-        mMinimapOverlay.setWidth(dm.widthPixels / 5);
-        mMinimapOverlay.setHeight(dm.heightPixels / 5);
-        map.getOverlays().add(this.mMinimapOverlay);
 
         //Copyright overlay
         mCopyrightOverlay = new CopyrightOverlay(mContext);
@@ -212,7 +207,7 @@ public class MapFragment extends Fragment {
         //map scale
         mScaleBarOverlay = new ScaleBarOverlay(map);
         mScaleBarOverlay.setCentred(true);
-        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 100);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 0);
         map.getOverlays().add(this.mScaleBarOverlay);
 
     }
