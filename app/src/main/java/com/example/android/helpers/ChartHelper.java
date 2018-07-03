@@ -226,22 +226,22 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
         SimpleDateFormat ft;
         switch (scale) {
             case "AVG_HOUR":
-                ft = new SimpleDateFormat("EEEE, d MMM, yyyy HH'h'");
+                ft = new SimpleDateFormat("EEEE, d MMM, yyyy HH'h'", Locale.getDefault());
                 break;
             case "AVG_DAY":
-                ft = new SimpleDateFormat("EEEE, d MMM, yyyy");
+                ft = new SimpleDateFormat("EEEE, d MMM, yyyy", Locale.getDefault());
                 break;
             case "AVG_MONTH":
-                ft = new SimpleDateFormat("MMMM yyyy");
+                ft = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
                 break;
             case "AVG_YEAR":
-                ft = new SimpleDateFormat("yyyy");
+                ft = new SimpleDateFormat("yyyy", Locale.getDefault());
                 break;
             case "CardCities":
-                ft = new SimpleDateFormat("EEEE, d MMM, yyyy HH:mm");
+                ft = new SimpleDateFormat("EEEE, d MMM, yyyy HH:mm", Locale.getDefault());
                 break;
             default:
-                ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 break;
         }
         return ft.format(date);

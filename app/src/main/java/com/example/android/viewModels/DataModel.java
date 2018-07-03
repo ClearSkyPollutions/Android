@@ -2,8 +2,6 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.os.AsyncTask;
-import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.example.android.activities.BuildConfig;
@@ -22,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -42,6 +41,7 @@ public class DataModel extends ViewModel {
     public List<MutableLiveData<Chart>> chartList = new ArrayList<>();
     public MutableLiveData<String> lastTempValueReceived = new MutableLiveData<>();
     public MutableLiveData<String> lastDatetimeReceived = new MutableLiveData<>();
+    public MutableLiveData<Boolean> refresh = new MutableLiveData<>();
     private String lastDateUrlParam;
     private static final String POLLUTANT = "POLLUTANT";
     private static final String DATE = "date";
@@ -97,7 +97,7 @@ public class DataModel extends ViewModel {
             }
             String query = "filter="+DATE+",gt," + lastDateUrlParam + "&order="+DATE+",desc&include="+POLLUTANT+"&transform=1";
             network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, scale, query, NetworkHelper.GET, parseChartData, null);
-            Log.d(DataModel.class.toString(), "sync " + scale + " data");
+            //Log.d(DataModel.class.toString(), "sync " + scale + " data");
         });
     }
 
@@ -112,7 +112,7 @@ public class DataModel extends ViewModel {
                 for (int i = jsonArray.length() - 1; i >= 0; i--) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     String dateString = jsonObject.getString(DATE);
-                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                     Date date = ft.parse(dateString);
                     JSONArray pollutant = jsonObject.getJSONArray(POLLUTANT);
                     String type = pollutant.getJSONObject(0).getString(POLLUTANT_NAME);
@@ -123,8 +123,8 @@ public class DataModel extends ViewModel {
                     data.setDataType(type);
                     data.setScale(scale);
                     realmDb.copyToRealmOrUpdate(data);
-                    Log.d("parseChartData", data.getDataType() + ", "
-                            + data.getScale() + ", " + data.getValue());
+                    /*Log.d("parseChartData", data.getDataType() + ", "
+                            + data.getScale() + ", " + data.getValue());*/
                 }
             } catch (JSONException | ParseException e) {
                 e.printStackTrace();
@@ -149,8 +149,8 @@ public class DataModel extends ViewModel {
             if (lastData != null) {
                 lastTempValueReceived.postValue(lastData.getValue().toString());
                 lastDatetimeReceived.postValue(ChartHelper.getStringDate(lastData.getDate(),"CardCities"));
-                Log.d("loadLastData", lastData.getDataType() + ", "
-                        + lastData.getScale() + ", " + lastData.getValue());
+                /*Log.d("loadLastData", lastData.getDataType() + ", "
+                        + lastData.getScale() + ", " + lastData.getValue());*/
             }
         });
     }
@@ -159,7 +159,7 @@ public class DataModel extends ViewModel {
         MutableLiveData<Chart> liveChart = getLiveChart(position);
         ArrayList<Date> xAxis = new ArrayList<>();
         ArrayList<Float> yAxis = new ArrayList<>();
-        Log.d(DataModel.class.toString(), "loadChartData");
+        //Log.d(DataModel.class.toString(), "loadChartData");
         realm.executeTransactionAsync(realmDb -> {
             RealmResults<Data> dataList = realmDb
                     .where(Data.class)
@@ -174,13 +174,15 @@ public class DataModel extends ViewModel {
                     Data data = dataList.get(i);
                     xAxis.add(data.getDate());
                     yAxis.add(data.getValue());
-                    Log.d("loadChartData", data.getDataType() + ", "
-                            + data.getScale() + ", " + data.getValue());
+                    /*Log.d("loadChartData", data.getDataType() + ", "
+                            + data.getScale() + ", " + data.getValue());*/
                     i--;
                 }
                 liveChart.getValue().setScale(scale);
                 liveChart.postValue(new Chart(liveChart.getValue(), xAxis, yAxis));
             }
+        }, () -> {
+            refresh.postValue(false);
         });
     }
 

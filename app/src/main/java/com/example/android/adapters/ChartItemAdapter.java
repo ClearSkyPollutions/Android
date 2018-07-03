@@ -3,7 +3,6 @@ package com.example.android.adapters;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +22,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ChartItemAdapter extends BaseAdapter {
+public class ChartItemAdapter extends BaseAdapter{
 
     private final Context mContext;
     private DataModel mDataModel;
@@ -37,10 +36,10 @@ public class ChartItemAdapter extends BaseAdapter {
     public ArrayList<String> favorite  = new ArrayList<>();
 
 
-    public ChartItemAdapter(Context mContext,DataModel dataModel, ChartHelper chartHelper) {
+    public ChartItemAdapter(Context mContext, DataModel dataModel, ChartHelper ChartHelper) {
         this.mContext = mContext;
         this.mDataModel = dataModel;
-        mChartHelper = chartHelper;
+        this.mChartHelper = ChartHelper;
     }
 
     @Override
@@ -64,15 +63,19 @@ public class ChartItemAdapter extends BaseAdapter {
         int textColor = R.color.primaryTextColor;
         Chart chart = mDataModel.charts.get(position);
         String type = chart.getType();
-        int color = chart.getColor();
-
+        Log.d("mData", mDataModel.charts.get(position).getType());
         if (convertView == null) {
+            Log.d("mData2", mDataModel.charts.get(position).getType() + " p " + position);
             final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             convertView = layoutInflater.inflate(R.layout.activity_chart_item_adapter, null);
 
             // Init FrameLayout
-            mChartCardFront.add(convertView.findViewById(R.id.chart_card_front));
-            mChartCardBack.add(convertView.findViewById(R.id.chart_card_back));
+            /*if(position < mChartCardFront.size()) {
+                mChartCardFront.remove(position);
+                mChartCardBack.remove(position);
+            }*/
+            mChartCardFront.add(position, convertView.findViewById(R.id.chart_card_front));
+            mChartCardBack.add(position, convertView.findViewById(R.id.chart_card_back));
             mButtonDelete = convertView.findViewById(R.id.buttonDelete);
             mButtonFavorite = convertView.findViewById(R.id.buttonFavori);
             mChartCardFront.get(position).setVisibility(View.VISIBLE);
@@ -121,7 +124,6 @@ public class ChartItemAdapter extends BaseAdapter {
                 mChartHelper.addEntry(lineChart, entry, mDataModel.charts.get(position).getColor(), false);
             }
         });
-
         return convertView;
     }
 
@@ -129,5 +131,4 @@ public class ChartItemAdapter extends BaseAdapter {
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
     }
-
 }

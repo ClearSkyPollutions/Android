@@ -21,12 +21,10 @@
         android:id="@+id/chart_card_front"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="false">
+        android:clickable="false"
+        android:gravity="center">
         <include layout="@layout/small_chart_card_front" />
 
     </FrameLayout>
-
-
-
 
 </FrameLayout>

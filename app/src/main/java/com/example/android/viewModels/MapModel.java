@@ -14,12 +14,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
-
-/**
- * Created by nrutemby on 20/06/2018.
- */
+import java.util.Date;
 
 public class MapModel extends ViewModel {
 
@@ -64,15 +62,17 @@ public class MapModel extends ViewModel {
                     rpi = new RPI(systemName, new GeoPoint(lat_d, long_d));
                     rpiArrayList.add(rpi);
                 }
-                String date = jsonObject.getString(DATE);
+                String dateString = jsonObject.getString(DATE);
                 Double value = jsonObject.getDouble(VALUE);
                 String pollutantName = jsonObject.getString(POLLUTANT);
+                SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = ft.parse(dateString);
                 SharedData sharedData = new SharedData(pollutantName, date, value);
                 if (rpi != null)
                     rpi.getSharedDataArrayList().add(sharedData);
             }
             liveRpiArrayList.postValue(rpiArrayList);
-        } catch (JSONException e) {
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
     };
@@ -87,7 +87,7 @@ public class MapModel extends ViewModel {
             String tableName = response.keys().next();
             JSONArray jsonArray = response.getJSONArray(tableName);
             String hour = jsonArray.getJSONObject(0).getString(DATE);
-            Log.d(MapModel.class.toString(), "Last Hour: " + hour);
+            //Log.d(MapModel.class.toString(), "Last Hour: " + hour);
             if (lastHour.getValue() == null) lastHour.postValue(hour);
             else if (!hour.equals(lastHour.getValue())) lastHour.postValue(hour);
             ;

@@ -1,10 +1,11 @@
 package com.example.android.fragments;
 
-import android.content.SharedPreferences;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
-import android.support.v4.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.InputDevice;
@@ -13,28 +14,25 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.Overlay.CircleOverlay;
 import com.example.android.activities.BuildConfig;
 import com.example.android.activities.R;
-
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.ITileSource;
-
 import com.example.android.models.RPI;
 import com.example.android.models.SharedData;
 import com.example.android.viewModels.MapModel;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
-import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class MapFragment extends Fragment {
 
@@ -45,32 +43,31 @@ public class MapFragment extends Fragment {
 
     private MapView map = null;
 
-    private MinimapOverlay mMinimapOverlay;
     private CopyrightOverlay mCopyrightOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
-    private RotationGestureOverlay mRotationGestureOverlay;
-    private CircleOverlay mcircleOverlay;
 
     private MapModel mapModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         mapModel = ViewModelProviders.of(getActivity()).get(MapModel.class);
         mapModel.syncMapData();
-
-        map = new MapView(inflater.getContext());
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
+        map = rootView.findViewById(R.id.mapView);
 
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+        Log.d("Event", "avant avant");
 
         map.setOnGenericMotionListener((v, event) -> {
+            Log.d("Event", "avant");
             if (0 != (event.getSource() & InputDevice.SOURCE_CLASS_POINTER)) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_SCROLL:
@@ -83,16 +80,24 @@ public class MapFragment extends Fragment {
                             map.getController().animateTo(iGeoPoint);
                             map.getController().zoomIn();
                         }
+                        Log.d("event2", "scroll");
                         return true;
                     // @TODO : setup other eventlistener pour naviguer dans la map
+                    case MotionEvent.ACTION_BUTTON_PRESS:
+                        Log.d("event", "click");
+                        MarkerInfoWindow.closeAllInfoWindowsOn(map);
+                        return true;
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d("event", "down");
+                        return true;
+                    default:
+                        Log.d("event", "autre");
                 }
             }
             return false;
         });
-
-
         map.setTileSource(TileSourceFactory.MAPNIK);
-        return map;
+        return rootView;
     }
 
 
@@ -106,11 +111,13 @@ public class MapFragment extends Fragment {
         mPrefs = mContext.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
 
-        map.setBuiltInZoomControls(true);
+        map.setBuiltInZoomControls(false);
+        map.setMaxZoomLevel(12.0);
         //needed for pinch zooms :
         map.setMultiTouchControls(true);
         //scales tiles to the current screen's DPI, helps with readability of labels :
-        map.setTilesScaledToDpi(true);
+        map.resetTilesScaleFactor();
+        //map.setTilesScaledToDpi(true);
 
         //the rest of this is restoring the last map location the user looked at
         final float zoomLevel = mPrefs.getFloat(getString(R.string.prefs_zoom_level_double),
@@ -120,7 +127,8 @@ public class MapFragment extends Fragment {
         map.setMapOrientation(orientation, false);
         final String latitudeString = mPrefs.getString(getString(R.string.prefs_latitude_string), "45.188529");
         final String longitudeString = mPrefs.getString(getString(R.string.prefs_longitude_string), "5.724523999999974");
-        if (latitudeString == null || longitudeString == null) { // case handled for historical reasons only
+        if (latitudeString == null || longitudeString == null) {
+            // case handled for historical reasons only
             final int scrollX = mPrefs.getInt(getString(R.string.prefs_scroll_x), 0);
             final int scrollY = mPrefs.getInt(getString(R.string.prefs_scroll_y), 0);
             map.scrollTo(scrollX, scrollY);
@@ -133,7 +141,10 @@ public class MapFragment extends Fragment {
         addOverlays();
 
         mapModel.liveRpiArrayList.observe(this, rpiArrayList -> {
+            SimpleDateFormat ft = new SimpleDateFormat("EEEE, d MMM, yyyy HH'h'mm",
+                    Locale.getDefault());
             map.getOverlays().clear();
+            addOverlays();
             for (RPI rpi : rpiArrayList) {
                 StringBuilder txt = new StringBuilder();
                 txt.append("<br>");
@@ -144,19 +155,17 @@ public class MapFragment extends Fragment {
                             .append("<br>");
                 }
                 CircleOverlay circleOverlay = new CircleOverlay(
-                        this.getResources().getDrawable(R.drawable.ic_home_black_24dp),
-                        rpi.getPosition(), rpi.getName(), txt.toString(), rpi.getSharedDataArrayList().get(0).getDate());
+                        this.getResources().getDrawable(R.drawable.icon_circle_100px),
+                        rpi.getPosition(), rpi.getName(), txt.toString(),
+                        ft.format(rpi.getSharedDataArrayList().get(0).getDate()));
                 map.getOverlays().add(circleOverlay);
             }
         });
-
-        setHasOptionsMenu(true);
     }
 
     @Override
     public void onPause() {
         if (map != null) {
-
             //save the current location
             final SharedPreferences.Editor edit = mPrefs.edit();
             edit.putString(getString(R.string.prefs_tile_source), map.getTileProvider().getTileSource().name());
@@ -199,17 +208,16 @@ public class MapFragment extends Fragment {
      * An appropriate place to override and add overlays.
      */
     protected void addOverlays() {
-
         //Copyright overlay
         mCopyrightOverlay = new CopyrightOverlay(mContext);
-        map.getOverlays().add(this.mCopyrightOverlay);
+        mCopyrightOverlay.setAlignRight(true);
+        map.getOverlays().add(mCopyrightOverlay);
 
         //map scale
         mScaleBarOverlay = new ScaleBarOverlay(map);
         mScaleBarOverlay.setCentred(true);
-        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 0);
-        map.getOverlays().add(this.mScaleBarOverlay);
-
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 5);
+        map.getOverlays().add(mScaleBarOverlay);
     }
 }
 

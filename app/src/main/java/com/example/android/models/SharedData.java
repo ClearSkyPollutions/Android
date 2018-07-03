@@ -1,16 +1,14 @@
 package com.example.android.models;
 
-/**
- * Created by nrutemby on 20/06/2018.
- */
+import java.util.Date;
 
 public class SharedData {
 
     private String type;
-    private String date;
+    private Date date;
     private Double  value;
 
-    public SharedData(String type, String date, Double value) {
+    public SharedData(String type, Date date, Double value) {
         this.type = type;
         this.date = date;
         this.value = value;
@@ -24,11 +22,11 @@ public class SharedData {
         this.type = type;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

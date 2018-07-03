@@ -2,7 +2,6 @@ package com.example.android.models;
 
 import java.util.List;
 
-
 public class Settings {
 
     public List<String> Sensors;

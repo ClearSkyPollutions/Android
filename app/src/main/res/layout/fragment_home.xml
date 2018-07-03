@@ -5,453 +5,457 @@
     tools:context="com.example.android.fragments.HomeFragment">
 
     <data>
-
         <variable
             name="lastData"
             type="com.example.android.viewModels.DataModel" />
         <variable
             name="aqiUI"
             type="com.example.android.viewModels.AQIModel" />
-
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="54dp">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/viewDialog"
-            style="@style/CardView.Light"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/margins_graph"
-            android:layout_marginEnd="24dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="110dp"
-            android:visibility="gone"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/CardFront">
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
 
-                <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/lineChartDialog"
+            <android.support.v7.widget.CardView
+                android:id="@+id/viewDialog"
+                style="@style/CardView.Light"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="110dp"
+                android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/CardFront">
+
+                <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="32dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_weight="8"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/labelData" />
+                    android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/data"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="100dp"
-                    android:layout_marginStart="100dp"
-                    android:layout_marginTop="8dp"
-                    android:text=""
-                    app:layout_constraintEnd_toStartOf="@+id/labelData"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/lineChartDialog"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="32dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_weight="8"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/labelData" />
 
-                <TextView
-                    android:id="@+id/labelData"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="100dp"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginRight="100dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
-                    android:text='@{lastData.lastDatetimeReceived, default=""}'
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/data"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="100dp"
+                        android:layout_marginStart="100dp"
+                        android:layout_marginTop="8dp"
+                        android:text=""
+                        app:layout_constraintEnd_toStartOf="@+id/labelData"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
-                    android:id="@+id/day_bt"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
-                    android:paddingTop="1dp"
-                    android:text="@string/hour"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/lineChartDialog" />
+                    <TextView
+                        android:id="@+id/labelData"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="100dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginRight="100dp"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="8dp"
+                        android:text='@{lastData.lastDatetimeReceived, default=""}'
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/data"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
-                    android:id="@+id/month_bt"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginRight="24dp"
-                    android:layout_marginStart="24dp"
-                    android:paddingTop="1dp"
-                    android:text="@string/day"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/year_bt"
-                    app:layout_constraintStart_toEndOf="@+id/day_bt"
-                    app:layout_constraintTop_toBottomOf="@+id/lineChartDialog" />
+                    <Button
+                        android:id="@+id/day_bt"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
+                        android:paddingTop="1dp"
+                        android:text="@string/hour"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/lineChartDialog" />
 
-                <Button
-                    android:id="@+id/year_bt"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:paddingTop="1dp"
-                    android:text="@string/month"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/month_bt" />
-            </android.support.constraint.ConstraintLayout>
+                    <Button
+                        android:id="@+id/month_bt"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginStart="24dp"
+                        android:paddingTop="1dp"
+                        android:text="@string/day"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/year_bt"
+                        app:layout_constraintStart_toEndOf="@+id/day_bt"
+                        app:layout_constraintTop_toBottomOf="@+id/lineChartDialog" />
 
-        </android.support.v7.widget.CardView>
+                    <Button
+                        android:id="@+id/year_bt"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:paddingTop="1dp"
+                        android:text="@string/month"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/month_bt" />
+                </android.support.constraint.ConstraintLayout>
 
-        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/CardBack"
-            style="@style/CardView.Light"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="36dp"
-            android:layout_marginStart="36dp"
-            android:alpha="0"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            app:contentPadding="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/CardFront"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/CardFront">
+            </android.support.v7.widget.CardView>
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/CardBack"
+                style="@style/CardView.Light"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="36dp"
+                android:layout_marginStart="36dp"
+                android:alpha="0"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:contentPadding="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/CardFront"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/CardFront">
 
-                <TextView
-                    android:id="@+id/EditCities"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Grenoble"
-                    android:textColor="@android:color/black"
-                    android:textSize="30sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-
-                <ImageButton
-                    android:id="@+id/buttonEditBack"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginBottom="24dp"
-                    android:layout_marginStart="32dp"
-                    android:background="@null"
-                    android:clickable="true"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/edit_icon"
-                    app:layout_constraintBottom_toBottomOf="@+id/EditCities"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/EditCities"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginLeft="32dp" />
-
-                <ImageButton
-                    android:id="@+id/buttonAddBack"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginBottom="24dp"
-                    android:layout_marginEnd="32dp"
-                    android:background="@null"
-                    android:clickable="true"
-                    android:scaleType="fitXY"
-                    app:srcCompat="@drawable/ic_add_circle_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/EditCities"
-                    app:layout_constraintEnd_toStartOf="@+id/EditCities"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginRight="32dp" />
-
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/CardFront"
-            style="@style/CardView.Light"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="36dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="50dp"
-            android:alpha="0.85"
-            android:visibility="visible"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            app:contentPadding="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/ville"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Grenoble"
-                    android:textColor="@android:color/black"
-                    android:textSize="30sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:text='@{lastData.lastDatetimeReceived, default="2018-05-28 13:00:00"}'
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ville" />
+                    <TextView
+                        android:id="@+id/EditCities"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Grenoble"
+                        android:textColor="@android:color/black"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
 
-                <TextView
-                    android:id="@+id/ica"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text='@{aqiUI.aqi.toString(), default="0"}'
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/date" />
+                    <ImageButton
+                        android:id="@+id/buttonEditBack"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginStart="32dp"
+                        android:background="@null"
+                        android:clickable="true"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/edit_icon"
+                        app:layout_constraintBottom_toBottomOf="@+id/EditCities"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/EditCities"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginLeft="32dp" />
 
-                <TextView
-                    android:id="@+id/labelICA2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="AQI"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ica" />
+                    <ImageButton
+                        android:id="@+id/buttonAddBack"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginEnd="32dp"
+                        android:background="@null"
+                        android:clickable="true"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/ic_add_circle_black_24dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/EditCities"
+                        app:layout_constraintEnd_toStartOf="@+id/EditCities"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginRight="32dp" />
 
-                <TextView
-                    android:id="@+id/indice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="16dp"
-                    android:text='@{aqiUI.label, default="No Connection"}'
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/ica"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/date" />
+                </android.support.constraint.ConstraintLayout>
+            </android.support.v7.widget.CardView>
 
-                <TextView
-                    android:id="@+id/labelICA"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:text="AQI"
-                    app:layout_constraintEnd_toStartOf="@+id/labelICA2"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/indice" />
-
-                <TextView
-                    android:id="@+id/temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-
-                    android:textStyle="bold"
-                    android:text='@{lastData.lastTempValueReceived, default="25"}'
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/ica"
-                    app:layout_constraintTop_toBottomOf="@+id/date" />
-
-                <TextView
-                    android:id="@+id/labeltemp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="°C"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/labelICA2"
-                    app:layout_constraintTop_toBottomOf="@+id/temp" />
-
-                <ImageButton
-                    android:id="@+id/buttonEditFront"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginBottom="24dp"
-                    android:layout_marginStart="32dp"
-                    android:background="@null"
-                    android:clickable="true"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/edit_icon"
-                    app:layout_constraintBottom_toTopOf="@+id/date"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/ville"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginLeft="32dp" />
-
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v7.widget.CardView>
-
-        <GridView
-            android:id="@+id/chartlist"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="32dp"
-            android:columnWidth="150dp"
-            android:numColumns="auto_fit"
-            android:stretchMode="spacingWidthUniform"
-            android:verticalSpacing="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/CardFront" />
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/grenb"
-            app:layout_constraintBottom_toTopOf="@id/chartlist" />
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/cover"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:alpha="0.3"
-            android:visibility="gone"
-            app:cardBackgroundColor="@android:color/black"
-            app:cardElevation="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/addElement"
-            style="@style/CardView.Light"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="100dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="16dp"
-            android:alpha="1"
-            android:visibility="gone"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"
-            app:layout_constraintBottom_toBottomOf="@+id/chartlist"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/CardBack">
-
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/CardFront"
+                style="@style/CardView.Light"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:padding="24dp">
+                android:layout_marginEnd="36dp"
+                android:layout_marginStart="36dp"
+                android:layout_marginTop="50dp"
+                android:alpha="0.85"
+                android:visibility="visible"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:contentPadding="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <Spinner
-                    android:id="@+id/SPnameSensors"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:entries="@array/nameSensors"
-                    android:prompt="@string/nameSensors_prompt"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-                <Spinner
-                    android:id="@+id/SPdataType"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
-                    android:entries="@array/dataType"
-                    android:prompt="@string/dataType_prompt"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/SPnameSensors" />
+                    <TextView
+                        android:id="@+id/ville"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Grenoble"
+                        android:textColor="@android:color/black"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <Spinner
-                    android:id="@+id/SPdataUnits"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
-                    android:entries="@array/dataUnits"
-                    android:prompt="@string/dataType_prompt"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/SPdataType" />
+                    <TextView
+                        android:id="@+id/date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="8dp"
+                        android:text='@{lastData.lastDatetimeReceived, default="2018-05-28 13:00:00"}'
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/ville" />
 
-                <Button
-                    android:id="@+id/buttonAddElement"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:layout_width="wrap_content"
+
+                    <TextView
+                        android:id="@+id/ica"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text='@{aqiUI.aqi.toString(), default="0"}'
+                        android:textColor='@{aqiUI.color, default=@android:color/black}'
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/date" />
+
+                    <TextView
+                        android:id="@+id/labelICA2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AQI"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/ica" />
+
+                    <TextView
+                        android:id="@+id/indice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="16dp"
+                        android:text='@{aqiUI.label, default="No Connection"}'
+                        android:textColor='@{aqiUI.color, default=@android:color/black}'
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toStartOf="@+id/ica"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/date"/>
+
+                    <TextView
+                        android:id="@+id/labelICA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:text="AQI"
+                        app:layout_constraintEnd_toStartOf="@+id/labelICA2"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/indice" />
+
+                    <TextView
+                        android:id="@+id/temp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+
+                        android:textStyle="bold"
+                        android:text='@{lastData.lastTempValueReceived, default="25"}'
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/ica"
+                        app:layout_constraintTop_toBottomOf="@+id/date" />
+
+                    <TextView
+                        android:id="@+id/labeltemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="°C"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/labelICA2"
+                        app:layout_constraintTop_toBottomOf="@+id/temp" />
+
+                    <ImageButton
+                        android:id="@+id/buttonEditFront"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginStart="32dp"
+                        android:background="@null"
+                        android:clickable="true"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/edit_icon"
+                        app:layout_constraintBottom_toTopOf="@+id/date"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/ville"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginLeft="32dp" />
+
+                </android.support.constraint.ConstraintLayout>
+            </android.support.v7.widget.CardView>
+
+            <GridView
+                android:id="@+id/chartlist"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="32dp"
+                android:columnWidth="170dp"
+                android:numColumns="auto_fit"
+                android:stretchMode="spacingWidthUniform"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/CardFront" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/grenb"
+                app:layout_constraintBottom_toTopOf="@id/chartlist" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cover"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:alpha="0.3"
+                android:visibility="gone"
+                app:cardBackgroundColor="@android:color/black"
+                app:cardElevation="6dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/addElement"
+                style="@style/CardView.Light"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="100dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:alpha="1"
+                android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+                app:layout_constraintBottom_toBottomOf="@+id/chartlist"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/CardBack">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/add"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/SPdataUnits"
-                    android:layout_marginRight="8dp" />
+                    android:padding="24dp">
 
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v7.widget.CardView>
+                    <Spinner
+                        android:id="@+id/SPnameSensors"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:entries="@array/nameSensors"
+                        android:prompt="@string/nameSensors_prompt"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
+                    <Spinner
+                        android:id="@+id/SPdataType"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="16dp"
+                        android:entries="@array/dataType"
+                        android:prompt="@string/dataType_prompt"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/SPnameSensors" />
 
-    </android.support.constraint.ConstraintLayout>
+                    <Spinner
+                        android:id="@+id/SPdataUnits"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="16dp"
+                        android:entries="@array/dataUnits"
+                        android:prompt="@string/dataType_prompt"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/SPdataType" />
 
+                    <Button
+                        android:id="@+id/buttonAddElement"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/add"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/SPdataUnits"
+                        android:layout_marginRight="8dp" />
+
+                </android.support.constraint.ConstraintLayout>
+            </android.support.v7.widget.CardView>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 </layout>

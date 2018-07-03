@@ -4,10 +4,6 @@ import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 
-/**
- * Created by nrutemby on 21/06/2018.
- */
-
 public class RPI {
 
     private String name;

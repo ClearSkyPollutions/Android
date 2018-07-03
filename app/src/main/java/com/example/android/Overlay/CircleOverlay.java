@@ -1,8 +1,7 @@
-package com.example.android.fragments;
+package com.example.android.Overlay;
 
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import com.example.android.activities.R;
 
@@ -49,7 +48,6 @@ public class CircleOverlay extends Overlay {
                 location.setLatitude(-85.05112877980659);
 
             m = new Marker(map);
-            Log.d("Mem",m.toString());
             m.setInfoWindow(new MarkerInfoWindow(R.layout.infowindow_map, map));
             m.setPosition(location);
             m.setIcon(circleIcon);
@@ -60,4 +58,5 @@ public class CircleOverlay extends Overlay {
             map.invalidate();
         }
     }
+
 }

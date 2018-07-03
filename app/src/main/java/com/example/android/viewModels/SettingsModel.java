@@ -4,9 +4,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
@@ -15,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -43,8 +39,6 @@ public class SettingsModel extends ViewModel {
             for (int i = 0; i < arraySensors.length(); i++) {
                 sensors.add(arraySensors.getString(i));
             }
-            Log.d("Sens", Arrays.toString(new ArrayList[]{sensors}));
-
             int frequency = response.getInt("Frequency");
             String ssid = response.getString("SSID");
             String securityType = response.getString("SecurityType");

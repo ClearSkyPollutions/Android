@@ -23,8 +23,8 @@ android {
     buildTypes {
         debug {
             buildConfigField 'String', 'IPADDR_RPI', '"192.168.2.118"'
-            buildConfigField 'int', 'PortHTTP_RPI', '5010'
-            buildConfigField 'int', 'PortDB_RPI', '5011'
+            buildConfigField 'int', 'PortHTTP_RPI', '4000'
+            buildConfigField 'int', 'PortDB_RPI', '4001'
             buildConfigField 'String', 'IPADDR_SERVER', '"192.168.2.118"'
             buildConfigField 'int', 'PortHTTP_SERVER', '5000'
             buildConfigField 'int', 'PortDB_SERVER', '5001'
@@ -35,8 +35,8 @@ android {
         }
         env_dev {
             buildConfigField 'String', 'IPADDR_RPI', '"192.168.2.118"'
-            buildConfigField 'int', 'PortHTTP_RPI', '4000'
-            buildConfigField 'int', 'PortDB_RPI', '4001'
+            buildConfigField 'int', 'PortHTTP_RPI', '5000'
+            buildConfigField 'int', 'PortDB_RPI', '5001'
         }
         env_test {
             buildConfigField 'String', 'IPADDR_RPI', '"192.168.2.118"'

@@ -11,12 +11,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -63,6 +65,7 @@ public class HomeFragment extends Fragment {
     private Spinner mSpinnerNameSensors;
     private Spinner mSpinnerDataType;
     private Spinner mSpinnerDataUnits;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     // Rotate View
     private AnimatorSet mSetRightOut;
@@ -85,7 +88,7 @@ public class HomeFragment extends Fragment {
         mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
 
         // sync all data
-        mDataModel.syncAll();
+        //mDataModel.syncAll();
 
         binding.setLastData(mDataModel);
         mDataModel.loadLastData();
@@ -93,7 +96,7 @@ public class HomeFragment extends Fragment {
         // Create or get the ViewModel for the Air Quality Index. Bind the xml variable aqiUI
         aqiModel = ViewModelProviders.of(getActivity()).get(AQIModel.class);
         binding.setAqiUI(aqiModel);
-        aqiModel.loadAQI();
+        //aqiModel.loadAQI();
 
         // Init Charts and views
         initViews();
@@ -202,8 +205,18 @@ public class HomeFragment extends Fragment {
             mCoverView.setVisibility(View.GONE);
 
         });
+
+        //
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            mDataModel.syncAll();
+            aqiModel.loadAQI();
+            mDataModel.refresh.observe(this, refreshValue ->
+                    mSwipeRefreshLayout.setRefreshing(refreshValue));
+        });
+
         return mRootView;
     }
+
 
     private void initViews() {
 
@@ -212,7 +225,7 @@ public class HomeFragment extends Fragment {
         int chartBackgroundColor = Color.WHITE;
 
         // Create the adapter to convert the array to views
-        chartItemAdapter = new ChartItemAdapter(getActivity(), mDataModel, mChartHelper);
+        chartItemAdapter = new ChartItemAdapter(getActivity(),mDataModel,mChartHelper);
 
         // Attach the adapter to the GridView
         mGridView = mRootView.findViewById(R.id.chartlist);
@@ -251,48 +264,62 @@ public class HomeFragment extends Fragment {
         mSpinnerDataType = mRootView.findViewById(R.id.SPdataType);
         mSpinnerDataUnits = mRootView.findViewById(R.id.SPdataUnits);
 
+        // Init SwipeRefreshLayout
+        mSwipeRefreshLayout = mRootView.findViewById(R.id.swiperefresh);
+
         // Init Animation
         mSetRightOut = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.out_animation);
         mSetLeftIn = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.in_animation);
     }
 
     public void flipCard(View view) {
-        if (!mIsBackCardVisible) {
-            mSetRightOut.setTarget(mCardCitiesFront);
-            mSetLeftIn.setTarget(mCardCitiesBack);
 
-            for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
-                chartItemAdapter.mChartCardFront.get(i).setVisibility(View.INVISIBLE);
-                Log.d(HomeFragment.class.toString(), "True: " + i );
-                chartItemAdapter.mChartCardBack.get(i).setVisibility(View.VISIBLE);
-            }
-
-            mSetRightOut.start();
-            mSetLeftIn.start();
-            mImageButtonFront.setClickable(false);
-            mImageButtonBack.setClickable(true);
-            mButtonAddChart.setClickable(true);
-            mImageButtonAddChart.setClickable(true);
-            mIsBackCardVisible = true;
-        } else {
-
+        Log.d("Size",""+chartItemAdapter.mChartCardFront.size()+" v " + mGridView.getChildCount());
+        /*
+        if (chartItemAdapter.mChartCardFront.size() == 4){
+            //this.flipCard(view);
             for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
                 chartItemAdapter.mChartCardFront.get(i).setVisibility(View.VISIBLE);
                 Log.d(HomeFragment.class.toString(), "True: " + i );
                 chartItemAdapter.mChartCardBack.get(i).setVisibility(View.INVISIBLE);
             }
+        }else
+        {*/
+            if (!mIsBackCardVisible) {
+                mSetRightOut.setTarget(mCardCitiesFront);
+                mSetLeftIn.setTarget(mCardCitiesBack);
 
-            mSetRightOut.setTarget(mCardCitiesBack);
-            mSetLeftIn.setTarget(mCardCitiesFront);
-            mSetRightOut.start();
-            mSetLeftIn.start();
-            mImageButtonFront.setClickable(true);
-            mImageButtonBack.setClickable(false);
-            mButtonAddChart.setClickable(false);
-            mImageButtonAddChart.setClickable(false);
-            mCardAddChart.setVisibility(View.GONE);
-            mIsBackCardVisible = false;
-        }
+                for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
+                    chartItemAdapter.mChartCardFront.get(i).setVisibility(View.INVISIBLE);
+                    chartItemAdapter.mChartCardBack.get(i).setVisibility(View.VISIBLE);
+                }
+
+                mSetRightOut.start();
+                mSetLeftIn.start();
+                mImageButtonFront.setClickable(false);
+                mImageButtonBack.setClickable(true);
+                mButtonAddChart.setClickable(true);
+                mImageButtonAddChart.setClickable(true);
+                mIsBackCardVisible = true;
+            } else {
+                mSetRightOut.setTarget(mCardCitiesBack);
+                mSetLeftIn.setTarget(mCardCitiesFront);
+
+                for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
+                    chartItemAdapter.mChartCardFront.get(i).setVisibility(View.VISIBLE);
+                    chartItemAdapter.mChartCardBack.get(i).setVisibility(View.INVISIBLE);
+                }
+
+                mSetRightOut.start();
+                mSetLeftIn.start();
+                mImageButtonFront.setClickable(true);
+                mImageButtonBack.setClickable(false);
+                mButtonAddChart.setClickable(false);
+                mImageButtonAddChart.setClickable(false);
+                mCardAddChart.setVisibility(View.GONE);
+                mIsBackCardVisible = false;
+            }
+        //}
     }
 
     private void changeCameraDistance() {
@@ -301,6 +328,5 @@ public class HomeFragment extends Fragment {
         mCardCitiesFront.setCameraDistance(scale);
         mCardCitiesBack.setCameraDistance(scale);
     }
-
 
 }

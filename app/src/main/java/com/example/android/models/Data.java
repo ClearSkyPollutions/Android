@@ -6,10 +6,6 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
-/**
- * Created by nrutemby on 06/06/2018.
- */
-
 public class Data extends RealmObject {
 
     @Required
