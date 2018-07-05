@@ -14,7 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.Overlay.CircleOverlay;
+import com.example.android.overlay.CircleOverlay;
 import com.example.android.activities.BuildConfig;
 import com.example.android.activities.R;
 import com.example.android.models.RPI;
@@ -64,10 +64,9 @@ public class MapFragment extends Fragment {
         map = rootView.findViewById(R.id.mapView);
 
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
-        Log.d("Event", "avant avant");
 
         map.setOnGenericMotionListener((v, event) -> {
-            Log.d("Event", "avant");
+
             if (0 != (event.getSource() & InputDevice.SOURCE_CLASS_POINTER)) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_SCROLL:
@@ -80,18 +79,16 @@ public class MapFragment extends Fragment {
                             map.getController().animateTo(iGeoPoint);
                             map.getController().zoomIn();
                         }
-                        Log.d("event2", "scroll");
+
                         return true;
                     // @TODO : setup other eventlistener pour naviguer dans la map
                     case MotionEvent.ACTION_BUTTON_PRESS:
-                        Log.d("event", "click");
                         MarkerInfoWindow.closeAllInfoWindowsOn(map);
                         return true;
                     case MotionEvent.ACTION_DOWN:
-                        Log.d("event", "down");
                         return true;
                     default:
-                        Log.d("event", "autre");
+                        Log.d("event", "other");
                 }
             }
             return false;
@@ -104,7 +101,6 @@ public class MapFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d("Map", "OnActivityCreated");
 
         mContext = this.getActivity();
         dm = mContext.getResources().getDisplayMetrics();

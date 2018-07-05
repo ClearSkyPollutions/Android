@@ -2,9 +2,11 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.graphics.Color;
 import android.util.Log;
 
 import com.example.android.activities.BuildConfig;
+import com.example.android.adapters.ChartItemAdapter;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.helpers.HashHelper;
 import com.example.android.models.Chart;
@@ -21,15 +23,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-
 public class DataModel extends ViewModel {
-
-    public ArrayList<Chart> charts;
 
     private Realm realm;
     private NetworkHelper network = new NetworkHelper();
@@ -42,38 +42,52 @@ public class DataModel extends ViewModel {
     public MutableLiveData<String> lastTempValueReceived = new MutableLiveData<>();
     public MutableLiveData<String> lastDatetimeReceived = new MutableLiveData<>();
     public MutableLiveData<Boolean> refresh = new MutableLiveData<>();
+    public MutableLiveData<Boolean> updateChartList = new MutableLiveData<>();
     private String lastDateUrlParam;
     private static final String POLLUTANT = "POLLUTANT";
     private static final String DATE = "date";
     private static final String VALUE = "value";
     private static final String POLLUTANT_NAME = "name";
 
-
     public DataModel() {
         realm = Realm.getDefaultInstance();
-        charts = new ArrayList<>();
+        loadDataTypeUnits();
+        /*
         charts.add(new Chart("pm10", getUnit("pm10"), getColor("pm10"), AVG_HOUR));
         charts.add(new Chart("pm25", getUnit("pm25"), getColor("pm25"), AVG_HOUR));
         charts.add(new Chart("temperature", getUnit("temperature"), getColor("temperature"), AVG_HOUR));
         charts.add(new Chart("humidity", getUnit("humidity"), getColor("humidity"), AVG_HOUR));
+        */
     }
 
     public void loadDataTypeUnits() {
-        String query = "?columns&filter=date,eq,0";
-        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, AVG_HOUR, query, NetworkHelper.GET, parseDataTypes, null);
+        String query = "transform=1&order=id";
+        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, POLLUTANT, query, NetworkHelper.GET, parseDataTypes, null);
     }
 
     private JSONParser<JSONObject> parseDataTypes = (JSONObject response) -> {
-        charts.clear();
+        ArrayList<Chart> charts = new ArrayList<>();
+        Random rnd = new Random();
+
         try {
-            JSONObject jsonObject = response.getJSONObject(AVG_HOUR);
-            JSONArray dataType = jsonObject.getJSONArray("columns");
-            for (int i = 0; i <= dataType.length() - 1; i++) {
-                if (!(dataType.getString(i).equals("date"))) {
-                    String type = dataType.getString(i);
-                    charts.add(new Chart(type, getUnit(type), getColor(type), AVG_HOUR));
-                }
+            JSONArray jsonArray = response.getJSONArray(POLLUTANT);
+            for (int i = 0; i <= jsonArray.length() - 1; i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                Chart chartReceive = new Chart(jsonObject.getString("name"),
+                        jsonObject.getString("unit"),
+                        Color.argb(255,
+                                rnd.nextInt(256),
+                                rnd.nextInt(256),
+                                rnd.nextInt(256)), AVG_HOUR);
+                charts.add(chartReceive);
             }
+            for(Chart chart : charts) {
+                MutableLiveData<Chart> liveChart = new MutableLiveData<>();
+
+                liveChart.setValue(chart);
+                chartList.add(liveChart);
+            }
+            updateChartList.postValue(true);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -130,7 +144,7 @@ public class DataModel extends ViewModel {
                 e.printStackTrace();
             }
         }, () -> {
-            for (int position = 0; position < charts.size(); position++){
+            for (int position = 0; position < chartList.size(); position++){
                 loadChartData(position, AVG_HOUR);
                 loadLastData();
             }
@@ -156,7 +170,7 @@ public class DataModel extends ViewModel {
     }
 
     public void loadChartData(int position, String scale) {
-        MutableLiveData<Chart> liveChart = getLiveChart(position);
+        MutableLiveData<Chart> liveChart = chartList.get(position);
         ArrayList<Date> xAxis = new ArrayList<>();
         ArrayList<Float> yAxis = new ArrayList<>();
         //Log.d(DataModel.class.toString(), "loadChartData");
@@ -186,37 +200,6 @@ public class DataModel extends ViewModel {
         });
     }
 
-    private String getUnit(String type) {
-        switch (type) {
-            case "pm10":
-                return "µg/m^3" ;
-            case "pm25":
-                return "µg/m^3";
-            case "humidity":
-                return "%";
-            case "temperature":
-                return "°C";
-            default:
-                return null;
-        }
-    }
-
-    private int getColor(String type) {
-        switch (type) {
-            case "pm10":
-                return 0xff00ffff ;
-            case "pm25":
-                return 0xff00ff00;
-            case "humidity":
-                return 0xffff00ff;
-            case "temperature":
-                return 0xFFFF4081;
-            default:
-                return 0;
-        }
-    }
-
-
     private int getNbOfData(String scale) {
         switch (scale) {
             case "AVG_HOUR":
@@ -229,34 +212,6 @@ public class DataModel extends ViewModel {
                 return 0;
         }
     }
-
-    public MutableLiveData<Chart> getLiveChart(int position) {
-        Chart chart = getChart(position);
-        for (MutableLiveData<Chart> i : chartList) {
-            if (i.getValue() != null && i.getValue().getType().equals(chart.getType())) {
-                return i;
-            }
-        }
-        int index = charts.indexOf(chart);
-        if (index != -1) {
-            MutableLiveData<Chart> newLiveChart = new MutableLiveData<>();
-            Chart newChart = new Chart(charts.get(index), new ArrayList<>(), new ArrayList<>());
-            newLiveChart.setValue(newChart);
-            this.chartList.add(newLiveChart);
-            return newLiveChart;
-        }
-        return null;
-    }
-
-    public Chart getChart(int position) {
-        if (position >= 0 & position < charts.size()) {
-            return charts.get(position);
-        }
-        return null;
-    }
-
-
-
 
     @Override
     protected void onCleared() {

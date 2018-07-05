@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class PollutantItemAdapter extends ArrayAdapter<Pollutant> {
     public PollutantItemAdapter(@NonNull Context context, ArrayList<Pollutant> pollutants) {
-        super(context, R.layout.activity_pollutant_item_adapter ,pollutants);
+        super(context, R.layout.item_adapter_liste_pollutant,pollutants);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class PollutantItemAdapter extends ArrayAdapter<Pollutant> {
         Pollutant pollutant = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.activity_pollutant_item_adapter, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_adapter_liste_pollutant, parent, false);
         }
 
         ImageView pollutant_image = convertView.findViewById(R.id.pollutant_img);
