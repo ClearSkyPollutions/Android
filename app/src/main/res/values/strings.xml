@@ -22,7 +22,7 @@
     <string name="title_home">Home</string>
     <string name="title_settings">Settings</string>
     <string name="title_map">Map</string>
-    <string name="title_pollutants">Pollutants</string>
+    <string name="title_info">Info</string>
     <string name="frag_cardNames">Sensors Settings</string>
     <string name="frequency">Frequency</string>
     <string name="unitfrequency">measurement/min</string>

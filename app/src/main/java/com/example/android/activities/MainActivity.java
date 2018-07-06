@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.android.fragments.HomeFragment;
+import com.example.android.fragments.InfoFragment;
 import com.example.android.fragments.ListPollutantsFragment;
 import com.example.android.fragments.MapFragment;
 import com.example.android.fragments.SettingsFragment;
@@ -44,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
                     //If the app has not the permission then asking for the permission
                     requestStoragePermission();
                     break;
-                case R.id.navigation_pollutants:
-                    selectedFragment = new ListPollutantsFragment();
-                    setTitle(R.string.title_pollutants);
+                case R.id.navigation_info:
+                    selectedFragment = new InfoFragment();
+                    setTitle(R.string.title_info);
                     break;
                 case R.id.navigation_settings:
                     selectedFragment = new SettingsFragment();
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
                 .commit();
     }
 

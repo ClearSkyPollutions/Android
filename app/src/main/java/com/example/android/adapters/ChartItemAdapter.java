@@ -4,6 +4,7 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,21 +60,15 @@ public class ChartItemAdapter extends BaseAdapter{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         int backgroundColor =  Color.WHITE;
         int textColor = R.color.primaryTextColor;
         Chart chart = mDataModel.charts.get(position);
         String type = chart.getType();
-        Log.d("mData", mDataModel.charts.get(position).getType());
-        if (convertView == null) {
-            Log.d("mData2", mDataModel.charts.get(position).getType() + " p " + position);
-            final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-            convertView = layoutInflater.inflate(R.layout.activity_chart_item_adapter, null);
 
-            // Init FrameLayout
-            /*if(position < mChartCardFront.size()) {
-                mChartCardFront.remove(position);
-                mChartCardBack.remove(position);
-            }*/
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.activity_chart_item_adapter, parent, false);
+
             mChartCardFront.add(position, convertView.findViewById(R.id.chart_card_front));
             mChartCardBack.add(position, convertView.findViewById(R.id.chart_card_back));
             mButtonDelete = convertView.findViewById(R.id.buttonDelete);

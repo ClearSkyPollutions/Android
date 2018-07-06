@@ -275,16 +275,7 @@ public class HomeFragment extends Fragment {
     public void flipCard(View view) {
 
         Log.d("Size",""+chartItemAdapter.mChartCardFront.size()+" v " + mGridView.getChildCount());
-        /*
-        if (chartItemAdapter.mChartCardFront.size() == 4){
-            //this.flipCard(view);
-            for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
-                chartItemAdapter.mChartCardFront.get(i).setVisibility(View.VISIBLE);
-                Log.d(HomeFragment.class.toString(), "True: " + i );
-                chartItemAdapter.mChartCardBack.get(i).setVisibility(View.INVISIBLE);
-            }
-        }else
-        {*/
+
             if (!mIsBackCardVisible) {
                 mSetRightOut.setTarget(mCardCitiesFront);
                 mSetLeftIn.setTarget(mCardCitiesBack);

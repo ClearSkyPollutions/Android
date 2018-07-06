@@ -36,7 +36,6 @@ public class PollutantItemAdapter extends ArrayAdapter<Pollutant> {
         pollutant_name.setText(pollutant.getName());
         pollutant_source.setText(pollutant.getSource());
 
-
         return convertView;
     }
 
