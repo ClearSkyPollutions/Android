@@ -56,22 +56,22 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/labelData" />
+                        app:layout_constraintTop_toBottomOf="@+id/SelectedDate" />
 
                     <TextView
-                        android:id="@+id/data"
+                        android:id="@+id/SelectedValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="100dp"
                         android:layout_marginStart="100dp"
                         android:layout_marginTop="8dp"
                         android:text=""
-                        app:layout_constraintEnd_toStartOf="@+id/labelData"
+                        app:layout_constraintEnd_toStartOf="@+id/SelectedDate"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/labelData"
+                        android:id="@+id/SelectedDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="100dp"
@@ -79,10 +79,11 @@
                         android:layout_marginRight="100dp"
                         android:layout_marginStart="24dp"
                         android:layout_marginTop="8dp"
-                        android:text='@{lastData.lastDatetimeReceived, default=""}'
+                        android:text=""
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/data"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintStart_toEndOf="@+id/SelectedValue"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="adzadzadzazd" />
 
                     <Button
                         android:id="@+id/day_bt"
@@ -378,7 +379,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <android.support.v7.widget.CardView
-                android:id="@+id/addElement"
+                android:id="@+id/CardDialogNewChart"
                 style="@style/CardView.Light"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
