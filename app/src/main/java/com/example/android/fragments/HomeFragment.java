@@ -213,8 +213,9 @@ public class HomeFragment extends Fragment {
             //mDataModel.loadDataTypeUnits();
             mDataModel.syncAll();
             aqiModel.loadAQI();
-            mDataModel.refresh.observe(this, refreshValue ->
-                    mSwipeRefreshLayout.setRefreshing(refreshValue));
+            mDataModel.refresh.observe(this, refreshValue -> {
+                mSwipeRefreshLayout.setRefreshing(refreshValue);
+            });
         });
 
         mDataModel.updateChartList.observe(this, updateChartListValue -> {
@@ -240,6 +241,7 @@ public class HomeFragment extends Fragment {
                         android.R.layout.simple_spinner_dropdown_item, listUnits);
                 mSpinnerDataType.setAdapter(listTypeAdapter);
                 mSpinnerDataUnits.setAdapter(listUnitAdapter);
+                mDataModel.updateChartList.postValue(false);
             }
         });
         return mRootView;
@@ -253,7 +255,6 @@ public class HomeFragment extends Fragment {
 
         // Create the adapter to convert the array to views
         chartItemAdapter = new ChartItemAdapter(getActivity(), mDataModel.chartList, mChartHelper);
-
 
         chartItemAdapter.setIsBackCardVisible(false);
         // Attach the adapter to the GridView
@@ -294,7 +295,7 @@ public class HomeFragment extends Fragment {
         mSpinnerDataUnits = mRootView.findViewById(R.id.SPdataUnits);
 
         // Init SwipeRefreshLayout
-        mSwipeRefreshLayout = mRootView.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout = mRootView.findViewById(R.id.swipeRefreshHomeFragment);
 
         // Init Animation
         mSetRightOut = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.out_animation);

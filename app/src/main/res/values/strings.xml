@@ -62,6 +62,9 @@
     </string-array>
     <string name="dataType_prompt">Choose a Type of Pollutant</string>
 
+    <string name="sensor">Sensors</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temperature">Temperature</string>
@@ -71,6 +74,18 @@
     <string name="hour">HOUR</string>
     <string name="day">DAY</string>
     <string name="month">MONTH</string>
+    <string name="new_sensor">New Sensor</string>
+    <string name="ip_address">IP Address</string>
+    <string name="raspberry_pi">Raspberry PI</string>
+    <string name="server">Server</string>
+    <string name="port_address">Port</string>
+    <string name="share_your_data">Share your Data</string>
+    <string name="share_data">Share Data</string>
+    <string name="confirm_these_changes">Confirm these changes ?</string>
+    <string name="accept">ACCEPT</string>
+    <string name="cancel">CANCEL</string>
+    <string name="toast_name_empty">Please enter a sensor name</string>
+    <string name="toast_cancel_configuration">Cancelled configuration changes</string>
 
 
     //Integer

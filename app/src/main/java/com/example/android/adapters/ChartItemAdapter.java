@@ -38,15 +38,14 @@ public class ChartItemAdapter extends BaseAdapter {
 
     public ArrayList<String> favorite = new ArrayList<>();
 
-
-    public void setIsBackCardVisible(boolean isBackCardVisible) {
-        this.isBackCardVisible = isBackCardVisible;
-    }
-
     public ChartItemAdapter(Context mContext, List<MutableLiveData<Chart>> chartList, ChartHelper ChartHelper) {
         this.mContext = mContext;
         this.mchartList = chartList;
         this.mChartHelper = ChartHelper;
+    }
+
+    public void setIsBackCardVisible(boolean isBackCardVisible) {
+        this.isBackCardVisible = isBackCardVisible;
     }
 
     @Override

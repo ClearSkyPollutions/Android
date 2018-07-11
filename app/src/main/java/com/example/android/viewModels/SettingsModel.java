@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import com.example.android.activities.BuildConfig;
+import com.example.android.models.Address;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
 
@@ -13,20 +14,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class SettingsModel extends ViewModel {
 
-    private MutableLiveData<Settings> setting;
-
+    private MutableLiveData<Settings> setting = new MutableLiveData<>();
     private NetworkHelper network = new NetworkHelper();
 
+    public MutableLiveData<Boolean> refreshSettings = new MutableLiveData<>();
+
     public MutableLiveData<Settings> getSetting() {
-        if (setting == null) {
-            setting = new MutableLiveData<>();
-            setting.postValue(new Settings(new ArrayList<>(), 15, "", "WEP", ""));
-        }
         return setting;
     }
 
@@ -34,17 +31,21 @@ public class SettingsModel extends ViewModel {
         try {
             ArrayList<String> sensors = new ArrayList<>();
 
-            JSONArray arraySensors = response.getJSONArray("Sensors");
+            JSONArray arraySensors = response.getJSONArray("sensors");
+            JSONObject objectServerAddress = response.getJSONObject("serverAddress");
 
             for (int i = 0; i < arraySensors.length(); i++) {
                 sensors.add(arraySensors.getString(i));
             }
-            int frequency = response.getInt("Frequency");
-            String ssid = response.getString("SSID");
-            String securityType = response.getString("SecurityType");
-            String password = response.getString("Password");
+            int frequency = response.getInt("frequency");
+            Address serverAddress = new Address(objectServerAddress.getString("ip"),
+                    objectServerAddress.getString("port"));
+            boolean isDataShared = response.getBoolean("isDataShared");
+            Log.d("jsonSensors", getSetting().getValue().getSensors().toString());
+            Log.d("json", getSetting().getValue().getRaspberryPiAddress().getIp());
+            getSetting().postValue(new Settings(sensors, frequency, getSetting().getValue().getRaspberryPiAddress(), serverAddress, isDataShared));
 
-            getSetting().postValue(new Settings(sensors, frequency, ssid, securityType, password));
+            refreshSettings.postValue(false);
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -3,10 +3,8 @@ package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.graphics.Color;
-import android.util.Log;
 
 import com.example.android.activities.BuildConfig;
-import com.example.android.adapters.ChartItemAdapter;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.helpers.HashHelper;
 import com.example.android.models.Chart;
@@ -68,7 +66,7 @@ public class DataModel extends ViewModel {
     private JSONParser<JSONObject> parseDataTypes = (JSONObject response) -> {
         ArrayList<Chart> charts = new ArrayList<>();
         Random rnd = new Random();
-
+        //TODO ne pas ajoute deux fois le même élement
         try {
             JSONArray jsonArray = response.getJSONArray(POLLUTANT);
             for (int i = 0; i <= jsonArray.length() - 1; i++) {

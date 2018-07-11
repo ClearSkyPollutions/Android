@@ -29,6 +29,7 @@ public class ButtonDeleteOnClickListener implements View.OnClickListener {
     public void onClick(View v) {
         Log.d("Position dans delete", "" + position + " type: " +
                 mchartList.get(position).getValue().getType());
+
         mchartList.get(position).removeObservers((LifecycleOwner) mchartItemAdapter.mContext);
         mchartList.remove(position);
         mchartItemAdapter.mChartCardFront.remove(position);
