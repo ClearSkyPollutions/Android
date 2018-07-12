@@ -31,7 +31,7 @@ public class ChartItemAdapter extends BaseAdapter {
 
     private boolean isBackCardVisible = false;
 
-    public ArrayList<Integer> favorite = new ArrayList<>();
+    public ArrayList<String> favorite = new ArrayList<>();
 
     public void setIsBackCardVisible(boolean isBackCardVisible) {
         this.isBackCardVisible = isBackCardVisible;
@@ -99,19 +99,20 @@ public class ChartItemAdapter extends BaseAdapter {
     private void initButtons(int position, View itemView){
         ImageButton mButtonDelete = itemView.findViewById(R.id.buttonDelete);
         ImageButton mButtonFavorite = itemView.findViewById(R.id.buttonFavori);
+        String type = mChartList.get(position).getValue().getType();
 
-        if (favorite.contains(position)) {
+        if (favorite.contains(type)) {
             mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
         } else {
             mButtonFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
         }
 
         mButtonFavorite.setOnClickListener(v -> {
-            if (favorite.contains(position)) {
-                favorite.remove(position);
+            if (favorite.contains(type)) {
+                favorite.remove(type);
                 mButtonFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
             } else {
-                favorite.add(position);
+                favorite.add(type);
                 mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
             }
         });
