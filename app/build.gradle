@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     dataBinding {
@@ -21,23 +22,26 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField 'String', 'IPADDR', '"192.168.2.118"'
-            buildConfigField 'int', 'PortHTTP', '7000'
-            buildConfigField 'int', 'PortDB', '7001'
+            buildConfigField 'String', 'IPADDR_RPI', '"192.168.2.118"'
+            buildConfigField 'int', 'PortHTTP_RPI', '4000'
+            buildConfigField 'int', 'PortDB_RPI', '4001'
+            buildConfigField 'String', 'IPADDR_SERVER', '"192.168.2.118"'
+            buildConfigField 'int', 'PortHTTP_SERVER', '5000'
+            buildConfigField 'int', 'PortDB_SERVER', '5001'
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         env_dev {
-            buildConfigField 'String', 'IPADDR', '"192.168.2.118"'
-            buildConfigField 'int', 'PortHTTP', '4000'
-            buildConfigField 'int', 'PortDB', '4001'
+            buildConfigField 'String', 'IPADDR_RPI', '"192.168.2.118"'
+            buildConfigField 'int', 'PortHTTP_RPI', '5000'
+            buildConfigField 'int', 'PortDB_RPI', '5001'
         }
         env_test {
-            buildConfigField 'String', 'IPADDR', '"192.168.2.118"'
-            buildConfigField 'String', 'PortHTTP', '80'
-            buildConfigField 'String', 'PortDB', '3306'
+            buildConfigField 'String', 'IPADDR_RPI', '"192.168.2.118"'
+            buildConfigField 'String', 'PortHTTP_RPI', '80'
+            buildConfigField 'String', 'PortDB_RPI', '3306'
         }
     }
     compileOptions {
@@ -49,7 +53,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.google.android.gms:play-services-plus:15.0.1'
     implementation 'com.android.support:design:27.1.1'
@@ -61,5 +64,6 @@ dependencies {
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'org.osmdroid:osmdroid-android:6.0.1'
 }

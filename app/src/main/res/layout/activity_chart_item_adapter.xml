@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="false">
+
+    <FrameLayout
+        android:id="@+id/chart_card_back"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:gravity="center"
+        android:alpha="1">
+
+        <include layout="@layout/small_chart_card_back" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/chart_card_front"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:gravity="center">
+        <include layout="@layout/small_chart_card_front" />
+
+    </FrameLayout>
+
+</FrameLayout>

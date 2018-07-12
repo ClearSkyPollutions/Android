@@ -1,150 +1,323 @@
 package com.example.android.fragments;
 
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
+import com.example.android.adapters.ChartItemAdapter;
 import com.example.android.helpers.ChartHelper;
+import com.example.android.models.Chart;
+import com.example.android.viewModels.AQIModel;
 import com.example.android.viewModels.DataModel;
-import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.Random;
 
 
 public class HomeFragment extends Fragment {
 
     private DataModel mDataModel;
+    private AQIModel aqiModel;
+    private ChartHelper mChartHelper = new ChartHelper();
 
-    //XML view objects
+    //View objects
+    private View mRootView;
     private LineChart mChartDialog;
+    private CardView mCardCitiesFront;
+    private CardView mCardCitiesBack;
     private CardView mChartViewDialog;
+    private CardView mCardAddChart;
     private View mCoverView;
     private Button mButtonDay;
     private Button mButtonMonth;
     private Button mButtonYear;
-    private TextView mDataView;
+    private Button mButtonAddChart;
+    private TextView mSelectedValueView;
     private TextView mLabelView;
+    private GridView mGridView;
+    private ImageButton mImageButtonFront;
+    private ImageButton mImageButtonBack;
+    private ImageButton mImageButtonAddChart;
+    private Spinner mSpinnerNameSensors;
+    private Spinner mSpinnerDataType;
+    private Spinner mSpinnerDataUnits;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
+    // Rotate View
+    private AnimatorSet mSetRightOut;
+    private AnimatorSet mSetLeftIn;
+    private boolean mIsBackCardVisible = false;
 
-    // List of charts in the home page
-    private List<LineChart> mCharts = new ArrayList<LineChart>();
-
-    public View.OnClickListener createPopupListener(String dataType, ChartHelper chartHelper,
-                                                    int lineColor) {
-        // Creates and return the functions called when a chart is clicked on
-        return view -> {
-            //Popup effect
-            mChartViewDialog.setVisibility(View.VISIBLE);
-            mCoverView.setVisibility(View.VISIBLE);
-
-            // Get the correct LiveData(pm10, pm25...) and bind the graph to it
-            mDataModel.getMeasurements(dataType).observe(this, entries -> {
-                mChartDialog.clearValues();
-                for (Float[] pmEntry : entries.values) {
-                    chartHelper.addEntry(mChartDialog, pmEntry, lineColor, true);
-                }
-            });
-
-            //Change the buttons event according to dataType
-            mButtonDay.setOnClickListener(v ->
-                    mDataModel.loadData(dataType, "AVG_HOUR"));
-            mButtonMonth.setOnClickListener(v ->
-                    mDataModel.loadData(dataType, "AVG_DAY"));
-            mButtonYear.setOnClickListener(v ->
-                    mDataModel.loadData(dataType, "AVG_MONTH"));
-
-            chartHelper.getSelected().observe(this, selected -> {
-                mDataView.setText(selected[1].toString());
-                mLabelView.setText(ChartHelper.getStringDate(selected[0], mDataModel.getMeasurements(dataType).getValue().scale));
-            });
-        };
-    }
+    private ChartItemAdapter chartItemAdapter;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             Bundle savedInstanceState) {
 
         // Inflate using DataBinding library
         FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         binding.setLifecycleOwner(this);
-        View rootView = binding.getRoot();
+        mRootView = binding.getRoot();
 
-        // Create or get the ViewModel for our date, and bind the xml variable lastData to it (Databinding library)
+        // Create or get the ViewModel for our charts. Bind the xml variable lastData
         mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
+
+        // sync all data
+        //mDataModel.syncAll();
+
         binding.setLastData(mDataModel);
+        mDataModel.loadLastData();
+
+        // Create or get the ViewModel for the Air Quality Index. Bind the xml variable aqiUI
+        aqiModel = ViewModelProviders.of(getActivity()).get(AQIModel.class);
+        binding.setAqiUI(aqiModel);
+        //aqiModel.loadAQI();
 
         // Init Charts and views
-        ChartHelper chartHelper = new ChartHelper();
-        initViews(rootView, chartHelper);
+        initViews();
 
-        // Associates each chart with one LiveData (pm10, pm25...)
-        for (int i = 0; i < DataModel.DATA_TYPES.length; i++) {
-            String type = DataModel.DATA_TYPES[i];
-            int color = DataModel.LINE_COLORS[i];
-            LineChart ch = mCharts.get(i);
-
-            mDataModel.getMeasurements(type).observe(this, data -> {
-                // The home charts should only show data by hour
-                if (!data.scale.equals("AVG_HOUR"))
-                    return;
-                ch.clearValues();
-                for (Float[] pmEntry : data.values) {
-                    chartHelper.addEntry(ch, pmEntry, color, false);
-                }
-            });
-            mDataModel.loadData(type, "AVG_HOUR");
-            ch.setOnClickListener(createPopupListener(type, chartHelper, color));
-        }
-
-
+        //Click event listener closing popup views
         mCoverView.setClickable(true);
         mCoverView.setOnClickListener(view -> {
+            mChartHelper.getSelected().removeObservers(this);
             mChartViewDialog.setVisibility(View.GONE);
             mCoverView.setVisibility(View.GONE);
+            mCardAddChart.setVisibility(View.GONE);
+            mButtonAddChart.setClickable(false);
         });
 
-        return rootView;
+        // Functions called when a chart is clicked on
+        mGridView.setOnItemClickListener((parent, view, position, id) -> {
+
+            mChartViewDialog.setVisibility(View.VISIBLE);
+            mCoverView.setVisibility(View.VISIBLE);
+
+            // Get the correct LiveData(pm10, pm25...) to fill chartDialog with data
+            chartItemAdapter.getItem(position).observe((LifecycleOwner) getContext(), newChart -> {
+                mChartHelper.reset(mChartDialog);
+                for (int index = 0; index < newChart.getXAxis().size(); index++) {
+                    String dateString = ChartHelper.getStringDate(newChart.getXAxis().get(index), "");
+                    Float ts_f = (float) Timestamp.valueOf(dateString).getTime();
+                    Float value = newChart.getYAxis().get(index);
+                    Float[] entry = new Float[]{ts_f, value};
+                    mChartHelper.addEntry(mChartDialog, entry, mDataModel.charts.get(position).getColor(), true);
+                    Log.d(HomeFragment.class.toString(), "add new entry");
+                }
+                mChartHelper.getSelected().setValue(mChartHelper.getEntries().size()-1);
+            });
+
+            //Change the buttons event according to dataType
+            mButtonDay.setOnClickListener(v -> {
+                mChartHelper.getSelected().setValue(-1);
+                mDataModel.loadChartData(position,
+                        DataModel.AVG_HOUR);
+            });
+            mButtonMonth.setOnClickListener(v -> {
+                mChartHelper.getSelected().setValue(-1);
+                mDataModel.loadChartData(position,
+                        DataModel.AVG_DAY);
+            });
+            mButtonYear.setOnClickListener(v -> {
+                mChartHelper.getSelected().setValue(-1);
+                mDataModel.loadChartData(position,
+                                DataModel.AVG_MONTH);
+            });
+
+            // Display the values selected with the chart cursor
+            mChartHelper.getSelected().observe(this, (Integer selected) -> {
+                // -1 for error in selection, null if mutableLiveData not set
+                if (selected == null || selected == -1) {
+                    mSelectedValueView.setText("");
+                    mLabelView.setText("");
+                } else {
+                    Chart ch = mDataModel.getLiveChart(position).getValue();
+
+                    String val = ch.getYAxis().get(selected).toString();
+                    Date date = ch.getXAxis().get(selected);
+
+                    // Formatting of the date depends on the scale of the chart
+                    String dateString = ChartHelper.getStringDate(date, ch.getScale());
+
+                    mSelectedValueView.setText(val+" "+ch.getUnit());
+                    mLabelView.setText(dateString);
+                }
+            });
+
+        });
+
+        // Functions Onclick on ImageButton
+        mImageButtonFront.setOnClickListener(this::flipCard);
+        mImageButtonBack.setOnClickListener(this::flipCard);
+
+        mImageButtonAddChart.setOnClickListener(v -> {
+            mCardAddChart.setVisibility(View.VISIBLE);
+            mCoverView.setVisibility(View.VISIBLE);
+            mButtonAddChart.setClickable(true);
+        });
+
+        mButtonAddChart.setOnClickListener(v -> {
+            Random rnd = new Random();
+            boolean existing = false;
+            int i = 0;
+            while (!existing && i < mDataModel.charts.size()) {
+                existing = mDataModel.charts.get(i).getType().equals(mSpinnerDataType.getSelectedItem());
+                i++;
+            }
+            if (!existing) {
+                Chart chart = new Chart(mSpinnerDataType.getSelectedItem().toString(),
+                        mSpinnerDataUnits.getSelectedItem().toString(),
+                        Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)),
+                        DataModel.AVG_HOUR);
+
+                mDataModel.charts.add(chart);
+            }
+
+            //Change item in GridView
+            chartItemAdapter.notifyDataSetChanged();
+
+            //Leave Card Add Chart
+            mCardAddChart.setVisibility(View.GONE);
+            mCoverView.setVisibility(View.GONE);
+
+        });
+
+        //
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            mDataModel.syncAll();
+            aqiModel.loadAQI();
+            mDataModel.refresh.observe(this, refreshValue ->
+                    mSwipeRefreshLayout.setRefreshing(refreshValue));
+        });
+
+        return mRootView;
     }
 
-    private void initViews(View rootView, ChartHelper chartHelper) {
 
-        int textColor = getResources().getColor(R.color.primaryTextColor);
-        int backgroundColor = Color.WHITE;
+    private void initViews() {
 
         // Init charts
-        for (String i : DataModel.DATA_TYPES) {
-            String idChart = "lineChart" + i;
-            mCharts.add(rootView.findViewById(getResources().getIdentifier(idChart, "id", getContext().getPackageName())));
-            chartHelper.initChart(mCharts.get(mCharts.size() - 1), backgroundColor, textColor);
-        }
-        mChartDialog = rootView.findViewById(R.id.lineChartDialog);
-        chartHelper.initChartDialog(mChartDialog, backgroundColor, textColor);
-        mChartViewDialog = rootView.findViewById(R.id.graphDialog);
+        int chartTextColor = getResources().getColor(R.color.primaryTextColor);
+        int chartBackgroundColor = Color.WHITE;
+
+        // Create the adapter to convert the array to views
+        chartItemAdapter = new ChartItemAdapter(getActivity(),mDataModel,mChartHelper);
+
+        // Attach the adapter to the GridView
+        mGridView = mRootView.findViewById(R.id.chartlist);
+        mGridView.setAdapter(chartItemAdapter);
+
+        mChartDialog = mRootView.findViewById(R.id.lineChartDialog);
+        mChartHelper.initChartDialog(mChartDialog, chartBackgroundColor, chartTextColor);
+        mChartViewDialog = mRootView.findViewById(R.id.viewDialog);
+
+        // Init CardView
+        mCardCitiesFront = mRootView.findViewById(R.id.CardFront);
+        mCardCitiesBack = mRootView.findViewById(R.id.CardBack);
+        mCardAddChart = mRootView.findViewById(R.id.addElement);
+
+        //For animation change the distance
+        //changeCameraDistance();
 
         //Init buttons
-        mButtonDay = rootView.findViewById(R.id.day_bt);
-        mButtonMonth = rootView.findViewById(R.id.month_bt);
-        mButtonYear = rootView.findViewById(R.id.year_bt);
+        mButtonDay = mRootView.findViewById(R.id.day_bt);
+        mButtonMonth = mRootView.findViewById(R.id.month_bt);
+        mButtonYear = mRootView.findViewById(R.id.year_bt);
+        mButtonAddChart = mRootView.findViewById(R.id.buttonAddElement);
 
         // Init popup
-        mCoverView = rootView.findViewById(R.id.cover);
-        mDataView = rootView.findViewById(R.id.data);
-        mLabelView = rootView.findViewById(R.id.labelData);
+        mCoverView = mRootView.findViewById(R.id.cover);
+        mLabelView = mRootView.findViewById(R.id.labelData);
+        mSelectedValueView = mRootView.findViewById(R.id.data);
+
+        // Init ImageButton
+        mImageButtonFront = mRootView.findViewById(R.id.buttonEditFront);
+        mImageButtonBack = mRootView.findViewById(R.id.buttonEditBack);
+        mImageButtonAddChart = mRootView.findViewById(R.id.buttonAddBack);
+
+        // Init Spinner
+        mSpinnerNameSensors = mRootView.findViewById(R.id.SPnameSensors);
+        mSpinnerDataType = mRootView.findViewById(R.id.SPdataType);
+        mSpinnerDataUnits = mRootView.findViewById(R.id.SPdataUnits);
+
+        // Init SwipeRefreshLayout
+        mSwipeRefreshLayout = mRootView.findViewById(R.id.swiperefresh);
+
+        // Init Animation
+        mSetRightOut = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.out_animation);
+        mSetLeftIn = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.in_animation);
+    }
+
+    public void flipCard(View view) {
+
+        Log.d("Size",""+chartItemAdapter.mChartCardFront.size()+" v " + mGridView.getChildCount());
+
+            if (!mIsBackCardVisible) {
+                mSetRightOut.setTarget(mCardCitiesFront);
+                mSetLeftIn.setTarget(mCardCitiesBack);
+
+                for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
+                    chartItemAdapter.mChartCardFront.get(i).setVisibility(View.INVISIBLE);
+                    chartItemAdapter.mChartCardBack.get(i).setVisibility(View.VISIBLE);
+                }
+
+                mSetRightOut.start();
+                mSetLeftIn.start();
+                mImageButtonFront.setClickable(false);
+                mImageButtonBack.setClickable(true);
+                mButtonAddChart.setClickable(true);
+                mImageButtonAddChart.setClickable(true);
+                mIsBackCardVisible = true;
+            } else {
+                mSetRightOut.setTarget(mCardCitiesBack);
+                mSetLeftIn.setTarget(mCardCitiesFront);
+
+                for (int i = 0; i < chartItemAdapter.mChartCardFront.size(); i++) {
+                    chartItemAdapter.mChartCardFront.get(i).setVisibility(View.VISIBLE);
+                    chartItemAdapter.mChartCardBack.get(i).setVisibility(View.INVISIBLE);
+                }
+
+                mSetRightOut.start();
+                mSetLeftIn.start();
+                mImageButtonFront.setClickable(true);
+                mImageButtonBack.setClickable(false);
+                mButtonAddChart.setClickable(false);
+                mImageButtonAddChart.setClickable(false);
+                mCardAddChart.setVisibility(View.GONE);
+                mIsBackCardVisible = false;
+            }
+        //}
+    }
+
+    private void changeCameraDistance() {
+        int distance = 8000;
+        float scale = getResources().getDisplayMetrics().density * distance;
+        mCardCitiesFront.setCameraDistance(scale);
+        mCardCitiesBack.setCameraDistance(scale);
     }
 
 }
