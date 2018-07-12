@@ -29,7 +29,6 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     public MutableLiveData<Integer> selected;
     private ArrayList<Float> entries = new ArrayList<>();
 
-
     public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {
 
         initStandard(mChart, BackgroundColor, TextColor);
@@ -132,7 +131,6 @@ public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedLis
     @Override
     public void onValueSelected(Entry e, Highlight h){
         selected.postValue(entries.indexOf(e.getX()));
-        Log.d(ChartHelper.class.toString(), "" +  entries.indexOf(e.getX()));
     }
 
     @Override
