@@ -86,6 +86,9 @@
     <string name="cancel">CANCEL</string>
     <string name="toast_name_empty">Please enter a sensor name</string>
     <string name="toast_cancel_configuration">Cancelled configuration changes</string>
+    <string name="toast_configuration_changed">Configuration changed</string>
+    <string name="toast_could_not_connect_RPI">Couldn\'t connect to Raspberry Pi</string>
+    <string name="toast_connection_successful_RPI">Connection to the successful Raspberry Pi</string>
 
 
     //Integer

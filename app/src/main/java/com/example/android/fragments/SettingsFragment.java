@@ -28,6 +28,7 @@ import com.example.android.adapters.SensorsItemAdapter;
 import com.example.android.listview.SensorsListView;
 import com.example.android.models.Address;
 import com.example.android.models.Settings;
+import com.example.android.network.NetworkHelper;
 import com.example.android.viewModels.SettingsModel;
 
 import org.json.JSONArray;
@@ -80,12 +81,11 @@ public class SettingsFragment extends Fragment {
         int frequency = sharedPref.getInt("frequency", 15);
         Address raspberryPiAddress = new Address(
                 sharedPref.getString("raspberryPiAddressIp", "192.168.0."),
-                sharedPref.getString("raspberryPiAddressPort", "80"));
+                sharedPref.getInt("raspberryPiAddressPort", 80));
         Address serverAddress = new Address(
                 sharedPref.getString("serverAddressIp", BuildConfig.IPADDR_SERVER),
-                sharedPref.getString("serverAddressPort", ""+BuildConfig.PortHTTP_SERVER));
+                sharedPref.getInt("serverAddressPort", BuildConfig.PortHTTP_SERVER));
         boolean isDataShared = sharedPref.getBoolean("isDataShared", false);
-
 
         mSettingsModel.getSetting().setValue(new Settings(sensors, frequency,
                 raspberryPiAddress, serverAddress, isDataShared));
@@ -93,23 +93,20 @@ public class SettingsFragment extends Fragment {
         // Init views
         initViews(rootView);
 
-        /*
-        // Recover data to file config.json in Raspberry Pi
-        mSettingsModel.communication("config.json", Request.Method.GET,null);
-        */
-
-        /*
-        mSettingsModel.refreshSettings.observe(this,updateSensorsValue -> {
-            if (updateSensorsValue){
-                // Init ItemAdapter
-                sensorsItemAdapter = new SensorsItemAdapter(getContext(), mSettingsModel.getSetting().getValue().getSensors());
-
-                // Init ListView
-                mSensorList = rootView.findViewById(R.id.list_sensors);
-                mSensorList.setAdapter(sensorsItemAdapter);
-                mSettingsModel.refreshSettings.postValue(false);
+        mSettingsModel.connectionRaspberryPiTest(mSettingsModel.getSetting().getValue().getRaspberryPiAddress());
+        // TODO Change manage error connection
+        mSettingsModel.connectionStat.observe(this, connectionStatValue -> {
+            if (connectionStatValue) {
+                Toast.makeText(getActivity(), R.string.toast_connection_successful_RPI,
+                        Toast.LENGTH_LONG).show();
+            }else {
+                Toast.makeText(getActivity(), R.string.toast_could_not_connect_RPI,
+                        Toast.LENGTH_LONG).show();
             }
-        });*/
+        });
+
+        // TODO Change Raspberry Pi Ip Address for future request
+
         return rootView;
     }
 
@@ -125,9 +122,9 @@ public class SettingsFragment extends Fragment {
             editor.putStringSet("sensors", sensorsSet);
             editor.putInt("frequency", settings.getFrequency());
             editor.putString("raspberryPiAddressIp", settings.getRaspberryPiAddress().getIp());
-            editor.putString("raspberryPiAddressPort", settings.getRaspberryPiAddress().getPort());
+            editor.putInt("raspberryPiAddressPort", settings.getRaspberryPiAddress().getPort());
             editor.putString("serverAddressIp", settings.getServerAddress().getIp());
-            editor.putString("serverAddressPort", settings.getServerAddress().getPort());
+            editor.putInt("serverAddressPort", settings.getServerAddress().getPort());
             editor.putBoolean("isDataShared", settings.isDataShared());
             editor.apply();
         }
@@ -148,10 +145,10 @@ public class SettingsFragment extends Fragment {
 
     private void initSeekBar(View rootView) {
         // Init SeekBar View in XML
-        SeekBar mSeekBar = rootView.findViewById(R.id.seekBar);
+        SeekBar seekBar = rootView.findViewById(R.id.seekBar);
 
         // Setup SeekBar
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             private int progressValues = 0;
 
             @Override
@@ -177,8 +174,8 @@ public class SettingsFragment extends Fragment {
         sensorsItemAdapter = new SensorsItemAdapter(getContext(), mSettingsModel.getSetting());
 
         // Init ListView
-        SensorsListView mSensorList = rootView.findViewById(R.id.list_sensors);
-        mSensorList.setAdapter(sensorsItemAdapter);
+        SensorsListView sensorList = rootView.findViewById(R.id.list_sensors);
+        sensorList.setAdapter(sensorsItemAdapter);
     }
 
     private void initTextView(View rootView) {
@@ -200,7 +197,8 @@ public class SettingsFragment extends Fragment {
                 // Code to execute when EditText loses focus
                 mSettingsModel.getSetting().getValue().setRaspberryPiAddress(new Address(
                         mRaspberryPiAddressIp.getText().toString(),
-                        mRaspberryPiAddressPort.getText().toString()));
+                        Integer.valueOf(mRaspberryPiAddressPort.getText().toString())
+                ));
             }
         });
         mRaspberryPiAddressPort.setOnFocusChangeListener((v, hasFocus) -> {
@@ -208,7 +206,9 @@ public class SettingsFragment extends Fragment {
                 // Code to execute when EditText loses focus
                 mSettingsModel.getSetting().getValue().setRaspberryPiAddress(new Address(
                         mRaspberryPiAddressIp.getText().toString(),
-                        mRaspberryPiAddressPort.getText().toString()));
+                        Integer.valueOf(mRaspberryPiAddressPort.getText().toString())
+
+                ));
             }
         });
 
@@ -218,7 +218,8 @@ public class SettingsFragment extends Fragment {
                 // Code to execute when EditText loses focus
                 mSettingsModel.getSetting().getValue().setServerAddress(new Address(
                         mServerAddressIp.getText().toString(),
-                        mServerAddressPort.getText().toString()));
+                        Integer.valueOf(mServerAddressPort.getText().toString())
+                ));
             }
         });
         mServerAddressPort.setOnFocusChangeListener((v, hasFocus) -> {
@@ -226,27 +227,28 @@ public class SettingsFragment extends Fragment {
                 // Code to execute when EditText loses focus
                 mSettingsModel.getSetting().getValue().setServerAddress(new Address(
                         mServerAddressIp.getText().toString(),
-                        mServerAddressPort.getText().toString()));
+                        Integer.valueOf(mServerAddressPort.getText().toString())
+                ));
             }
         });
     }
 
     private void initButton(View rootView) {
         // Init Button
-        Button mValidate = rootView.findViewById(R.id.validate);
-        Button mAccept = rootView.findViewById(R.id.accept_confirmation);
-        Button mCancel = rootView.findViewById(R.id.cancel_confirmation);
+        Button validate = rootView.findViewById(R.id.validate);
+        Button accept = rootView.findViewById(R.id.accept_confirmation);
+        Button cancel = rootView.findViewById(R.id.cancel_confirmation);
 
         // Init ImageButton
         ImageButton mButtonAddSensor = rootView.findViewById(R.id.button_add_sensor);
 
         // Setup Button
-        mValidate.setOnClickListener(v -> {
+        validate.setOnClickListener(v -> {
             mCoverSettingsFragment.setVisibility(View.VISIBLE);
             mCardConfirmation.setVisibility(View.VISIBLE);
         });
 
-        mAccept.setOnClickListener(v -> {
+        accept.setOnClickListener(v -> {
             Settings settings = mSettingsModel.getSetting().getValue();
 
             JSONArray sensorsJson = new JSONArray(settings.getSensors());
@@ -261,7 +263,6 @@ public class SettingsFragment extends Fragment {
                 jsonSend.put("frequency", settings.getFrequency());
                 jsonSend.put("serverAddress", serverAddressJson);
                 jsonSend.put("isDataShared", settings.isDataShared());
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -271,7 +272,7 @@ public class SettingsFragment extends Fragment {
             mCardConfirmation.setVisibility(View.GONE);
         });
 
-        mCancel.setOnClickListener(v -> {
+        cancel.setOnClickListener(v -> {
             mCoverSettingsFragment.setVisibility(View.GONE);
             mCardConfirmation.setVisibility(View.GONE);
             Toast.makeText(getActivity(), R.string.toast_cancel_configuration,
@@ -295,10 +296,10 @@ public class SettingsFragment extends Fragment {
 
     private void initSwitch(View rootView) {
         // Init Switch
-        Switch mSwitchShareData = rootView.findViewById(R.id.switch_data_shared);
+        Switch switchShareData = rootView.findViewById(R.id.switch_data_shared);
 
         // Setup Switch
-        mSwitchShareData.setOnCheckedChangeListener((buttonView, isChecked) ->
+        switchShareData.setOnCheckedChangeListener((buttonView, isChecked) ->
                 mSettingsModel.getSetting().getValue().setDataShared(isChecked));
     }
 

@@ -243,7 +243,7 @@
                     android:digits="0123456789"
                     android:hint="@string/port_address"
                     android:inputType="number|numberDecimal"
-                    android:text='@{settings.setting.raspberryPiAddress.port}'
+                    android:text='@{settings.setting.raspberryPiAddress.port.toString}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ip_raspberry_pi"
                     app:layout_constraintTop_toBottomOf="@+id/trait5" />
@@ -283,7 +283,7 @@
                     android:digits="0123456789"
                     android:hint="@string/port_address"
                     android:inputType="number|numberDecimal"
-                    android:text='@{settings.setting.serverAddress.port}'
+                    android:text='@{settings.setting.serverAddress.port.toString}'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ip_server"
                     app:layout_constraintTop_toBottomOf="@+id/ip_raspberry_pi" />

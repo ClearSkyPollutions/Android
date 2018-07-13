@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.android.activities.BuildConfig;
 import com.example.android.viewModels.JSONParser;
 
 import org.json.JSONObject;
@@ -17,7 +16,7 @@ import java.net.URL;
 
 public class NetworkHelper implements Request.Method {
 
-    public void sendRequest(String ipAddress, int portHTTP,  String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+    public void sendRequest(String ipAddress, int portHTTP, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 method,
                 buildUrl(ipAddress, portHTTP, path, query).toString(),
@@ -43,5 +42,4 @@ public class NetworkHelper implements Request.Method {
         }
         return url;
     }
-
 }
