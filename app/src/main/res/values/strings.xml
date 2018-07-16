@@ -72,6 +72,11 @@
     <string name="day">DAY</string>
     <string name="month">MONTH</string>
 
+    <!-- Notification -->
+    <string name="notification">Notification Air quality</string>
+    <string name="notification_title">Air quality</string>
+    <string name="notification_desc">Index: </string>
+
 
     //Integer
     <integer name="anim_length">1000</integer>

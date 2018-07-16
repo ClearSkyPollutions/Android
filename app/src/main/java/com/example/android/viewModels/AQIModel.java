@@ -47,9 +47,9 @@ public class AQIModel extends ViewModel {
             Integer aqiRcv = response.getInt("index");
             String levelRcv = response.getString("level");
             String colorRcv = response.getString("color");
-            aqi.postValue(aqiRcv);
             label.postValue(levelRcv);
             color.postValue(Color.parseColor(colorRcv));
+            aqi.postValue(aqiRcv);
         } catch (JSONException e) {
             e.printStackTrace();
         }

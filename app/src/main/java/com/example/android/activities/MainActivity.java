@@ -1,6 +1,11 @@
 package com.example.android.activities;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,8 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.android.fragments.HomeFragment;
@@ -19,6 +22,7 @@ import com.example.android.fragments.ListPollutantsFragment;
 import com.example.android.fragments.MapFragment;
 import com.example.android.fragments.SettingsFragment;
 import com.example.android.network.RequestQueueSingleton;
+import com.example.android.viewModels.AQIModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -70,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(navListener);
         loadFragment(new HomeFragment());
 
+        createNotificationAQI();
     }
 
     private void loadFragment(Fragment fragment){
@@ -120,6 +125,30 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"Oops you just denied the permission But is need for Maps",Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+
+    private final void createNotificationAQI(){
+        final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        final Intent launchNotificationIntent = new Intent(this, MainActivity.class);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, launchNotificationIntent,
+                0);
+        AQIModel aqiModel = ViewModelProviders.of(this).get(AQIModel.class);
+        aqiModel.loadAQI();
+
+        aqiModel.getAqi().observe(this, aqi -> {
+            Notification.Builder builder = new Notification.Builder(this)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(getResources().getString(R.string.notification_title))
+                    .setContentText(getResources().getString(R.string.notification_desc) + aqiModel.getLabel().getValue() + " (" + aqi + ")" )
+                    .setContentIntent(pendingIntent);
+
+            mNotification.notify(1, builder.build());
+        });
+
     }
 
 }
