@@ -16,7 +16,8 @@
       "name": "MQ-2",
       "smalldesc": "Combustible gases sensor",
       "desc": "<b>For :</b> Combustible Gases - Methane, Butane, LPG, smoke <p><b>Informations :</b> Standard gas concentration sensor, conductivity of the sensor depends on the concentration of target gases in the air.",
-      "image": "mq2"
+      "image": "mq2",
+      "help": "text pour setup"
     }
   ]
 

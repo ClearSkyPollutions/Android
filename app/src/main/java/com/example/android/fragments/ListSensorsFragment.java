@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +27,12 @@ public class ListSensorsFragment extends Fragment {
 
     ArrayList<Sensor> listSensors = new ArrayList<>();
 
-    static ListSensorsFragment newInstance(int num) {
-        return new ListSensorsFragment();
+
+    public static ListSensorsFragment newInstance() {
+        ListSensorsFragment fragment = new ListSensorsFragment();
+        return fragment;
     }
+
 
     @Nullable
     @Override
@@ -38,7 +40,9 @@ public class ListSensorsFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_list_sensors, container, false);
 
-        getSensorsData();
+        if (listSensors.isEmpty()) {
+            getSensorsData();
+        }
 
         // Create an adapter class extending ArrayAdapter :
         ArrayAdapter<Sensor> adapter = new ArrayAdapter<Sensor>(getContext(), R.layout.item_adapter_sensor, listSensors) {

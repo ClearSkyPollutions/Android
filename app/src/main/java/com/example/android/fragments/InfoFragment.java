@@ -40,7 +40,6 @@ public class InfoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              Bundle savedInstanceState) {
-        num_pages = 2;
         infoView = inflater.inflate(R.layout.fragment_info, container, false);
 
         pager = infoView.findViewById(R.id.pager);
@@ -69,7 +68,7 @@ public class InfoFragment extends Fragment {
                 case POLLUTANT_NUM:
                     return ListPollutantsFragment.newInstance(position);
                 case SENSOR_NUM:
-                    return ListSensorsFragment.newInstance(position);
+                    return ListSensorsFragment.newInstance();
             }
             return null;
         }

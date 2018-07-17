@@ -2,64 +2,60 @@
   "slide" : [
     {
       "position": 1,
-      "title": "<h2>Welcome to ClearSky !</h2>",
+      "title": "Welcome to ClearSky !",
       "lines":
       [
       "<p>With the next few pages we’ll try and help you setup your mliti-pollutions sensing system.</p>",
       "<p>Depending on your familiarity with the Raspberry Pi, the process may take up to 15 minutes.</p>"
       ],
-        "image": "sds011"
+        "image": "slide1"
     },
     {
       "position": 2,
-      "title": "<h2>Setting up the Raspberry Pi</h2>",
+      "title": "Setting up the Raspberry Pi",
       "lines": [
-        "<p>First up, you need to get a Raspberry Pi with internet connectivity.",
-        "<li>The latest model (Raspberry Pi 3B) comes equipped with Wifi and ethernet</li>",
-        "<li>The Pi 0 also comes with Wifi, but is slower</li>",
-        "<li>Finally, you can also buy a Wifi adapter and plug it into any Raspberry Pi</li>",
-        "We recommend heading over to https://projects.raspberrypi.org for a quick tutorial on getting started.</p>"
+        "First up, you need to get a Raspberry Pi with internet connectivity.<br>",
+        "  * Pi 3 : Wifi & ethernet<br>",
+        "  * Pi 0 : Wifi           <br>",
+        "  * Pi + Wifi adapter     <br>",
+        "<p>We recommend heading over to https://projects.raspberrypi.org for a quick tutorial on getting started.</p>"
   ],
-        "image": "sds011"
+        "image": "setuprpi"
     },
     {
       "position": 3,
-      "title": "<h2>Setting up the sensors</h2>",
+      "title": "Setting up the sensors",
       "lines": [
-        "<p>To have an accurate estimate of the air quality in your area, you’ll need to buy sensors for the most common types of pollutants.",
-        "For an out-of-the-box solution, use the following sensors :",
-        "SDS011 : details",
-        "DHT22 : details",
-        "MQ2 : details</p>",
-        "<p>A minimal amount of coding is necessary if you wish to add differents sensors, but we’ll be glad to help at https://github.com/capteurPollutions/Embedded.</p>"
+        "To have an accurate estimate of the air quality in your area, you’ll need to buy sensors for the most common types of pollutants."
       ],
-      "image": "sds011"
+      "image": "pm25"
     },
     {
       "position": 4,
-      "title": "<h2>Setting up ClearSky</h2>",
+      "title": "Setting up ClearSky",
       "lines": [
-        "<p>Please clone or download from github in your Raspberry Pi :",
-        "<li>mkdir ~/ClearSky</li>",
-        "<li>cd ~/ClearSky</li>",
-        "<li>git clone https://github.com/CapteursPollution/Embedded</li>",
-        "<li>cd Embedded/Installation/RaspberryPi/ &amp;&amp;  sudo sh setup.sh</li>",
-        "</p>",
-        "<p>After restarting, your Raspberry should now start reading the data from the sensors.</p>",
-        "<p>Next up, configuring the mobile app to visualize this data !</p>"
+        "Please download and install ClearSky in your Raspberry Pi<br>",
+        "After restarting, your Raspberry should now start reading the data from the sensors.<br>",
+        "Next up, configuring the mobile app to visualize this data !"
       ],
-      "image": "sds011"
+      "image": "slide2"
     },
     {
       "position": 5,
-      "title": "<h2>Addresses</h2>",
+      "title": "Addresses",
       "lines": [
-        "<p>What’s the IP Address of the Raspberry Pi (How to get it ? ) : INPUT</p>",
-        "<p>Help us spread knowledge and data about Air Quality ! We’re building a map of the data collected by our users and accessible to everyone (data is anonymized).</p>",
-        "<p>Do you wish to upload the data collected by your system : TOGGLE YES NO</p>",
-        "<p>Optionally, you may want to use another server to upload your data to : INPUT SERVER ADD</p>"
+        "What’s the IP Address of the Raspberry Pi (How to get it ? )"
       ],
-      "image": "sds011"
+      "image": "slide1"
+    },
+    {
+      "position": 6,
+      "title": "Share your data",
+      "lines": [
+        "Help us spread knowledge and data about Air Quality !<br>",
+        "We’re building a map of the data collected by our users and accessible to everyone.<br>"
+      ],
+      "image": "slide1"
     }
     ]
 }

@@ -108,7 +108,7 @@ public class MapFragment extends Fragment {
 
         mContext = this.getActivity();
         dm = mContext.getResources().getDisplayMetrics();
-        mPrefs = mContext.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        mPrefs = mContext.getSharedPreferences(getString(R.string.map_file_key), Context.MODE_PRIVATE);
 
 
         map.setBuiltInZoomControls(false);

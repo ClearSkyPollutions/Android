@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">ClearSky</string>
 
-    <string name="preference_file_key">com.example.android.preferences</string>
+    <string name="map_file_key">com.example.android.preferences</string>
+    <string name="config_file_key">com.example.android.config</string>
     <string name="prefs_zoom_level_double">zoomLevelDouble</string>
     <string name="prefs_zoom_level">zoomLevel</string>
     <string name="prefs_orientation">orientation</string>
@@ -36,6 +37,9 @@
     <string name="add">ADD</string>
     <string name="validate">Validate</string>
     <string name="networkSecurity_prompt">Choose a Network Security</string>
+
+    <string name="ok">Start</string>
+
     <string-array name="networkSecurity">
         <item>WEP</item>
         <item>WPA-PSK</item>
@@ -43,6 +47,7 @@
         <item>WPA Enterprise</item>
         <item>WPA2 Enterprise</item>
     </string-array>
+
     <string name="nameSensors_prompt">Choose a Names of Sensor</string>
     <string-array name="nameSensors">
         <item>SDS011</item>
@@ -62,52 +67,6 @@
     </string-array>
     <string name="dataType_prompt">Choose a Type of Pollutant</string>
 
-    <!-- Sliders -->
-    <string-array name="slide_titles">
-        <item><![CDATA[<h2>Welcome to ClearSky !</h2>]]></item>
-        <item><![CDATA[<h2>Setting up the Raspberry Pi</h2>]]></item>
-        <item><![CDATA[<h2>Setting up the sensors</h2>]]></item>
-        <item><![CDATA[<h2>Setting up ClearSky</h2>]]></item>
-        <item><![CDATA[<h2>Addresses</h2>]]></item>
-    </string-array>
-
-    <string-array name="slide_contents">
-        <item><![CDATA[
-            <p>With the next few pages we’ll try and help you setup your mliti-pollutions sensing system.</p>
-            <p>Depending on your familiarity with the Raspberry Pi, the process may take up to 15 minutes.</p>
-        ]]></item>
-        <item><![CDATA[
-            <p>First up, you need to get a Raspberry Pi with internet connectivity.
-            <li>The latest model (Raspberry Pi 3B) comes equipped with Wifi and ethernet</li>
-            <li>The Pi 0 also comes with Wifi, but is slower</li>
-            <li>Finally, you can also buy a Wifi adapter and plug it into any Raspberry Pi</li>
-            We recommend heading over to https://projects.raspberrypi.org for a quick tutorial on getting started.</p>
-        ]]></item>
-        <item><![CDATA[
-            <p>To have an accurate estimate of the air quality in your area, you’ll need to buy sensors for the most common types of pollutants.
-            For an out-of-the-box solution, use the following sensors :
-            SDS011 : details
-            DHT22 : details
-            MQ2 : details</p>
-            <p>A minimal amount of coding is necessary if you wish to add differents sensors, but we’ll be glad to help at https://github.com/capteurPollutions/Embedded.</p>
-        ]]></item>
-        <item><![CDATA[
-            <p>Please clone or download from github in your Raspberry Pi :
-            <li>mkdir ~/ClearSky</li>
-            <li>cd ~/ClearSky</li>
-            <li>git clone https://github.com/CapteursPollution/Embedded</li>
-            <li>cd Embedded/Installation/RaspberryPi/ &amp;&amp;  sudo sh setup.sh</li>
-            </p>
-            <p>After restarting, your Raspberry should now start reading the data from the sensors.</p>
-            <p>Next up, configuring the mobile app to visualize this data !</p>
-        ]]></item>
-        <item><![CDATA[
-            <p>What’s the IP Address of the Raspberry Pi (How to get it ? ) : INPUT</p>
-            <p>Help us spread knowledge and data about Air Quality ! We’re building a map of the data collected by our users and accessible to everyone (data is anonymized).</p>
-            <p>Do you wish to upload the data collected by your system : TOGGLE YES NO</p>
-            <p>Optionally, you may want to use another server to upload your data to : INPUT SERVER ADD</p>
-        ]]></item>
-    </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temperature">Temperature</string>
