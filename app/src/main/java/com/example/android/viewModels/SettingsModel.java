@@ -2,9 +2,9 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Address;
@@ -15,8 +15,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class SettingsModel extends ViewModel {
@@ -80,6 +81,37 @@ public class SettingsModel extends ViewModel {
         network.sendRequest(raspberryPiAddress.getIp(), raspberryPiAddress.getPort(), path,
                 null, Request.Method.GET, parserConnectionRaspberryPiTest, null);
 
-
     }
+
+    public void fetchPrefsSettings(SharedPreferences sharedPref) {
+        ArrayList<String> sensors = new ArrayList<>(sharedPref.getStringSet("sensors", new HashSet<>()));
+
+        int frequency = sharedPref.getInt("frequency", 15);
+        Address raspberryPiAddress = new Address(
+                sharedPref.getString("raspberryPiAddressIp", "192.168.0."),
+                sharedPref.getInt("raspberryPiAddressPort", 80));
+        Address serverAddress = new Address(
+                sharedPref.getString("serverAddressIp", BuildConfig.IPADDR_SERVER),
+                sharedPref.getInt("serverAddressPort", BuildConfig.PortHTTP_SERVER));
+        boolean isDataShared = sharedPref.getBoolean("isDataShared", false);
+
+        setting.setValue(new Settings(sensors, frequency,
+                raspberryPiAddress, serverAddress, isDataShared));
+    }
+
+    public void storeSettings(SharedPreferences sharedPref) {
+        Settings settings = setting.getValue();
+        Set<String> sensorsSet = new HashSet<>(settings.getSensors());
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putStringSet("sensors", sensorsSet);
+        editor.putInt("frequency", settings.getFrequency());
+        editor.putString("raspberryPiAddressIp", settings.getRaspberryPiAddress().getIp());
+        editor.putInt("raspberryPiAddressPort", settings.getRaspberryPiAddress().getPort());
+        editor.putString("serverAddressIp", settings.getServerAddress().getIp());
+        editor.putInt("serverAddressPort", settings.getServerAddress().getPort());
+        editor.putBoolean("isDataShared", settings.isDataShared());
+        editor.apply();
+    }
+
 }

@@ -18,6 +18,14 @@ public class Settings {
         this.isDataShared = isDataShared;
     }
 
+    public Settings(Settings copy) {
+        this.sensors = copy.sensors;
+        this.frequency = copy.frequency;
+        this.raspberryPiAddress = copy.raspberryPiAddress;
+        this.serverAddress = copy.serverAddress;
+        this.isDataShared = copy.isDataShared;
+    }
+
     public ArrayList<String> getSensors() {
         return sensors;
     }
