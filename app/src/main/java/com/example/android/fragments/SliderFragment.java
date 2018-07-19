@@ -1,56 +1,56 @@
 package com.example.android.fragments;
 
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.activities.BuildConfig;
 import com.example.android.activities.MainActivity;
 import com.example.android.activities.R;
 import com.example.android.helpers.JsonReaderHelper;
+import com.example.android.models.Address;
 import com.example.android.models.Sensor;
+import com.example.android.models.Settings;
+import com.example.android.network.NetworkHelper;
+import com.example.android.viewModels.SettingsModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 
 public class SliderFragment extends Fragment {
+
+    //Slider parameters
     private static final String ARG_LAYOUT = "layout";
     private static final String ARG_POSITION = "position";
-
     private int mLayout;
     private int mPosition;
+
+    // Settings values
+    MutableLiveData<Settings> mSettings = new MutableLiveData<>();
     private ArrayList<Sensor> listSensors = new ArrayList<>();
     private HashSet<String> usedSensors = new HashSet<>();
-
-    private SharedPreferences mPrefs;
 
     public SliderFragment() {
     }
@@ -67,7 +67,6 @@ public class SliderFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPrefs = getContext().getSharedPreferences(getString(R.string.config_file_key), Context.MODE_PRIVATE);
 
         if (getArguments() != null) {
             mLayout = getArguments().getInt(ARG_LAYOUT);
@@ -78,6 +77,10 @@ public class SliderFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // Create or get the ViewModel for our date
+        SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+
         View rootView = inflater.inflate(mLayout, container, false);
 
         String title = "";
@@ -92,7 +95,7 @@ public class SliderFragment extends Fragment {
             title = slide.getString("title");
 
             JSONArray lines = slide.getJSONArray("lines");
-            for (int i = 0; i<lines.length(); i++) {
+            for (int i = 0; i < lines.length(); i++) {
                 content.append(lines.getString(i));
             }
 
@@ -109,34 +112,102 @@ public class SliderFragment extends Fragment {
         t = rootView.findViewById(R.id.body);
         t.setText(Html.fromHtml(content.toString()));
 
-        if (imgId != 0){
+        if (imgId != 0) {
             ImageView slider_image = rootView.findViewById(R.id.slider_image);
             slider_image.setImageResource(imgId);
         }
 
-        Switch sw = rootView.findViewById(R.id.share);
-        if(sw != null) {
-            //@TODO: setup event listener
-        }
 
-        ListView listView = rootView.findViewById(R.id.listSensors);
 
-        if (listView != null) {
+        if (mLayout == R.layout.fragment_slider_sensor) {
+            ListView listView = rootView.findViewById(R.id.listSensors);
             listView.setAdapter(setup_list_sensors());
         }
 
-        ImageButton confirm = rootView.findViewById(R.id.confirmSensors);
+        // If slide RPI config
+        if (mLayout == R.layout.fragment_slider_rpi) {
+            TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
+            inputIp.setText(BuildConfig.IPADDR_RPI);
+            inputIp.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String tmp = ((TextInputEditText) v).getText().toString();
 
-        if (confirm != null) {
+                    Settings s = mSettings.getValue();
+                    s.getRaspberryPiAddress().setIp(tmp);
+                    mSettings.setValue(new Settings(s));
+                }
+            });
 
-            TextInputEditText input = rootView.findViewById(R.id.add_ip_input);
-            input.setText(BuildConfig.IPADDR_SERVER);
-            input = rootView.findViewById(R.id.add_port_input);
-            input.setText(Integer.toString(BuildConfig.PortHTTP_SERVER));
+            TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
+            inputPort.setText(Integer.toString(BuildConfig.PortHTTP_RPI));
+            inputPort.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String tmp = ((TextInputEditText) v).getText().toString();
 
+                    Settings s = mSettings.getValue();
+                    s.getRaspberryPiAddress().setPort(Integer.parseInt(tmp));
+                    mSettings.setValue(new Settings(s));
+                }
+            });
+        }
+
+        // If last slide (web config and confirm button)
+        if (mLayout == R.layout.fragment_slider_web) {
+
+            Switch sw = rootView.findViewById(R.id.share);
+            sw.setOnCheckedChangeListener((v, isChecked) ->
+            {
+                Settings s = mSettings.getValue();
+                s.setDataShared(isChecked);
+                mSettings.setValue(new Settings(s));
+            });
+
+            TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
+            inputIp.setText(BuildConfig.IPADDR_SERVER);
+            inputIp.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String tmp = ((TextInputEditText) v).getText().toString();
+
+                    Settings s = mSettings.getValue();
+                    s.getServerAddress().setIp(tmp);
+                    mSettings.setValue(new Settings(s));
+                }
+            });
+
+            TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
+            inputPort.setText(Integer.toString(BuildConfig.PortHTTP_SERVER));
+            inputPort.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String tmp = ((TextInputEditText) v).getText().toString();
+
+                    Settings s = mSettings.getValue();
+                    if(tmp != null)
+                        s.getServerAddress().setPort(Integer.parseInt(tmp));
+                    mSettings.setValue(new Settings(s));
+                }
+            });
+
+            ImageButton confirm = rootView.findViewById(R.id.confirmSensors);
             confirm.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
+
+                NetworkHelper netHelper = new NetworkHelper();
+                netHelper.checkConnectionRPi(mSettings.getValue().getRaspberryPiAddress().getIp(),
+                        mSettings.getValue().getRaspberryPiAddress().getPort()).observe(this, connected ->
+                {
+                    if (!connected){
+                        Toast.makeText(getContext(),
+                                "Couldn't connect to the Raspberry Pi", Toast.LENGTH_LONG);
+                    }
+                    else {
+                        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                                getString(R.string.settings_rpi_file_key),
+                                Context.MODE_PRIVATE);
+
+                        settingsModel.storeSettings(sharedPref);
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
             });
         }
 
@@ -144,7 +215,7 @@ public class SliderFragment extends Fragment {
     }
 
     private ArrayAdapter<Sensor> setup_list_sensors() {
-        if(listSensors.isEmpty()) {
+        if (listSensors.isEmpty()) {
             getSensorsData();
         }
         // Create an adapter class extending ArrayAdapter :
@@ -163,14 +234,14 @@ public class SliderFragment extends Fragment {
                 name.setText(sensor.getName());
                 Switch toggle = convertView.findViewById(R.id.switchSensor);
                 toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    if(isChecked){
-                        usedSensors.add(sensor.getName());
+                    Settings s = mSettings.getValue();
+                    if (isChecked) {
+                        s.getSensors().add(sensor.getName());
+                    } else {
+                        s.getSensors().remove(sensor.getName());
                     }
-                    else {
-                        usedSensors.remove(sensor.getName());
-                    }
+                    mSettings.setValue(new Settings(s));
                 });
-
                 return convertView;
             }
         };

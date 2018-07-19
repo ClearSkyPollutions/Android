@@ -2,7 +2,8 @@
     <string name="app_name">ClearSky</string>
 
     <string name="map_file_key">com.example.android.preferences</string>
-    <string name="config_file_key">com.example.android.config</string>
+    <string name="slider_file_key">com.example.android.slider</string>
+    <string name="settings_rpi_file_key">com.example.android.settingsRPi</string>
     <string name="prefs_zoom_level_double">zoomLevelDouble</string>
     <string name="prefs_zoom_level">zoomLevel</string>
     <string name="prefs_orientation">orientation</string>

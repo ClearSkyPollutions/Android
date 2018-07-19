@@ -1,5 +1,6 @@
 package com.example.android.network;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -17,7 +18,8 @@ import java.net.URL;
 
 public class NetworkHelper implements Request.Method {
 
-    public void sendRequest(String ipAddress, int portHTTP,  String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+    public void sendRequest(String ipAddress, int portHTTP,  String path, String query,
+                            int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 method,
                 buildUrl(ipAddress, portHTTP, path, query).toString(),
@@ -27,6 +29,22 @@ public class NetworkHelper implements Request.Method {
         );
         RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
         Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, path, query).toString());
+    }
+
+    public MutableLiveData<Boolean> checkConnectionRPi(String ipAddress, int portHTTP) {
+        MutableLiveData<Boolean> connection = new MutableLiveData<>();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                this.GET,
+                buildUrl(ipAddress, portHTTP, "api.php", null).toString(),
+                null,
+                success -> connection.postValue(true),
+                error -> connection.postValue(false)
+        );
+
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
+        return connection;
     }
 
     private URL buildUrl(String ipAddress, int portHTTP, String path, String query) {
