@@ -15,42 +15,48 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.activities.R;
+import com.example.android.customOnClickListener.ButtonDeleteOnClickListener;
+import com.example.android.customOnClickListener.ButtonFavoriteOnClickListener;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.models.Chart;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
-public class ChartItemAdapter extends BaseAdapter{
+public class ChartItemAdapter extends BaseAdapter {
 
-    private final Context mContext;
-    private DataModel mDataModel;
+    public final Context mContext;
+    private List<MutableLiveData<Chart>> mchartList = new ArrayList<>();
     private ChartHelper mChartHelper;
 
     public ArrayList<FrameLayout> mChartCardFront = new ArrayList<>();
     public ArrayList<FrameLayout> mChartCardBack = new ArrayList<>();
     private ImageButton mButtonDelete;
     private ImageButton mButtonFavorite;
+    private boolean isBackCardVisible;
 
-    public ArrayList<String> favorite  = new ArrayList<>();
+    public ArrayList<String> favorite = new ArrayList<>();
 
-
-    public ChartItemAdapter(Context mContext, DataModel dataModel, ChartHelper ChartHelper) {
+    public ChartItemAdapter(Context mContext, List<MutableLiveData<Chart>> chartList, ChartHelper ChartHelper) {
         this.mContext = mContext;
-        this.mDataModel = dataModel;
+        this.mchartList = chartList;
         this.mChartHelper = ChartHelper;
+    }
+
+    public void setIsBackCardVisible(boolean isBackCardVisible) {
+        this.isBackCardVisible = isBackCardVisible;
     }
 
     @Override
     public int getCount() {
-        return mDataModel.charts.size();
+        return mchartList.size();
     }
 
     @Override
     public MutableLiveData<Chart> getItem(int position) {
-        return mDataModel.getLiveChart(position);
+        return mchartList.get(position);
     }
 
     @Override
@@ -61,40 +67,43 @@ public class ChartItemAdapter extends BaseAdapter{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        int backgroundColor =  Color.WHITE;
+        int backgroundColor = Color.WHITE;
         int textColor = R.color.primaryTextColor;
-        Chart chart = mDataModel.charts.get(position);
-        String type = chart.getType();
+        MutableLiveData<Chart> chart = mchartList.get(position);
+        String type = chart.getValue().getType();
 
-        if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.activity_chart_item_adapter, parent, false);
+        final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+        convertView = layoutInflater.inflate(R.layout.item_adapter_chart, parent, false);
 
+        // Init FrameLayout
+
+        if (position < mChartCardFront.size()) {
+            mChartCardFront.set(position, convertView.findViewById(R.id.chart_card_front));
+            mChartCardBack.set(position, convertView.findViewById(R.id.chart_card_back));
+        } else {
             mChartCardFront.add(position, convertView.findViewById(R.id.chart_card_front));
             mChartCardBack.add(position, convertView.findViewById(R.id.chart_card_back));
-            mButtonDelete = convertView.findViewById(R.id.buttonDelete);
-            mButtonFavorite = convertView.findViewById(R.id.buttonFavori);
-            mChartCardFront.get(position).setVisibility(View.VISIBLE);
-            mChartCardBack.get(position).setVisibility(View.GONE);
-
-            mButtonFavorite.setOnClickListener(v -> {
-                if (favorite.contains(type)) {
-                    favorite.remove(type);
-                    mButtonFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
-                } else {
-                    favorite.add(type);
-                    mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
-                }
-                Log.d("Favorite",Arrays.toString(new ArrayList[]{favorite}));
-            });
-
-            mButtonDelete.setOnClickListener(v -> {
-                Log.d("Position dans delete", "" + position);
-                getItem(position).removeObservers((LifecycleOwner) mContext);
-                mDataModel.charts.remove(position);
-                notifyDataSetChanged();
-            });
-
         }
+
+        mButtonDelete = convertView.findViewById(R.id.buttonDelete);
+        mButtonFavorite = convertView.findViewById(R.id.buttonFavori);
+        if (isBackCardVisible) {
+            mChartCardFront.get(position).setVisibility(View.INVISIBLE);
+            mChartCardBack.get(position).setVisibility(View.VISIBLE);
+        } else {
+            mChartCardFront.get(position).setVisibility(View.VISIBLE);
+            mChartCardBack.get(position).setVisibility(View.INVISIBLE);
+        }
+
+
+        if (favorite.contains(type)) {
+            mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
+        } else {
+            mButtonFavorite.setImageResource(R.drawable.ic_star_border_black_24dp);
+        }
+
+        mButtonFavorite.setOnClickListener(new ButtonFavoriteOnClickListener(position, this, mButtonFavorite, type));
+        mButtonDelete.setOnClickListener(new ButtonDeleteOnClickListener(position, this, mchartList));
 
         TextView chartTitleFront = convertView.findViewById(R.id.chartTitleFront);
         TextView chartTitleBack = convertView.findViewById(R.id.chartTitleBack);
@@ -108,6 +117,7 @@ public class ChartItemAdapter extends BaseAdapter{
         lineChart.setTouchEnabled(false);
 
         getItem(position).observe((LifecycleOwner) mContext, newChart -> {
+            notifyDataSetChanged();
             // The home charts should only show data by hour
             if (!newChart.getScale().equals(DataModel.AVG_HOUR))
                 return;
@@ -116,14 +126,11 @@ public class ChartItemAdapter extends BaseAdapter{
                 Float ts_f = (float) newChart.getXAxis().get(index).getTime();
                 Float value = newChart.getYAxis().get(index);
                 Float[] entry = new Float[]{ts_f, value};
-                mChartHelper.addEntry(lineChart, entry, mDataModel.charts.get(position).getColor(), false);
+                mChartHelper.addEntry(lineChart, entry, newChart.getColor(), false);
             }
         });
         return convertView;
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-    }
 }
+

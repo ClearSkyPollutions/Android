@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -21,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.example.android.activities.BuildConfig;
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentSettingsBinding;
 import com.example.android.adapters.SensorsItemAdapter;
@@ -35,17 +35,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
-
 public class SettingsFragment extends Fragment {
 
     private SettingsModel mSettingsModel;
-
-    //
-    private static final String MY_PREFS_NAME = "MySettingsPref";
 
     private SensorsItemAdapter sensorsItemAdapter;
 
@@ -58,7 +50,35 @@ public class SettingsFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private CardView mCardConfirmation;
-    private CardView mCoverSettingsFragment;;
+    private CardView mCoverSettingsFragment;
+
+    private NetworkHelper mNetworkHelper = new NetworkHelper();
+    private SharedPreferences mPrefSettings;
+
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Create or get the ViewModel for our date, and bind the xml variable lastData to it (Databinding library)
+        mSettingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+
+        // Set Data in storage
+        mPrefSettings = getActivity().getSharedPreferences(getString(R.string.settings_rpi_file_key), Context.MODE_PRIVATE);
+        mSettingsModel.fetchPrefsSettings(mPrefSettings);
+
+        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
+
+        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
+                this,
+                connectionValue -> {
+                    if (connectionValue) {
+                        mSettingsModel.communication("config.json", Request.Method.GET, null);
+                        Toast.makeText(getActivity(), R.string.toast_data_updated,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), R.string.toast_data_storage,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,66 +88,19 @@ public class SettingsFragment extends Fragment {
         binding.setLifecycleOwner(this);
         View rootView = binding.getRoot();
 
-        // Create or get the ViewModel for our date, and bind the xml variable lastData to it (Databinding library)
-        mSettingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
-
         binding.setSettings(mSettingsModel);
-
-
-        // Set Data in storage
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
-        ArrayList<String> sensors = new ArrayList<>(sharedPref.getStringSet("sensors", new HashSet<>()));
-
-        int frequency = sharedPref.getInt("frequency", 15);
-        Address raspberryPiAddress = new Address(
-                sharedPref.getString("raspberryPiAddressIp", "192.168.0."),
-                sharedPref.getInt("raspberryPiAddressPort", 80));
-        Address serverAddress = new Address(
-                sharedPref.getString("serverAddressIp", BuildConfig.IPADDR_SERVER),
-                sharedPref.getInt("serverAddressPort", BuildConfig.PortHTTP_SERVER));
-        boolean isDataShared = sharedPref.getBoolean("isDataShared", false);
-
-        mSettingsModel.getSetting().setValue(new Settings(sensors, frequency,
-                raspberryPiAddress, serverAddress, isDataShared));
 
         // Init views
         initViews(rootView);
-
-        mSettingsModel.connectionRaspberryPiTest(mSettingsModel.getSetting().getValue().getRaspberryPiAddress());
-        // TODO Change manage error connection
-        mSettingsModel.connectionStat.observe(this, connectionStatValue -> {
-            if (connectionStatValue) {
-                Toast.makeText(getActivity(), R.string.toast_connection_successful_RPI,
-                        Toast.LENGTH_LONG).show();
-            }else {
-                Toast.makeText(getActivity(), R.string.toast_could_not_connect_RPI,
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-
-        // TODO Change Raspberry Pi Ip Address for future request
-
         return rootView;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (mSettingsModel != null) {
-            Settings settings = mSettingsModel.getSetting().getValue();
-            Set<String> sensorsSet = new HashSet<>(settings.getSensors());
-
-            SharedPreferences sharedPref = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putStringSet("sensors", sensorsSet);
-            editor.putInt("frequency", settings.getFrequency());
-            editor.putString("raspberryPiAddressIp", settings.getRaspberryPiAddress().getIp());
-            editor.putInt("raspberryPiAddressPort", settings.getRaspberryPiAddress().getPort());
-            editor.putString("serverAddressIp", settings.getServerAddress().getIp());
-            editor.putInt("serverAddressPort", settings.getServerAddress().getPort());
-            editor.putBoolean("isDataShared", settings.isDataShared());
-            editor.apply();
-        }
+        mSettingsModel.refreshSettings.removeObservers(this);
+        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
+        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).removeObservers(this);
     }
 
     private void initCardView(View rootView) {
@@ -138,6 +111,9 @@ public class SettingsFragment extends Fragment {
         mCoverSettingsFragment.setOnClickListener(v -> {
             mCardConfirmation.setVisibility(View.GONE);
             mCoverSettingsFragment.setVisibility(View.GONE);
+
+            mSwipeRefreshLayout.setEnabled(true);
+
             Toast.makeText(getActivity(), R.string.toast_cancel_configuration,
                     Toast.LENGTH_LONG).show();
         });
@@ -194,41 +170,62 @@ public class SettingsFragment extends Fragment {
         // Raspberry Pi Address
         mRaspberryPiAddressIp.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                // Code to execute when EditText loses focus
-                mSettingsModel.getSetting().getValue().setRaspberryPiAddress(new Address(
-                        mRaspberryPiAddressIp.getText().toString(),
-                        Integer.valueOf(mRaspberryPiAddressPort.getText().toString())
-                ));
+                String tmp = ((EditText) v).getText().toString();
+                Settings s = mSettingsModel.getSetting().getValue();
+
+                if (tmp.equals("")){
+                    Toast.makeText(getActivity(), R.string.toast_ip_empty,
+                            Toast.LENGTH_LONG).show();
+                }
+                s.getRaspberryPiAddress().setIp(tmp);
+                mSettingsModel.getSetting().setValue(new Settings(s));
             }
         });
+
         mRaspberryPiAddressPort.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                // Code to execute when EditText loses focus
-                mSettingsModel.getSetting().getValue().setRaspberryPiAddress(new Address(
-                        mRaspberryPiAddressIp.getText().toString(),
-                        Integer.valueOf(mRaspberryPiAddressPort.getText().toString())
+                String tmp = ((EditText) v).getText().toString();
+                Settings s = mSettingsModel.getSetting().getValue();
 
-                ));
+                if (!tmp.equals("")){
+                    s.getRaspberryPiAddress().setPort(Integer.parseInt(tmp));
+                    mSettingsModel.getSetting().setValue(new Settings(s));
+                } else {
+                    s.getRaspberryPiAddress().setPort(null);
+                    mSettingsModel.getSetting().setValue(new Settings(s));
+                    Toast.makeText(getActivity(), R.string.toast_port_empty,
+                            Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         // Server Address
         mServerAddressIp.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                // Code to execute when EditText loses focus
-                mSettingsModel.getSetting().getValue().setServerAddress(new Address(
-                        mServerAddressIp.getText().toString(),
-                        Integer.valueOf(mServerAddressPort.getText().toString())
-                ));
+                String tmp = ((EditText) v).getText().toString();
+                Settings s = mSettingsModel.getSetting().getValue();
+
+                if (tmp.equals("")){
+                    Toast.makeText(getActivity(), R.string.toast_ip_empty,
+                            Toast.LENGTH_LONG).show();
+                }
+                s.getServerAddress().setIp(tmp);
+                mSettingsModel.getSetting().setValue(new Settings(s));
             }
         });
+
         mServerAddressPort.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                // Code to execute when EditText loses focus
-                mSettingsModel.getSetting().getValue().setServerAddress(new Address(
-                        mServerAddressIp.getText().toString(),
-                        Integer.valueOf(mServerAddressPort.getText().toString())
-                ));
+            String tmp = ((EditText) v).getText().toString();
+            Settings s = mSettingsModel.getSetting().getValue();
+
+            if (!tmp.equals("")){
+                s.getServerAddress().setPort(Integer.parseInt(tmp));
+                mSettingsModel.getSetting().setValue(new Settings(s));
+            } else {
+                s.getServerAddress().setPort(null);
+                mSettingsModel.getSetting().setValue(new Settings(s));
+                Toast.makeText(getActivity(), R.string.toast_port_empty,
+                        Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -244,11 +241,34 @@ public class SettingsFragment extends Fragment {
 
         // Setup Button
         validate.setOnClickListener(v -> {
-            mCoverSettingsFragment.setVisibility(View.VISIBLE);
-            mCardConfirmation.setVisibility(View.VISIBLE);
+            mRaspberryPiAddressIp.clearFocus();
+            mRaspberryPiAddressPort.clearFocus();
+            mServerAddressIp.clearFocus();
+            mServerAddressPort.clearFocus();
+
+            Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
+
+            if (mSettingsModel.checkInput()) {
+                mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
+                        this,
+                        connectionValue -> {
+                            if (connectionValue) {
+                                Toast.makeText(getActivity(), R.string.toast_connection_successful_RPI,
+                                        Toast.LENGTH_LONG).show();
+                                mCoverSettingsFragment.setVisibility(View.VISIBLE);
+                                mCardConfirmation.setVisibility(View.VISIBLE);
+                                mSwipeRefreshLayout.setEnabled(false);
+                            } else {
+                                Toast.makeText(getActivity(), R.string.toast_could_not_connect_RPI,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
         });
 
         accept.setOnClickListener(v -> {
+            mSettingsModel.storeSettings(mPrefSettings);
+
             Settings settings = mSettingsModel.getSetting().getValue();
 
             JSONArray sensorsJson = new JSONArray(settings.getSensors());
@@ -270,15 +290,16 @@ public class SettingsFragment extends Fragment {
             mSettingsModel.communication("config.php", Request.Method.PUT, jsonSend);
             mCoverSettingsFragment.setVisibility(View.GONE);
             mCardConfirmation.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setEnabled(true);
         });
 
         cancel.setOnClickListener(v -> {
             mCoverSettingsFragment.setVisibility(View.GONE);
             mCardConfirmation.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setEnabled(true);
             Toast.makeText(getActivity(), R.string.toast_cancel_configuration,
                     Toast.LENGTH_LONG).show();
         });
-
 
         // Setup ImageButton
         mButtonAddSensor.setOnClickListener(v -> {
@@ -314,12 +335,13 @@ public class SettingsFragment extends Fragment {
             mSettingsModel.refreshSettings.observe(this, updateSettingsValue -> {
                 mSwipeRefreshLayout.setRefreshing(updateSettingsValue);
                 sensorsItemAdapter.notifyDataSetChanged();
+                Toast.makeText(getActivity(), R.string.toast_data_updated,
+                        Toast.LENGTH_LONG).show();
             });
         });
     }
 
     private void initViews(View rootView) {
-
         initCardView(rootView);
         initSeekBar(rootView);
         initSensorsItemAdapterListView(rootView);
@@ -328,7 +350,5 @@ public class SettingsFragment extends Fragment {
         initButton(rootView);
         initSwitch(rootView);
         initSwipeRefresh(rootView);
-
     }
 }
-

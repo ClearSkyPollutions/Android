@@ -48,7 +48,7 @@ public class SliderFragment extends Fragment {
     private int mPosition;
 
     // Settings values
-    MutableLiveData<Settings> mSettings = new MutableLiveData<>();
+    MutableLiveData<Settings> mSettings;
     private ArrayList<Sensor> listSensors = new ArrayList<>();
     private HashSet<String> usedSensors = new HashSet<>();
 
@@ -80,6 +80,7 @@ public class SliderFragment extends Fragment {
 
         // Create or get the ViewModel for our date
         SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+        mSettings = settingsModel.getSetting();
 
         View rootView = inflater.inflate(mLayout, container, false);
 
@@ -127,7 +128,7 @@ public class SliderFragment extends Fragment {
         // If slide RPI config
         if (mLayout == R.layout.fragment_slider_rpi) {
             TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
-            inputIp.setText(BuildConfig.IPADDR_RPI);
+            inputIp.setText(mSettings.getValue().getRaspberryPiAddress().getIp());
             inputIp.setOnFocusChangeListener((v, hasFocus) -> {
                 if (!hasFocus) {
                     String tmp = ((TextInputEditText) v).getText().toString();
@@ -139,7 +140,7 @@ public class SliderFragment extends Fragment {
             });
 
             TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
-            inputPort.setText(Integer.toString(BuildConfig.PortHTTP_RPI));
+            inputPort.setText(Integer.toString(mSettings.getValue().getRaspberryPiAddress().getPort()));
             inputPort.setOnFocusChangeListener((v, hasFocus) -> {
                 if (!hasFocus) {
                     String tmp = ((TextInputEditText) v).getText().toString();
@@ -163,7 +164,7 @@ public class SliderFragment extends Fragment {
             });
 
             TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
-            inputIp.setText(BuildConfig.IPADDR_SERVER);
+            inputIp.setText(mSettings.getValue().getServerAddress().getIp());
             inputIp.setOnFocusChangeListener((v, hasFocus) -> {
                 if (!hasFocus) {
                     String tmp = ((TextInputEditText) v).getText().toString();
@@ -175,7 +176,7 @@ public class SliderFragment extends Fragment {
             });
 
             TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
-            inputPort.setText(Integer.toString(BuildConfig.PortHTTP_SERVER));
+            inputPort.setText(Integer.toString(mSettings.getValue().getServerAddress().getPort()));
             inputPort.setOnFocusChangeListener((v, hasFocus) -> {
                 if (!hasFocus) {
                     String tmp = ((TextInputEditText) v).getText().toString();

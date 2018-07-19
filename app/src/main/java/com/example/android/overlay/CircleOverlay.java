@@ -1,4 +1,4 @@
-package com.example.android.Overlay;
+package com.example.android.overlay;
 
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;

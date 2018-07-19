@@ -11,8 +11,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.android.fragments.SliderFragment;
+import com.example.android.network.RequestQueueSingleton;
 import com.example.android.viewModels.SettingsModel;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -51,6 +53,9 @@ public class WelcomeActivity extends AppCompatActivity {
         mSettingsModel = ViewModelProviders.of(this).get(SettingsModel.class);
         mSettingsModel.fetchPrefsSettings(sharedPref);
 
+        RequestQueueSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
+
+        Log.d("SettingsModel", "" + mSettingsModel.getSetting().getValue().getFrequency());
         //Setup sliders
         mPager = findViewById(R.id.viewPager);
         mAdapter = new SlideAdapter(getSupportFragmentManager());

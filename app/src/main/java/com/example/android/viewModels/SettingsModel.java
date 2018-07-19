@@ -3,10 +3,7 @@ package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.android.volley.NoConnectionError;
-import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Address;
 import com.example.android.models.Settings;
@@ -16,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +26,11 @@ public class SettingsModel extends ViewModel {
     public MutableLiveData<Boolean> refreshSettings = new MutableLiveData<>();
 
     public MutableLiveData<Settings> getSetting() {
+       /*
+        if (setting.getValue() == null) {
+            setting.postValue(new Settings(new ArrayList<>(), 0, new Address("", 80), new Address("", 80), false));
+        }
+        */
         return setting;
     }
 
@@ -68,7 +69,7 @@ public class SettingsModel extends ViewModel {
                 sharedPref.getInt("serverAddressPort", BuildConfig.PortHTTP_SERVER));
         boolean isDataShared = sharedPref.getBoolean("isDataShared", false);
 
-        setting.setValue(new Settings(sensors, frequency,
+        getSetting().setValue(new Settings(sensors, frequency,
                 raspberryPiAddress, serverAddress, isDataShared));
     }
 
@@ -90,4 +91,20 @@ public class SettingsModel extends ViewModel {
     public void communication(String path, int method, JSONObject configToSend) {
         network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, path, null, method, parseSettings, configToSend);
     }
+
+    public boolean checkInput(){
+        Address addressRPI = getSetting().getValue().getRaspberryPiAddress();
+        Address addressServer = getSetting().getValue().getServerAddress();
+
+        if (!(addressRPI.getIp().equals("")) &&
+                addressRPI.getPort() != null &&
+                !(addressServer.getIp().equals("")) &&
+                addressServer.getPort() != null) {
+            return true;
+        }else {
+            return false;
+        }
+
+    }
+
 }

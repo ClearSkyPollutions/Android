@@ -16,7 +16,6 @@ public class Settings {
         this.frequency = frequency;
         this.raspberryPiAddress = raspberryPiAddress;
         this.serverAddress = serverAddress;
-        this.isDataShared = isDataShared;
     }
 
     public Settings(Settings copy) {

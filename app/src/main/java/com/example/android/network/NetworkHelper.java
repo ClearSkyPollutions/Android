@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.android.activities.BuildConfig;
 import com.example.android.viewModels.JSONParser;
 
 import org.json.JSONObject;
@@ -20,6 +19,7 @@ public class NetworkHelper implements Request.Method {
 
     public void sendRequest(String ipAddress, int portHTTP,  String path, String query,
                             int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 method,
                 buildUrl(ipAddress, portHTTP, path, query).toString(),
@@ -36,7 +36,7 @@ public class NetworkHelper implements Request.Method {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 this.GET,
-                buildUrl(ipAddress, portHTTP, "api.php", null).toString(),
+                buildUrl(ipAddress, portHTTP, "api.php", "").toString(),
                 null,
                 success -> connection.postValue(true),
                 error -> connection.postValue(false)
@@ -60,6 +60,22 @@ public class NetworkHelper implements Request.Method {
             e.printStackTrace();
         }
         return url;
+    }
+
+    public MutableLiveData<Boolean> checkConnection(String ipAddress, int portHTTP) {
+        MutableLiveData<Boolean> connection = new MutableLiveData<>();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                buildUrl(ipAddress, portHTTP, "api.php", null).toString(),
+                null,
+                success -> connection.postValue(true),
+                error -> connection.postValue(false)
+        );
+
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
+        return connection;
     }
 
 }
