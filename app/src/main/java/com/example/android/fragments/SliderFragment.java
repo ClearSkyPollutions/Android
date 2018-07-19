@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -192,12 +193,12 @@ public class SliderFragment extends Fragment {
             confirm.setOnClickListener(v -> {
 
                 NetworkHelper netHelper = new NetworkHelper();
-                netHelper.checkConnectionRPi(mSettings.getValue().getRaspberryPiAddress().getIp(),
+                netHelper.checkConnection(mSettings.getValue().getRaspberryPiAddress().getIp(),
                         mSettings.getValue().getRaspberryPiAddress().getPort()).observe(this, connected ->
                 {
                     if (!connected){
                         Toast.makeText(getContext(),
-                                "Couldn't connect to the Raspberry Pi", Toast.LENGTH_LONG);
+                                getString(R.string.toast_could_not_connect_RPI), Toast.LENGTH_LONG).show();
                     }
                     else {
                         SharedPreferences sharedPref = getActivity().getSharedPreferences(
@@ -226,23 +227,31 @@ public class SliderFragment extends Fragment {
             @Override
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 Sensor sensor = getItem(position);
-                Switch check;
 
                 if (convertView == null) {
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_adapter_sensor_slider, parent, false);
-                }
-                TextView name = convertView.findViewById(R.id.nameSensor);
-                name.setText(sensor.getName());
-                Switch toggle = convertView.findViewById(R.id.switchSensor);
-                toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    Settings s = mSettings.getValue();
-                    if (isChecked) {
-                        s.getSensors().add(sensor.getName());
-                    } else {
-                        s.getSensors().remove(sensor.getName());
+                    TextView name = convertView.findViewById(R.id.nameSensor);
+                    Switch toggle = convertView.findViewById(R.id.switchSensor);
+
+                    name.setText(sensor.getName());
+                    toggle.setChecked(mSettings.getValue().getSensors().contains(sensor.getName()));
+                    Log.d("Position", "" + position);
+                    for (String a : mSettings.getValue().getSensors()
+                            ) {
+                        Log.d("List ", a);
                     }
-                    mSettings.setValue(new Settings(s));
-                });
+                    Log.d("Name", sensor.getName());
+
+                    toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                        Settings s = mSettings.getValue();
+                        if (isChecked) {
+                            s.getSensors().add(sensor.getName());
+                        } else {
+                            s.getSensors().remove(sensor.getName());
+                        }
+                        mSettings.setValue(new Settings(s));
+                    });
+                }
                 return convertView;
             }
         };

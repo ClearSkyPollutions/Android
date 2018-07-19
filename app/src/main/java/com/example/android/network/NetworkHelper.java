@@ -31,19 +31,23 @@ public class NetworkHelper implements Request.Method {
         Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, path, query).toString());
     }
 
-    public MutableLiveData<Boolean> checkConnectionRPi(String ipAddress, int portHTTP) {
+    public MutableLiveData<Boolean> checkConnection(String ipAddress, int portHTTP) {
         MutableLiveData<Boolean> connection = new MutableLiveData<>();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                this.GET,
-                buildUrl(ipAddress, portHTTP, "api.php", "").toString(),
-                null,
-                success -> connection.postValue(true),
-                error -> connection.postValue(false)
-        );
-
-        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
+        URL url = buildUrl(ipAddress, portHTTP, "api.php", "");
+        if(url == null) {
+            connection.postValue(false);
+        }
+        else {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    this.GET,
+                    url.toString(),
+                     null,
+                    success -> connection.postValue(true),
+                    error -> connection.postValue(false)
+            );
+            RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+            Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
+        }
         return connection;
     }
 
@@ -60,22 +64,6 @@ public class NetworkHelper implements Request.Method {
             e.printStackTrace();
         }
         return url;
-    }
-
-    public MutableLiveData<Boolean> checkConnection(String ipAddress, int portHTTP) {
-        MutableLiveData<Boolean> connection = new MutableLiveData<>();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                buildUrl(ipAddress, portHTTP, "api.php", null).toString(),
-                null,
-                success -> connection.postValue(true),
-                error -> connection.postValue(false)
-        );
-
-        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
-        return connection;
     }
 
 }

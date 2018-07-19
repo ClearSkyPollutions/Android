@@ -43,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:gravity="center_vertical"
+            android:gravity="fill_horizontal|fill"
             android:textAppearance="@android:style/TextAppearance.Material.Body1"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/rpi"
