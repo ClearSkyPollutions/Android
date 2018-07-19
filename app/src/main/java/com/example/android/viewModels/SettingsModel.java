@@ -3,9 +3,7 @@ package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Address;
 import com.example.android.models.Settings;
@@ -26,7 +24,6 @@ public class SettingsModel extends ViewModel {
     private NetworkHelper network = new NetworkHelper();
 
     public MutableLiveData<Boolean> refreshSettings = new MutableLiveData<>();
-    public MutableLiveData<Boolean> connectionStat = new MutableLiveData<>();
 
     public MutableLiveData<Settings> getSetting() {
         return setting;
@@ -59,30 +56,6 @@ public class SettingsModel extends ViewModel {
         network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, path, null, method, parseSettings, configToSend);
     }
 
-    public void connectionRaspberryPiTest(Address raspberryPiAddress) {
-
-        String path = "api.php";
-
-        JSONParser<JSONObject> parserConnectionRaspberryPiTest = (JSONObject response) -> {
-            try {
-                JSONObject objectInfo = response.getJSONObject("info");
-                String dataBaseRaspberryPiName = objectInfo.getString("title");
-                Log.d("connection", dataBaseRaspberryPiName);
-                if (dataBaseRaspberryPiName.equals(BuildConfig.DataBaseRPI_Name)) {
-                    connectionStat.postValue(Boolean.TRUE);
-                }
-            } catch (JSONException e) {
-                Log.d("connection", "error");
-                connectionStat.postValue(Boolean.FALSE);
-                e.printStackTrace();
-            }
-        };
-
-        network.sendRequest(raspberryPiAddress.getIp(), raspberryPiAddress.getPort(), path,
-                null, Request.Method.GET, parserConnectionRaspberryPiTest, null);
-
-    }
-
     public void fetchPrefsSettings(SharedPreferences sharedPref) {
         ArrayList<String> sensors = new ArrayList<>(sharedPref.getStringSet("sensors", new HashSet<>()));
 
@@ -112,6 +85,21 @@ public class SettingsModel extends ViewModel {
         editor.putInt("serverAddressPort", settings.getServerAddress().getPort());
         editor.putBoolean("isDataShared", settings.isDataShared());
         editor.apply();
+    }
+
+    public boolean akecoucou(){
+        Address addressRPI = getSetting().getValue().getRaspberryPiAddress();
+        Address addressServer = getSetting().getValue().getServerAddress();
+
+        if (!(addressRPI.getIp().equals("")) &&
+                addressRPI.getPort() != null &&
+                !(addressServer.getIp().equals("")) &&
+                addressServer.getPort() != null) {
+            return true;
+        }else {
+            return false;
+        }
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.android.network;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -42,4 +43,21 @@ public class NetworkHelper implements Request.Method {
         }
         return url;
     }
+
+    public MutableLiveData<Boolean> checkConnection(String ipAddress, int portHTTP) {
+        MutableLiveData<Boolean> connection = new MutableLiveData<>();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                buildUrl(ipAddress, portHTTP, "api.php", null).toString(),
+                null,
+                success -> connection.postValue(true),
+                error -> connection.postValue(false)
+        );
+
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
+        return connection;
+    }
+
 }

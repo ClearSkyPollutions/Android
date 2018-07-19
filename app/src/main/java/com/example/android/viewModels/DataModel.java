@@ -1,9 +1,12 @@
 package com.example.android.viewModels;
 
+import android.app.DownloadManager;
+import android.app.VoiceInteractor;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.graphics.Color;
 
+import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.helpers.HashHelper;
@@ -60,7 +63,7 @@ public class DataModel extends ViewModel {
 
     public void loadDataTypeUnits() {
         String query = "transform=1&order=id";
-        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, POLLUTANT, query, NetworkHelper.GET, parseDataTypes, null);
+        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, POLLUTANT, query, Request.Method.GET, parseDataTypes, null);
     }
 
     private JSONParser<JSONObject> parseDataTypes = (JSONObject response) -> {
