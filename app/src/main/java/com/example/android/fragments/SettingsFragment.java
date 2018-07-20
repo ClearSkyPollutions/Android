@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,10 +29,6 @@ import com.example.android.models.Address;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
 import com.example.android.viewModels.SettingsModel;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class SettingsFragment extends Fragment {
 
@@ -268,26 +263,8 @@ public class SettingsFragment extends Fragment {
 
         accept.setOnClickListener(v -> {
             mSettingsModel.storeSettings(mPrefSettings);
+            mSettingsModel.sendNewSettings();
 
-            Settings settings = mSettingsModel.getSetting().getValue();
-
-            JSONArray sensorsJson = new JSONArray(settings.getSensors());
-            JSONObject serverAddressJson = new JSONObject();
-
-            JSONObject jsonSend = new JSONObject();
-            try {
-                serverAddressJson.put("ip", settings.getServerAddress().getIp());
-                serverAddressJson.put("port", settings.getServerAddress().getPort());
-
-                jsonSend.put("sensors", sensorsJson);
-                jsonSend.put("frequency", settings.getFrequency());
-                jsonSend.put("serverAddress", serverAddressJson);
-                jsonSend.put("isDataShared", settings.isDataShared());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            Log.d("debug", jsonSend.toString());
-            mSettingsModel.communication("config.php", Request.Method.PUT, jsonSend);
             mCoverSettingsFragment.setVisibility(View.GONE);
             mCardConfirmation.setVisibility(View.GONE);
             mSwipeRefreshLayout.setEnabled(true);
@@ -305,7 +282,7 @@ public class SettingsFragment extends Fragment {
         mButtonAddSensor.setOnClickListener(v -> {
             String newSensor = mEditTextSensorAdd.getText().toString();
             if (!newSensor.equals("")) {
-                mSettingsModel.getSetting().getValue().addSeqnsors(newSensor);
+                mSettingsModel.getSetting().getValue().addSensors(newSensor);
                 mEditTextSensorAdd.setText("");
                 sensorsItemAdapter.notifyDataSetChanged();
             } else {

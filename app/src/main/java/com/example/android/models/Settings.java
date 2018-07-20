@@ -34,10 +34,9 @@ public class Settings {
         this.sensors = sensors;
     }
 
-    public void addSeqnsors(String sensors) {
+    public void addSensors(String sensors) {
         this.sensors.add(sensors);
     }
-
 
     public int getFrequency() {
         return frequency;

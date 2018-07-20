@@ -55,7 +55,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
         RequestQueueSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
 
-        Log.d("SettingsModel", "" + mSettingsModel.getSetting().getValue().getFrequency());
         //Setup sliders
         mPager = findViewById(R.id.viewPager);
         mAdapter = new SlideAdapter(getSupportFragmentManager());

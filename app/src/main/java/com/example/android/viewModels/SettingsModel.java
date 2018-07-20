@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.SharedPreferences;
 
+import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Address;
 import com.example.android.models.Settings;
@@ -92,6 +93,28 @@ public class SettingsModel extends ViewModel {
         network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, path, null, method, parseSettings, configToSend);
     }
 
+    public void sendNewSettings() {
+        Settings settings = getSetting().getValue();
+
+        JSONArray sensorsJson = new JSONArray(settings.getSensors());
+        JSONObject serverAddressJson = new JSONObject();
+
+        JSONObject jsonSend = new JSONObject();
+        try {
+            serverAddressJson.put("ip", settings.getServerAddress().getIp());
+            serverAddressJson.put("port", settings.getServerAddress().getPort());
+
+            jsonSend.put("sensors", sensorsJson);
+            jsonSend.put("frequency", settings.getFrequency());
+            jsonSend.put("serverAddress", serverAddressJson);
+            jsonSend.put("isDataShared", settings.isDataShared());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        communication("config.php", Request.Method.PUT, jsonSend);
+    }
+
+    //@TODO : Check validity of Add IP (XXX.XXX.XXX.XXX) and port (<~36k)
     public boolean checkInput(){
         Address addressRPI = getSetting().getValue().getRaspberryPiAddress();
         Address addressServer = getSetting().getValue().getServerAddress();

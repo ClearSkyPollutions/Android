@@ -22,11 +22,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.activities.BuildConfig;
 import com.example.android.activities.MainActivity;
 import com.example.android.activities.R;
 import com.example.android.helpers.JsonReaderHelper;
-import com.example.android.models.Address;
 import com.example.android.models.Sensor;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
@@ -37,7 +35,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 
 public class SliderFragment extends Fragment {
@@ -49,9 +46,9 @@ public class SliderFragment extends Fragment {
     private int mPosition;
 
     // Settings values
+    SettingsModel mSettingsModel;
     MutableLiveData<Settings> mSettings;
     private ArrayList<Sensor> listSensors = new ArrayList<>();
-    private HashSet<String> usedSensors = new HashSet<>();
 
     public SliderFragment() {
     }
@@ -80,25 +77,45 @@ public class SliderFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Create or get the ViewModel for our date
-        SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
-        mSettings = settingsModel.getSetting();
+        mSettingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+        mSettings = mSettingsModel.getSetting();
 
         View rootView = inflater.inflate(mLayout, container, false);
 
+        //Init views Title/description/image shared by all slides
+        initSlides(rootView);
+
+        if (mLayout == R.layout.fragment_slider_sensor) {
+            ListView listView = rootView.findViewById(R.id.listSensors);
+            listView.setAdapter(setup_list_sensors());
+        }
+
+        if (mLayout == R.layout.fragment_slider_rpi) {
+            initRPISlide(rootView);
+        }
+
+        if (mLayout == R.layout.fragment_slider_web) {
+            initLastSlide(rootView);
+        }
+
+        return rootView;
+    }
+
+    private void initSlides(View rootView) {
         String title = "";
         int imgId = 0;
-        StringBuilder content = new StringBuilder();
-        String json = JsonReaderHelper.loadJSONFromAsset("slides.json", getContext());
+        StringBuilder txt = new StringBuilder();
+
         try {
+            String json = JsonReaderHelper.loadJSONFromAsset("slides.json", getContext());
             JSONObject root = new JSONObject(json);
-            // Get JSON Array node
             JSONObject slide = root.getJSONArray("slide").getJSONObject(mPosition);
 
             title = slide.getString("title");
 
             JSONArray lines = slide.getJSONArray("lines");
             for (int i = 0; i < lines.length(); i++) {
-                content.append(lines.getString(i));
+                txt.append(lines.getString(i));
             }
 
             imgId = getResources().getIdentifier(
@@ -111,51 +128,44 @@ public class SliderFragment extends Fragment {
 
         TextView t = rootView.findViewById(R.id.title);
         t.setText(Html.fromHtml(title));
+
         t = rootView.findViewById(R.id.body);
-        t.setText(Html.fromHtml(content.toString()));
+        t.setText(Html.fromHtml(txt.toString()));
 
         if (imgId != 0) {
             ImageView slider_image = rootView.findViewById(R.id.slider_image);
             slider_image.setImageResource(imgId);
         }
+    }
 
+    private void initRPISlide(View rootView) {
+        TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
+        inputIp.setText(mSettings.getValue().getRaspberryPiAddress().getIp());
+        inputIp.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String usrInput = ((TextInputEditText) v).getText().toString();
 
+                Settings s = mSettings.getValue();
+                s.getRaspberryPiAddress().setIp(usrInput);
+                mSettings.setValue(new Settings(s));
+            }
+        });
 
-        if (mLayout == R.layout.fragment_slider_sensor) {
-            ListView listView = rootView.findViewById(R.id.listSensors);
-            listView.setAdapter(setup_list_sensors());
-        }
+        TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
+        inputPort.setText(Integer.toString(mSettings.getValue().getRaspberryPiAddress().getPort()));
+        inputPort.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String usrInput = ((TextInputEditText) v).getText().toString();
 
-        // If slide RPI config
-        if (mLayout == R.layout.fragment_slider_rpi) {
-            TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
-            inputIp.setText(mSettings.getValue().getRaspberryPiAddress().getIp());
-            inputIp.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    String tmp = ((TextInputEditText) v).getText().toString();
+                Settings s = mSettings.getValue();
+                s.getRaspberryPiAddress().setPort(Integer.parseInt(usrInput));
+                mSettings.setValue(new Settings(s));
+            }
+        });
+    }
 
-                    Settings s = mSettings.getValue();
-                    s.getRaspberryPiAddress().setIp(tmp);
-                    mSettings.setValue(new Settings(s));
-                }
-            });
-
-            TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
-            inputPort.setText(Integer.toString(mSettings.getValue().getRaspberryPiAddress().getPort()));
-            inputPort.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    String tmp = ((TextInputEditText) v).getText().toString();
-
-                    Settings s = mSettings.getValue();
-                    s.getRaspberryPiAddress().setPort(Integer.parseInt(tmp));
-                    mSettings.setValue(new Settings(s));
-                }
-            });
-        }
-
-        // If last slide (web config and confirm button)
-        if (mLayout == R.layout.fragment_slider_web) {
-
+    private void initLastSlide(View rootView) {
+        {
             Switch sw = rootView.findViewById(R.id.share);
             sw.setOnCheckedChangeListener((v, isChecked) ->
             {
@@ -164,30 +174,7 @@ public class SliderFragment extends Fragment {
                 mSettings.setValue(new Settings(s));
             });
 
-            TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
-            inputIp.setText(mSettings.getValue().getServerAddress().getIp());
-            inputIp.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    String tmp = ((TextInputEditText) v).getText().toString();
-
-                    Settings s = mSettings.getValue();
-                    s.getServerAddress().setIp(tmp);
-                    mSettings.setValue(new Settings(s));
-                }
-            });
-
-            TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
-            inputPort.setText(Integer.toString(mSettings.getValue().getServerAddress().getPort()));
-            inputPort.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    String tmp = ((TextInputEditText) v).getText().toString();
-
-                    Settings s = mSettings.getValue();
-                    if(tmp != null)
-                        s.getServerAddress().setPort(Integer.parseInt(tmp));
-                    mSettings.setValue(new Settings(s));
-                }
-            });
+            initInputs(rootView);
 
             ImageButton confirm = rootView.findViewById(R.id.confirmSensors);
             confirm.setOnClickListener(v -> {
@@ -196,24 +183,53 @@ public class SliderFragment extends Fragment {
                 netHelper.checkConnection(mSettings.getValue().getRaspberryPiAddress().getIp(),
                         mSettings.getValue().getRaspberryPiAddress().getPort()).observe(this, connected ->
                 {
-                    if (!connected){
+                    if (!connected) {
                         Toast.makeText(getContext(),
                                 getString(R.string.toast_could_not_connect_RPI), Toast.LENGTH_LONG).show();
-                    }
-                    else {
+                    } else {
                         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                                 getString(R.string.settings_rpi_file_key),
                                 Context.MODE_PRIVATE);
 
-                        settingsModel.storeSettings(sharedPref);
+                        //Save new sharedPreferences and send the config to the RPI
+                        mSettingsModel.storeSettings(sharedPref);
+                        mSettingsModel.sendNewSettings();
+
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         startActivity(intent);
                     }
                 });
             });
         }
+    }
 
-        return rootView;
+    // Only manage inputs from last Slide, maybe refactor to make it more generic and
+    // initialise inputs for both RPI and WEB address ? (Non trivial)
+    private void initInputs(View rootView) {
+        TextInputEditText inputIp = rootView.findViewById(R.id.add_ip_input);
+        inputIp.setText(mSettings.getValue().getServerAddress().getIp());
+        inputIp.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String tmp = ((TextInputEditText) v).getText().toString();
+
+                Settings s = mSettings.getValue();
+                s.getServerAddress().setIp(tmp);
+                mSettings.setValue(new Settings(s));
+            }
+        });
+
+        TextInputEditText inputPort = rootView.findViewById(R.id.add_port_input);
+        inputPort.setText(Integer.toString(mSettings.getValue().getServerAddress().getPort()));
+        inputPort.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String tmp = ((TextInputEditText) v).getText().toString();
+
+                Settings s = mSettings.getValue();
+                if (tmp != null)
+                    s.getServerAddress().setPort(Integer.parseInt(tmp));
+                mSettings.setValue(new Settings(s));
+            }
+        });
     }
 
     private ArrayAdapter<Sensor> setup_list_sensors() {
@@ -228,19 +244,12 @@ public class SliderFragment extends Fragment {
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 Sensor sensor = getItem(position);
 
-                if (convertView == null) {
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_adapter_sensor_slider, parent, false);
                     TextView name = convertView.findViewById(R.id.nameSensor);
                     Switch toggle = convertView.findViewById(R.id.switchSensor);
 
                     name.setText(sensor.getName());
                     toggle.setChecked(mSettings.getValue().getSensors().contains(sensor.getName()));
-                    Log.d("Position", "" + position);
-                    for (String a : mSettings.getValue().getSensors()
-                            ) {
-                        Log.d("List ", a);
-                    }
-                    Log.d("Name", sensor.getName());
 
                     toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
                         Settings s = mSettings.getValue();
@@ -251,7 +260,6 @@ public class SliderFragment extends Fragment {
                         }
                         mSettings.setValue(new Settings(s));
                     });
-                }
                 return convertView;
             }
         };
@@ -284,5 +292,6 @@ public class SliderFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
 }
 
