@@ -87,7 +87,7 @@ public class SettingsModel extends ViewModel {
         editor.apply();
     }
 
-    public boolean akecoucou(){
+    public boolean checkInput(){
         Address addressRPI = getSetting().getValue().getRaspberryPiAddress();
         Address addressServer = getSetting().getValue().getServerAddress();
 

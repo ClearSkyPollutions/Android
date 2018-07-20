@@ -1,10 +1,14 @@
 package com.example.android.network;
 
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.android.activities.R;
+import com.example.android.models.Address;
 import com.example.android.viewModels.JSONParser;
 
 import org.json.JSONObject;
@@ -17,16 +21,48 @@ import java.net.URL;
 
 public class NetworkHelper implements Request.Method {
 
-    public void sendRequest(String ipAddress, int portHTTP, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+    public void sendRequest(){
+        
+    }
+    public void sendRequestRPI(Context context, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+        // TODO CHANGE FILE NAME
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key),Context.MODE_PRIVATE);
+
+
+        Address raspberryPiAddress = new Address(
+                sharedPref.getString("raspberryPiAddressIp", "192.168.0."),
+                sharedPref.getInt("raspberryPiAddressPort", 80));
+
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 method,
-                buildUrl(ipAddress, portHTTP, path, query).toString(),
+                buildUrl(raspberryPiAddress.getIp(), raspberryPiAddress.getPort(), path, query).toString(),
                 dataToSend,
                 f::apply,
                 Throwable::printStackTrace
         );
         RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, path, query).toString());
+        Log.d(NetworkHelper.class.toString(), buildUrl(raspberryPiAddress.getIp(),
+                raspberryPiAddress.getPort(), path, query).toString());
+    }
+
+    public void sendRequestServer(Context context, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+        // TODO CHANGE FILE NAME
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key),Context.MODE_PRIVATE);
+
+        Address serverAddress = new Address(
+                sharedPref.getString("serverAddressIp",""),
+                sharedPref.getInt("serverAddressPort", 0));
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                method,
+                buildUrl(serverAddress.getIp(), serverAddress.getPort(), path, query).toString(),
+                dataToSend,
+                f::apply,
+                Throwable::printStackTrace
+        );
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+        Log.d(NetworkHelper.class.toString(), buildUrl(serverAddress.getIp(), serverAddress.getPort(), path, query).toString());
     }
 
     private URL buildUrl(String ipAddress, int portHTTP, String path, String query) {

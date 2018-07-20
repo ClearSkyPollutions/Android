@@ -248,7 +248,7 @@ public class SettingsFragment extends Fragment {
 
             Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
 
-            if (mSettingsModel.akecoucou()) {
+            if (mSettingsModel.checkInput()) {
                 mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
                         this,
                         connectionValue -> {

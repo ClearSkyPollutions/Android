@@ -89,7 +89,7 @@
     <string name="toast_ip_empty">Please enter the Ip address</string>
     <string name="toast_cancel_configuration">Cancelled configuration changes</string>
     <string name="toast_configuration_changed">Configuration changed</string>
-    <string name="toast_could_not_connect_RPI">Couldn\'t connect to Raspberry Pi. Please try new address</string>
+    <string name="toast_could_not_connect_RPI">Couldn\'t connect to Raspberry Pi. Please try a new address</string>
     <string name="toast_connection_successful_RPI">Connected successfully to the Raspberry Pi</string>
     <string name="toast_data_updated">Local settings synced with the Raspberry Pi</string>
     <string name="toast_data_storage">Using last known settings</string>
