@@ -26,18 +26,17 @@
                 android:layout_height="match_parent"
                 android:isScrollContainer="true">
 
-                <FrameLayout
+                <View
+                    android:id="@+id/trait1"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:color/white"
-                    app:layout_constraintBottom_toTopOf="@id/ip_address"
+                    android:layout_height="2dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@android:color/darker_gray"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/nameCard_basic">
-
-                </FrameLayout>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/nameCard_basic"
@@ -45,13 +44,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
                     android:text="@string/frag_cardNames"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/trait1"/>
 
                 <TextView
                     android:id="@+id/frequency"
@@ -129,6 +128,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:background="@null"
                     android:scaleType="fitXY"
                     app:layout_constraintBottom_toBottomOf="@+id/edit_text_add_sensors"
@@ -136,28 +136,30 @@
                     app:layout_constraintTop_toTopOf="@id/edit_text_add_sensors"
                     app:srcCompat="@drawable/ic_add_circle_black_24dp" />
 
+                <View
+                    android:id="@+id/trait2"
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@android:color/darker_gray"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/button_add_sensor" />
+
                 <TextView
                     android:id="@+id/ip_address"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
                     android:text="@string/ip_address"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/nameCard_basic"
-                    app:layout_constraintTop_toBottomOf="@+id/button_add_sensor" />
-
-                <FrameLayout
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:color/white"
-                    app:layout_constraintBottom_toTopOf="@id/validate"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ip_address" />
+                    app:layout_constraintTop_toBottomOf="@+id/trait2" />
 
 
                 <TextView

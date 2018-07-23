@@ -91,7 +91,7 @@ public class HomeFragment extends Fragment {
 
         binding.setLastData(mDataModel);
         //mDataModel.loadDataTypeUnits();
-        mDataModel.syncAll();
+        mDataModel.syncAll(getContext());
 
         // Create or get the ViewModel for the Air Quality Index. Bind the xml variable aqiUI
         aqiModel = ViewModelProviders.of(getActivity()).get(AQIModel.class);
@@ -212,7 +212,7 @@ public class HomeFragment extends Fragment {
         // Swipe to Refresh Data in DataBase and Chart
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             //mDataModel.loadDataTypeUnits();
-            mDataModel.syncAll();
+            mDataModel.syncAll(getContext());
             aqiModel.loadAQI(getContext());
 
             mDataModel.refreshChart.observe(this,
@@ -262,7 +262,7 @@ public class HomeFragment extends Fragment {
 
         chartItemAdapter.setIsBackCardVisible(false);
         // Attach the adapter to the GridView
-        mGridView = mRootView.findViewById(R.id.chartlist);
+        mGridView = mRootView.findViewById(R.id.chartList);
         mGridView.setAdapter(chartItemAdapter);
 
         mChartDialog = mRootView.findViewById(R.id.lineChartDialog);

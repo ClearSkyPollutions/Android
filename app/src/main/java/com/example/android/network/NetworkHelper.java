@@ -21,20 +21,10 @@ import java.net.URL;
 
 public class NetworkHelper implements Request.Method {
 
-    public void sendRequest(String host, int portHTTP, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                method,
-                buildUrl(host, portHTTP, path, query).toString(),
-                dataToSend,
-                f::apply,
-                Throwable::printStackTrace
-        );
-        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-        Log.d(NetworkHelper.class.toString(), buildUrl(host,
-                portHTTP, path, query).toString());
-    }
-    public void sendRequestRPI(Context context, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
+    public void sendRequestRPI(Context context, String path, String query,
+                               int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
 
         Address raspberryPiAddress = new Address(
                 sharedPref.getString("raspberryPiAddressIp", "192.168.0."),
@@ -52,8 +42,10 @@ public class NetworkHelper implements Request.Method {
                 raspberryPiAddress.getPort(), path, query).toString());
     }
 
-    public void sendRequestServer(Context context, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
+    public void sendRequestServer(Context context, String path, String query,
+                                  int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
 
         Address serverAddress = new Address(
                 sharedPref.getString("serverAddressIp",""),

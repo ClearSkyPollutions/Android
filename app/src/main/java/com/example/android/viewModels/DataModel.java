@@ -2,6 +2,7 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 import android.graphics.Color;
 
 import com.example.android.activities.BuildConfig;
@@ -103,13 +104,13 @@ public class DataModel extends ViewModel {
         });
     }
 
-    public void syncAll() {
-        syncChartData(AVG_HOUR);
-        syncChartData(AVG_DAY);
-        syncChartData(AVG_MONTH);
+    public void syncAll(Context context) {
+        syncChartData(context, AVG_HOUR);
+        syncChartData(context, AVG_DAY);
+        syncChartData(context, AVG_MONTH);
     }
 
-    private void syncChartData(String scale) {
+    private void syncChartData(Context context, String scale) {
         realm.executeTransaction(realmDb -> {
             Data lastData = realmDb
                     .where(Data.class)
@@ -120,7 +121,7 @@ public class DataModel extends ViewModel {
                 lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
             }
             String query = "filter="+DATE+",gt," + lastDateUrlParam + "&order="+DATE+",desc&include="+POLLUTANT+"&transform=1";
-            network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, scale, query, NetworkHelper.GET, parseChartData, null);
+            network.sendRequestRPI(context, scale, query, NetworkHelper.GET, parseChartData, null);
             //Log.d(DataModel.class.toString(), "sync " + scale + " data");
         });
     }
