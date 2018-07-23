@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/name_sensor"
         android:layout_width="0dp"
-        android:layout_height="15dp"
+        android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="4dp"

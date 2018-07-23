@@ -59,7 +59,7 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         mapModel = ViewModelProviders.of(getActivity()).get(MapModel.class);
-        mapModel.syncMapData();
+        mapModel.syncMapData(getContext());
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         map = rootView.findViewById(R.id.mapView);
 
@@ -104,7 +104,7 @@ public class MapFragment extends Fragment {
 
         mContext = this.getActivity();
         dm = mContext.getResources().getDisplayMetrics();
-        mPrefs = mContext.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        mPrefs = mContext.getSharedPreferences(getString(R.string.map_file_key), Context.MODE_PRIVATE);
 
 
         map.setBuiltInZoomControls(false);

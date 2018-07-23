@@ -21,18 +21,24 @@ import java.net.URL;
 
 public class NetworkHelper implements Request.Method {
 
-    public void sendRequest(){
-        
+    public void sendRequest(String host, int portHTTP, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                method,
+                buildUrl(host, portHTTP, path, query).toString(),
+                dataToSend,
+                f::apply,
+                Throwable::printStackTrace
+        );
+        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+        Log.d(NetworkHelper.class.toString(), buildUrl(host,
+                portHTTP, path, query).toString());
     }
     public void sendRequestRPI(Context context, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
-        // TODO CHANGE FILE NAME
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key),Context.MODE_PRIVATE);
-
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
 
         Address raspberryPiAddress = new Address(
                 sharedPref.getString("raspberryPiAddressIp", "192.168.0."),
                 sharedPref.getInt("raspberryPiAddressPort", 80));
-
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 method,
@@ -47,8 +53,7 @@ public class NetworkHelper implements Request.Method {
     }
 
     public void sendRequestServer(Context context, String path, String query, int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
-        // TODO CHANGE FILE NAME
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key),Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
 
         Address serverAddress = new Address(
                 sharedPref.getString("serverAddressIp",""),
@@ -65,6 +70,26 @@ public class NetworkHelper implements Request.Method {
         Log.d(NetworkHelper.class.toString(), buildUrl(serverAddress.getIp(), serverAddress.getPort(), path, query).toString());
     }
 
+    public MutableLiveData<Boolean> checkConnection(String ipAddress, int portHTTP) {
+        MutableLiveData<Boolean> connection = new MutableLiveData<>();
+        URL url = buildUrl(ipAddress, portHTTP, "api.php", "");
+        if(url == null) {
+            connection.postValue(false);
+        }
+        else {
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    this.GET,
+                    url.toString(),
+                     null,
+                    success -> connection.postValue(true),
+                    error -> connection.postValue(false)
+            );
+            RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
+            Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
+        }
+        return connection;
+    }
+
     private URL buildUrl(String ipAddress, int portHTTP, String path, String query) {
 
         URI uri;
@@ -78,22 +103,6 @@ public class NetworkHelper implements Request.Method {
             e.printStackTrace();
         }
         return url;
-    }
-
-    public MutableLiveData<Boolean> checkConnection(String ipAddress, int portHTTP) {
-        MutableLiveData<Boolean> connection = new MutableLiveData<>();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET,
-                buildUrl(ipAddress, portHTTP, "api.php", null).toString(),
-                null,
-                success -> connection.postValue(true),
-                error -> connection.postValue(false)
-        );
-
-        RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-        Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
-        return connection;
     }
 
 }

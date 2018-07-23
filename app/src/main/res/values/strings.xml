@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">ClearSky</string>
 
-    <string name="preference_file_key">com.example.android.preferences</string>
+    <string name="map_file_key">com.example.android.preferences</string>
+    <string name="slider_file_key">com.example.android.slider</string>
+    <string name="settings_rpi_file_key">com.example.android.settingsRPi</string>
     <string name="prefs_zoom_level_double">zoomLevelDouble</string>
     <string name="prefs_zoom_level">zoomLevel</string>
     <string name="prefs_orientation">orientation</string>
@@ -22,7 +24,7 @@
     <string name="title_home">Home</string>
     <string name="title_settings">Settings</string>
     <string name="title_map">Map</string>
-    <string name="title_pollutants">Pollutants</string>
+    <string name="title_info">Info</string>
     <string name="frag_cardNames">Sensors Settings</string>
     <string name="frequency">Frequency</string>
     <string name="unitfrequency">measurement/min</string>
@@ -36,6 +38,9 @@
     <string name="add">ADD</string>
     <string name="validate">Validate</string>
     <string name="networkSecurity_prompt">Choose a Network Security</string>
+
+    <string name="ok">Start</string>
+
     <string-array name="networkSecurity">
         <item>WEP</item>
         <item>WPA-PSK</item>
@@ -43,6 +48,7 @@
         <item>WPA Enterprise</item>
         <item>WPA2 Enterprise</item>
     </string-array>
+
     <string name="nameSensors_prompt">Choose a Names of Sensor</string>
     <string-array name="nameSensors">
         <item>SDS011</item>

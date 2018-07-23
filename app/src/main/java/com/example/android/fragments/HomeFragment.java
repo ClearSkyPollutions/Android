@@ -90,7 +90,8 @@ public class HomeFragment extends Fragment {
         mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
 
         binding.setLastData(mDataModel);
-        mDataModel.loadLastData();
+        //mDataModel.loadDataTypeUnits();
+        mDataModel.syncAll();
 
         // Create or get the ViewModel for the Air Quality Index. Bind the xml variable aqiUI
         aqiModel = ViewModelProviders.of(getActivity()).get(AQIModel.class);
@@ -212,18 +213,16 @@ public class HomeFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             //mDataModel.loadDataTypeUnits();
             mDataModel.syncAll();
-            aqiModel.loadAQI();
-            mDataModel.refresh.observe(this, refreshValue -> {
-                mSwipeRefreshLayout.setRefreshing(refreshValue);
-            });
+            aqiModel.loadAQI(getContext());
+
+            mDataModel.refreshChart.observe(this,
+                    refreshValue -> mSwipeRefreshLayout.setRefreshing(refreshValue));
         });
 
         mDataModel.updateChartList.observe(this, updateChartListValue -> {
             if (updateChartListValue){
                 chartItemAdapter.notifyDataSetChanged();
-                mDataModel.syncAll();
-                aqiModel.loadAQI();
-
+                aqiModel.loadAQI(getContext());
                 List<String> listTypes = new ArrayList<>();
                 List<String> listUnits = new ArrayList<>();
                 for (int i = 0; i < mDataModel.chartList.size(); i++)
@@ -241,9 +240,14 @@ public class HomeFragment extends Fragment {
                         android.R.layout.simple_spinner_dropdown_item, listUnits);
                 mSpinnerDataType.setAdapter(listTypeAdapter);
                 mSpinnerDataUnits.setAdapter(listUnitAdapter);
-                mDataModel.updateChartList.postValue(false);
+
+                for (int position = 0; position < mDataModel.chartList.size(); position++){
+                    mDataModel.loadChartData(position,mDataModel.AVG_HOUR);
+                }
+
             }
         });
+
         return mRootView;
     }
 
@@ -303,6 +307,7 @@ public class HomeFragment extends Fragment {
     }
 
     public void flipCard(View view) {
+
         if (mIsBackCardVisible) {
             mSetRightOut.setTarget(mCardCitiesBack);
             mSetLeftIn.setTarget(mCardCitiesFront);

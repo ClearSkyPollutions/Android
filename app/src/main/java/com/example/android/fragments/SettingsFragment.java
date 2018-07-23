@@ -39,8 +39,6 @@ public class SettingsFragment extends Fragment {
 
     private SettingsModel mSettingsModel;
 
-    private static final String MY_PREFS_NAME = "MySettingsPref";
-
     private SensorsItemAdapter sensorsItemAdapter;
 
     private TextView mFrequencyLabel;
@@ -57,6 +55,37 @@ public class SettingsFragment extends Fragment {
     private NetworkHelper mNetworkHelper = new NetworkHelper();
     private SharedPreferences mPrefSettings;
 
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Create or get the ViewModel for our date, and bind the xml variable lastData to it (Databinding library)
+        mSettingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+
+        // Set Data in storage
+        mPrefSettings = getActivity().getSharedPreferences(getString(R.string.settings_rpi_file_key), Context.MODE_PRIVATE);
+        mSettingsModel.fetchPrefsSettings(mPrefSettings);
+
+        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
+
+        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
+                this,
+                connectionValue -> {
+                    if (connectionValue) {
+                        mSettingsModel.communication(getContext(), "config.json", Request.Method.GET, null);
+                    } else {
+                        Toast.makeText(getActivity(), R.string.toast_data_storage,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        mSettingsModel.refreshSettings.observe(this, updateSettingsValue -> {
+            mSwipeRefreshLayout.setRefreshing(updateSettingsValue);
+            sensorsItemAdapter.notifyDataSetChanged();
+            Toast.makeText(getActivity(), R.string.toast_data_updated,
+                    Toast.LENGTH_SHORT).show();
+        });
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,34 +98,7 @@ public class SettingsFragment extends Fragment {
 
         // Init views
         initViews(rootView);
-
         return rootView;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // Create or get the ViewModel for our date, and bind the xml variable lastData to it (Databinding library)
-        mSettingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
-
-        // Set Data in storage
-        mPrefSettings = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
-        mSettingsModel.fetchPrefsSettings(mPrefSettings);
-
-        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
-
-        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
-                this,
-                connectionValue -> {
-                    if (connectionValue) {
-                        mSettingsModel.communication("config.json", Request.Method.GET, null);
-                        Toast.makeText(getActivity(), R.string.toast_data_updated,
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getActivity(), R.string.toast_data_storage,
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
     }
 
     @Override
@@ -115,9 +117,11 @@ public class SettingsFragment extends Fragment {
         mCoverSettingsFragment.setOnClickListener(v -> {
             mCardConfirmation.setVisibility(View.GONE);
             mCoverSettingsFragment.setVisibility(View.GONE);
+
             mSwipeRefreshLayout.setEnabled(true);
+
             Toast.makeText(getActivity(), R.string.toast_cancel_configuration,
-                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -175,27 +179,28 @@ public class SettingsFragment extends Fragment {
                 String tmp = ((EditText) v).getText().toString();
                 Settings s = mSettingsModel.getSetting().getValue();
 
-                if (tmp.equals("")){
+                if (tmp.equals("")) {
                     Toast.makeText(getActivity(), R.string.toast_ip_empty,
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
                 }
                 s.getRaspberryPiAddress().setIp(tmp);
                 mSettingsModel.getSetting().setValue(new Settings(s));
             }
         });
+
         mRaspberryPiAddressPort.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 String tmp = ((EditText) v).getText().toString();
                 Settings s = mSettingsModel.getSetting().getValue();
 
-                if (!tmp.equals("")){
+                if (!tmp.equals("")) {
                     s.getRaspberryPiAddress().setPort(Integer.parseInt(tmp));
                     mSettingsModel.getSetting().setValue(new Settings(s));
                 } else {
                     s.getRaspberryPiAddress().setPort(null);
                     mSettingsModel.getSetting().setValue(new Settings(s));
                     Toast.makeText(getActivity(), R.string.toast_port_empty,
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -206,26 +211,27 @@ public class SettingsFragment extends Fragment {
                 String tmp = ((EditText) v).getText().toString();
                 Settings s = mSettingsModel.getSetting().getValue();
 
-                if (tmp.equals("")){
+                if (tmp.equals("")) {
                     Toast.makeText(getActivity(), R.string.toast_ip_empty,
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
                 }
                 s.getServerAddress().setIp(tmp);
                 mSettingsModel.getSetting().setValue(new Settings(s));
             }
         });
+
         mServerAddressPort.setOnFocusChangeListener((v, hasFocus) -> {
             String tmp = ((EditText) v).getText().toString();
             Settings s = mSettingsModel.getSetting().getValue();
 
-            if (!tmp.equals("")){
+            if (!tmp.equals("")) {
                 s.getServerAddress().setPort(Integer.parseInt(tmp));
                 mSettingsModel.getSetting().setValue(new Settings(s));
             } else {
                 s.getServerAddress().setPort(null);
                 mSettingsModel.getSetting().setValue(new Settings(s));
                 Toast.makeText(getActivity(), R.string.toast_port_empty,
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -253,14 +259,12 @@ public class SettingsFragment extends Fragment {
                         this,
                         connectionValue -> {
                             if (connectionValue) {
-                                Toast.makeText(getActivity(), R.string.toast_connection_successful_RPI,
-                                        Toast.LENGTH_LONG).show();
                                 mCoverSettingsFragment.setVisibility(View.VISIBLE);
                                 mCardConfirmation.setVisibility(View.VISIBLE);
                                 mSwipeRefreshLayout.setEnabled(false);
                             } else {
                                 Toast.makeText(getActivity(), R.string.toast_could_not_connect_RPI,
-                                        Toast.LENGTH_LONG).show();
+                                        Toast.LENGTH_SHORT).show();
                             }
                         });
             }
@@ -287,10 +291,12 @@ public class SettingsFragment extends Fragment {
                 e.printStackTrace();
             }
             Log.d("debug", jsonSend.toString());
-            mSettingsModel.communication("config.php", Request.Method.PUT, jsonSend);
+            mSettingsModel.communication(getContext(), "config.php", Request.Method.PUT, jsonSend);
             mCoverSettingsFragment.setVisibility(View.GONE);
             mCardConfirmation.setVisibility(View.GONE);
             mSwipeRefreshLayout.setEnabled(true);
+            Toast.makeText(getActivity(), R.string.toast_configuration_changed,
+                    Toast.LENGTH_SHORT).show();
         });
 
         cancel.setOnClickListener(v -> {
@@ -298,19 +304,19 @@ public class SettingsFragment extends Fragment {
             mCardConfirmation.setVisibility(View.GONE);
             mSwipeRefreshLayout.setEnabled(true);
             Toast.makeText(getActivity(), R.string.toast_cancel_configuration,
-                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_SHORT).show();
         });
 
         // Setup ImageButton
         mButtonAddSensor.setOnClickListener(v -> {
             String newSensor = mEditTextSensorAdd.getText().toString();
             if (!newSensor.equals("")) {
-                mSettingsModel.getSetting().getValue().addSeqnsors(newSensor);
+                mSettingsModel.getSetting().getValue().addSensors(newSensor);
                 mEditTextSensorAdd.setText("");
                 sensorsItemAdapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(getActivity(), R.string.toast_name_empty,
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -321,7 +327,7 @@ public class SettingsFragment extends Fragment {
 
         // Setup Switch
         switchShareData.setOnCheckedChangeListener((buttonView, isChecked) ->
-                mSettingsModel.getSetting().getValue().setDataShared(isChecked));
+            mSettingsModel.getSetting().getValue().setDataShared(isChecked));
     }
 
     private void initSwipeRefresh(View rootView) {
@@ -331,18 +337,11 @@ public class SettingsFragment extends Fragment {
         // Setup
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             // Recover data to file config.json in Raspberry Pi
-            mSettingsModel.communication("config.json", Request.Method.GET, null);
-            mSettingsModel.refreshSettings.observe(this, updateSettingsValue -> {
-                mSwipeRefreshLayout.setRefreshing(updateSettingsValue);
-                sensorsItemAdapter.notifyDataSetChanged();
-                Toast.makeText(getActivity(), R.string.toast_data_updated,
-                        Toast.LENGTH_LONG).show();
-            });
+            mSettingsModel.communication(getContext(), "config.json", Request.Method.GET, null);
         });
     }
 
     private void initViews(View rootView) {
-
         initCardView(rootView);
         initSeekBar(rootView);
         initSensorsItemAdapterListView(rootView);
@@ -351,6 +350,5 @@ public class SettingsFragment extends Fragment {
         initButton(rootView);
         initSwitch(rootView);
         initSwipeRefresh(rootView);
-
     }
 }

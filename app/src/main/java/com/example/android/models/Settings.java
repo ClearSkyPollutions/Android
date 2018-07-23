@@ -10,11 +10,12 @@ public class Settings {
     private Address serverAddress;
     private boolean isDataShared;
 
-    public Settings(ArrayList<String> sensors, int frequency, Address raspberryPiAddress, Address ipServer,boolean isDataShared) {
+    public Settings(ArrayList<String> sensors, int frequency,
+                    Address raspberryPiAddress, Address serverAddress, boolean isDataShared) {
         this.sensors = sensors;
         this.frequency = frequency;
         this.raspberryPiAddress = raspberryPiAddress;
-        this.serverAddress = ipServer;
+        this.serverAddress = serverAddress;
         this.isDataShared = isDataShared;
     }
 
@@ -34,7 +35,7 @@ public class Settings {
         this.sensors = sensors;
     }
 
-    public void addSeqnsors(String sensors) {
+    public void addSensors(String sensors) {
         this.sensors.add(sensors);
     }
 

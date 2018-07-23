@@ -18,6 +18,8 @@ public class Data extends RealmObject {
     @Required
     private String dataType;
     @Required
+    private String dataUnit;
+    @Required
     private String scale;
 
     public String getId() {
@@ -58,5 +60,13 @@ public class Data extends RealmObject {
 
     public void setScale(String scale) {
         this.scale = scale;
+    }
+
+    public String getDataUnit() {
+        return dataUnit;
+    }
+
+    public void setDataUnit(String dataUnit) {
+        this.dataUnit = dataUnit;
     }
 }

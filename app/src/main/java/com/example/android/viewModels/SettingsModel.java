@@ -2,7 +2,9 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.android.activities.BuildConfig;
 import com.example.android.models.Address;
@@ -47,14 +49,9 @@ public class SettingsModel extends ViewModel {
 
             refreshSettings.postValue(false);
         } catch (JSONException e) {
-            refreshSettings.postValue(false);
             e.printStackTrace();
         }
     };
-
-    public void communication(String path, int method, JSONObject configToSend) {
-        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, path, null, method, parseSettings, configToSend);
-    }
 
     public void fetchPrefsSettings(SharedPreferences sharedPref) {
         ArrayList<String> sensors = new ArrayList<>(sharedPref.getStringSet("sensors", new HashSet<>()));
@@ -68,7 +65,7 @@ public class SettingsModel extends ViewModel {
                 sharedPref.getInt("serverAddressPort", BuildConfig.PortHTTP_SERVER));
         boolean isDataShared = sharedPref.getBoolean("isDataShared", false);
 
-        setting.setValue(new Settings(sensors, frequency,
+        getSetting().setValue(new Settings(sensors, frequency,
                 raspberryPiAddress, serverAddress, isDataShared));
     }
 
@@ -85,6 +82,10 @@ public class SettingsModel extends ViewModel {
         editor.putInt("serverAddressPort", settings.getServerAddress().getPort());
         editor.putBoolean("isDataShared", settings.isDataShared());
         editor.apply();
+    }
+
+    public void communication(Context context, String path, int method, JSONObject configToSend) {
+        network.sendRequestRPI(context, path, null, method, parseSettings, configToSend);
     }
 
     public boolean checkInput(){
