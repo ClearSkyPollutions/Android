@@ -2,9 +2,9 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.util.Log;
+import android.content.Context;
 
-import com.example.android.activities.BuildConfig;
+import com.example.android.helpers.JSONParser;
 import com.example.android.models.RPI;
 import com.example.android.models.SharedData;
 import com.example.android.network.NetworkHelper;
@@ -36,12 +36,12 @@ public class MapModel extends ViewModel {
     public MapModel() {
         networkHelper = new NetworkHelper();
         lastHour = new MutableLiveData<>();
-        liveRpiArrayList = new MutableLiveData<ArrayList<RPI>>();
+        liveRpiArrayList = new MutableLiveData<>();
     }
 
-    public void syncMapData() {
+    public void syncMapData(Context context) {
         String query = "order=system,asc&transform=1";
-        networkHelper.sendRequest(BuildConfig.IPADDR_SERVER, BuildConfig.PortHTTP_SERVER, MAP, query, NetworkHelper.GET, parseMapData, null);
+        networkHelper.sendRequestServer(context, MAP, query, NetworkHelper.GET, parseMapData, null);
     }
 
     private JSONParser<JSONObject> parseMapData = (JSONObject response) -> {
@@ -77,9 +77,9 @@ public class MapModel extends ViewModel {
         }
     };
 
-    public void getLastHour() {
+    public void getLastHour(Context context) {
         String query = "order=" + DATE + ",desc&page=1,1&columns=" + DATE + "&transform=1";
-        networkHelper.sendRequest(BuildConfig.IPADDR_SERVER, BuildConfig.PortHTTP_SERVER, MAP, query, NetworkHelper.GET, parseLastHour, null);
+        networkHelper.sendRequestServer(context, MAP, query, NetworkHelper.GET, parseLastHour, null);
     }
 
     JSONParser<JSONObject> parseLastHour = (JSONObject response) -> {
@@ -90,7 +90,6 @@ public class MapModel extends ViewModel {
             //Log.d(MapModel.class.toString(), "Last Hour: " + hour);
             if (lastHour.getValue() == null) lastHour.postValue(hour);
             else if (!hour.equals(lastHour.getValue())) lastHour.postValue(hour);
-            ;
         } catch (JSONException e) {
             e.printStackTrace();
         }

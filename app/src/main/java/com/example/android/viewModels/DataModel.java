@@ -2,13 +2,12 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 
-import com.example.android.activities.BuildConfig;
-import com.example.android.adapters.ChartItemAdapter;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.helpers.HashHelper;
+import com.example.android.helpers.JSONParser;
 import com.example.android.models.Chart;
 import com.example.android.models.Data;
 import com.example.android.network.NetworkHelper;
@@ -21,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -41,65 +41,76 @@ public class DataModel extends ViewModel {
     public List<MutableLiveData<Chart>> chartList = new ArrayList<>();
     public MutableLiveData<String> lastTempValueReceived = new MutableLiveData<>();
     public MutableLiveData<String> lastDatetimeReceived = new MutableLiveData<>();
-    public MutableLiveData<Boolean> refresh = new MutableLiveData<>();
+    public MutableLiveData<Boolean> refreshChart = new MutableLiveData<>();
     public MutableLiveData<Boolean> updateChartList = new MutableLiveData<>();
     private String lastDateUrlParam;
     private static final String POLLUTANT = "POLLUTANT";
     private static final String DATE = "date";
     private static final String VALUE = "value";
     private static final String POLLUTANT_NAME = "name";
+    private static final String POLLUTANT_UNIT = "unit";
 
     public DataModel() {
         realm = Realm.getDefaultInstance();
-        loadDataTypeUnits();
-        /*
-        charts.add(new Chart("pm10", getUnit("pm10"), getColor("pm10"), AVG_HOUR));
-        charts.add(new Chart("pm25", getUnit("pm25"), getColor("pm25"), AVG_HOUR));
-        charts.add(new Chart("temperature", getUnit("temperature"), getColor("temperature"), AVG_HOUR));
-        charts.add(new Chart("humidity", getUnit("humidity"), getColor("humidity"), AVG_HOUR));
-        */
     }
 
     public void loadDataTypeUnits() {
-        String query = "transform=1&order=id";
-        network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, POLLUTANT, query, NetworkHelper.GET, parseDataTypes, null);
-    }
-
-    private JSONParser<JSONObject> parseDataTypes = (JSONObject response) -> {
+        ArrayList<String> dataType = new ArrayList<>();
+        ArrayList<String> dataUnit = new ArrayList<>();
         ArrayList<Chart> charts = new ArrayList<>();
-        Random rnd = new Random();
 
-        try {
-            JSONArray jsonArray = response.getJSONArray(POLLUTANT);
-            for (int i = 0; i <= jsonArray.length() - 1; i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                Chart chartReceive = new Chart(jsonObject.getString("name"),
-                        jsonObject.getString("unit"),
-                        Color.argb(255,
-                                rnd.nextInt(256),
-                                rnd.nextInt(256),
-                                rnd.nextInt(256)), AVG_HOUR);
-                charts.add(chartReceive);
-            }
-            for(Chart chart : charts) {
-                MutableLiveData<Chart> liveChart = new MutableLiveData<>();
+        realm.executeTransaction(realmDb -> {
+            RealmResults<Data> realmDataTypeUnit = realmDb
+                    .where(Data.class)
+                    .equalTo("scale", "AVG_HOUR")
+                    .sort("dataType", Sort.ASCENDING)
+                    .distinct("dataType")
+                    .findAll();
+            if (!realmDataTypeUnit.isEmpty()) {
+                Iterator<Data> iterator = realmDataTypeUnit.iterator();
+                while(iterator.hasNext()) {
+                    Data data = iterator.next();
+                    dataType.add(data.getDataType());
+                    dataUnit.add(data.getDataUnit());
+                }
 
-                liveChart.setValue(chart);
-                chartList.add(liveChart);
+                for (int i = 0; i <= dataType.size() - 1; i++) {
+                    Random rnd = new Random();
+                    Chart chartReceive = new Chart(dataType.get(i),
+                            dataUnit.get(i),
+                            Color.argb(255,
+                                    rnd.nextInt(256),
+                                    rnd.nextInt(256),
+                                    rnd.nextInt(256)), AVG_HOUR);
+                    charts.add(chartReceive);
+                }
+                if (chartList.isEmpty()){
+                    for(Chart chart : charts) {
+                        MutableLiveData<Chart> liveChart = new MutableLiveData<>();
+                        liveChart.setValue(chart);
+                        chartList.add(liveChart);
+                    }
+                }else {
+                    for(Chart chart : charts) {
+                        if (!containsType(chart.getType())){
+                            MutableLiveData<Chart> liveChart = new MutableLiveData<>();
+                            liveChart.setValue(chart);
+                            chartList.add(liveChart);
+                        }
+                    }
+                }
             }
             updateChartList.postValue(true);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    };
-
-    public void syncAll() {
-        syncChartData(AVG_HOUR);
-        syncChartData(AVG_DAY);
-        syncChartData(AVG_MONTH);
+        });
     }
 
-    private void syncChartData(String scale) {
+    public void syncAll(Context context) {
+        syncChartData(context, AVG_HOUR);
+        syncChartData(context, AVG_DAY);
+        syncChartData(context, AVG_MONTH);
+    }
+
+    private void syncChartData(Context context, String scale) {
         realm.executeTransaction(realmDb -> {
             Data lastData = realmDb
                     .where(Data.class)
@@ -110,7 +121,7 @@ public class DataModel extends ViewModel {
                 lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
             }
             String query = "filter="+DATE+",gt," + lastDateUrlParam + "&order="+DATE+",desc&include="+POLLUTANT+"&transform=1";
-            network.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, scale, query, NetworkHelper.GET, parseChartData, null);
+            network.sendRequestRPI(context, scale, query, NetworkHelper.GET, parseChartData, null);
             //Log.d(DataModel.class.toString(), "sync " + scale + " data");
         });
     }
@@ -130,11 +141,13 @@ public class DataModel extends ViewModel {
                     Date date = ft.parse(dateString);
                     JSONArray pollutant = jsonObject.getJSONArray(POLLUTANT);
                     String type = pollutant.getJSONObject(0).getString(POLLUTANT_NAME);
+                    String unit = pollutant.getJSONObject(0).getString(POLLUTANT_UNIT);
                     Float val = (float) jsonObject.getDouble(VALUE);
                     data.setId(HashHelper.generateMD5(dateString + type + scale));
                     data.setDate(date);
                     data.setValue(val);
                     data.setDataType(type);
+                    data.setDataUnit(unit);
                     data.setScale(scale);
                     realmDb.copyToRealmOrUpdate(data);
                     /*Log.d("parseChartData", data.getDataType() + ", "
@@ -144,10 +157,8 @@ public class DataModel extends ViewModel {
                 e.printStackTrace();
             }
         }, () -> {
-            for (int position = 0; position < chartList.size(); position++){
-                loadChartData(position, AVG_HOUR);
-                loadLastData();
-            }
+            loadDataTypeUnits();
+            loadLastData();
         });
         realm.close();
     };
@@ -195,9 +206,7 @@ public class DataModel extends ViewModel {
                 liveChart.getValue().setScale(scale);
                 liveChart.postValue(new Chart(liveChart.getValue(), xAxis, yAxis));
             }
-        }, () -> {
-            refresh.postValue(false);
-        });
+        }, () -> refreshChart.postValue(false));
     }
 
     private int getNbOfData(String scale) {
@@ -213,6 +222,15 @@ public class DataModel extends ViewModel {
         }
     }
 
+    private boolean containsType(String type){
+        for (int position = 0; position < chartList.size(); position++) {
+            if (chartList.get(position).getValue().getType().equals(type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();
@@ -220,4 +238,3 @@ public class DataModel extends ViewModel {
     }
 
 }
-

@@ -2,10 +2,10 @@ package com.example.android.viewModels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 
-import com.example.android.activities.BuildConfig;
+import com.example.android.helpers.JSONParser;
 import com.example.android.network.NetworkHelper;
 
 import org.json.JSONException;
@@ -37,9 +37,9 @@ public class AQIModel extends ViewModel {
         return color;
     }
 
-    public void loadAQI() {
+    public void loadAQI(Context context) {
         NetworkHelper netHelper = new NetworkHelper();
-        netHelper.sendRequest(BuildConfig.IPADDR_RPI, BuildConfig.PortHTTP_RPI, "aqi.php", null, NetworkHelper.GET, parseAQI, null);
+        netHelper.sendRequestRPI(context, "aqi.php", null, NetworkHelper.GET, parseAQI, null);
     }
 
     private JSONParser<JSONObject> parseAQI = (JSONObject response) -> {

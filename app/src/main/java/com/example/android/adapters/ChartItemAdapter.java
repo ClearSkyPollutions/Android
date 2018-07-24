@@ -4,7 +4,6 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +19,11 @@ import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChartItemAdapter extends BaseAdapter {
 
-    public final Context mContext;
+    private final Context mContext;
     private List<MutableLiveData<Chart>> mChartList;
     private ChartHelper mChartHelper;
 
@@ -33,17 +31,18 @@ public class ChartItemAdapter extends BaseAdapter {
 
     public ArrayList<String> favorite = new ArrayList<>();
 
-    public void setIsBackCardVisible(boolean isBackCardVisible) {
-        this.isBackCardVisible = isBackCardVisible;
-    }
-    public boolean isBackCardVisible() {
-        return isBackCardVisible;
-    }
-
     public ChartItemAdapter(Context context, List<MutableLiveData<Chart>> chartList, ChartHelper chartHelper) {
         this.mContext = context;
         this.mChartList = chartList;
         this.mChartHelper = chartHelper;
+    }
+
+    public void setIsBackCardVisible(boolean isBackCardVisible) {
+        this.isBackCardVisible = isBackCardVisible;
+    }
+
+    public boolean isBackCardVisible() {
+        return isBackCardVisible;
     }
 
     @Override

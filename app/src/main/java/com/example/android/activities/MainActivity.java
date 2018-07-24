@@ -18,7 +18,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.android.fragments.HomeFragment;
-import com.example.android.fragments.ListPollutantsFragment;
+import com.example.android.fragments.InfoFragment;
 import com.example.android.fragments.MapFragment;
 import com.example.android.fragments.SettingsFragment;
 import com.example.android.network.RequestQueueSingleton;
@@ -48,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
                     //If the app has not the permission then asking for the permission
                     requestStoragePermission();
                     break;
-                case R.id.navigation_pollutants:
-                    selectedFragment = new ListPollutantsFragment();
-                    setTitle(R.string.title_pollutants);
+                case R.id.navigation_info:
+                    selectedFragment = new InfoFragment();
+                    setTitle(R.string.title_info);
                     break;
                 case R.id.navigation_settings:
                     selectedFragment = new SettingsFragment();
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -127,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private final void createNotificationAQI(){
         final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 0, launchNotificationIntent,
                 0);
         AQIModel aqiModel = ViewModelProviders.of(this).get(AQIModel.class);
-        aqiModel.loadAQI();
+        aqiModel.loadAQI(this);
 
         aqiModel.getAqi().observe(this, aqi -> {
             Notification.Builder builder = new Notification.Builder(this)
@@ -150,5 +150,4 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
 }

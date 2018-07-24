@@ -88,29 +88,59 @@ public class HomeFragment extends Fragment {
 
         // Create or get the ViewModel for our charts. Bind the xml variable lastData
         mDataModel = ViewModelProviders.of(getActivity()).get(DataModel.class);
-
         binding.setLastData(mDataModel);
-        mDataModel.loadLastData();
 
         // Create or get the ViewModel for the Air Quality Index. Bind the xml variable aqiUI
         aqiModel = ViewModelProviders.of(getActivity()).get(AQIModel.class);
         binding.setAqiUI(aqiModel);
-        //aqiModel.loadAQI();
 
-        // Init Charts and views
+        mDataModel.syncAll(getContext());
+        aqiModel.loadAQI(getContext());
+
         initViews();
 
-        //Click event listener closing popup views
-        mCoverView.setClickable(true);
-        mCoverView.setOnClickListener(view -> {
-            mChartHelper.getSelected().removeObservers(this);
-            mChartViewDialog.setVisibility(View.GONE);
-            mCoverView.setVisibility(View.GONE);
-            mCardAddChart.setVisibility(View.GONE);
-            mButtonAddChart.setClickable(false);
-            if (!chartItemAdapter.isBackCardVisible())
-                mSwipeRefreshLayout.setEnabled(true);
+        // When data in DB has been loaded : init charts & lists with this data
+        mDataModel.updateChartList.observe(this, updateChartListValue -> {
+            if (updateChartListValue){
+                chartItemAdapter.notifyDataSetChanged();
+                List<String> listTypes = new ArrayList<>();
+                List<String> listUnits = new ArrayList<>();
+                for (int i = 0; i < mDataModel.chartList.size(); i++)
+                {
+                    if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getType())) {
+                        listTypes.add(mDataModel.chartList.get(i).getValue().getType());
+                    }
+                    if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getUnit())) {
+                        listUnits.add(mDataModel.chartList.get(i).getValue().getUnit());
+                    }
+                }
+                ArrayAdapter<String> listTypeAdapter = new ArrayAdapter<>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item, listTypes);
+                ArrayAdapter<String> listUnitAdapter = new ArrayAdapter<>(getContext(),
+                        android.R.layout.simple_spinner_dropdown_item, listUnits);
+                mSpinnerDataType.setAdapter(listTypeAdapter);
+                mSpinnerDataUnits.setAdapter(listUnitAdapter);
+
+                for (int position = 0; position < mDataModel.chartList.size(); position++){
+                    mDataModel.loadChartData(position,mDataModel.AVG_HOUR);
+                }
+
+            }
         });
+
+        return mRootView;
+    }
+
+
+    private void initAdapter() {
+        // Create the adapter to convert the array of pollutant into views, bind it to gridview
+        chartItemAdapter = new ChartItemAdapter(getActivity(), mDataModel.chartList, mChartHelper);
+
+
+        chartItemAdapter.setIsBackCardVisible(false);
+        // Attach the adapter to the GridView
+        mGridView = mRootView.findViewById(R.id.chartList);
+        mGridView.setAdapter(chartItemAdapter);
 
         // Functions called when a chart is clicked on
         mGridView.setOnItemClickListener((parent, view, position, id) -> {
@@ -171,6 +201,54 @@ public class HomeFragment extends Fragment {
 
             mSwipeRefreshLayout.setEnabled(false);
         });
+    }
+
+    private void initDialogChart() {
+        int chartTextColor = getResources().getColor(R.color.primaryTextColor);
+        int chartBackgroundColor = Color.WHITE;
+
+        //Init buttons
+        mButtonDay = mRootView.findViewById(R.id.day_bt);
+        mButtonMonth = mRootView.findViewById(R.id.month_bt);
+        mButtonYear = mRootView.findViewById(R.id.year_bt);
+
+        // Init popup
+        mSelectedDateView = mRootView.findViewById(R.id.SelectedDate);
+        mSelectedValueView = mRootView.findViewById(R.id.SelectedValue);
+
+        //init chart
+        mChartDialog = mRootView.findViewById(R.id.lineChartDialog);
+        mChartHelper.initChartDialog(mChartDialog, chartBackgroundColor, chartTextColor);
+        mChartViewDialog = mRootView.findViewById(R.id.viewDialog);
+
+        //Click event listener closing popup views
+        mCoverView = mRootView.findViewById(R.id.cover);
+        mCoverView.setClickable(true);
+        mCoverView.setOnClickListener(view -> {
+            mChartHelper.getSelected().removeObservers(this);
+            mChartViewDialog.setVisibility(View.GONE);
+            mCoverView.setVisibility(View.GONE);
+            mCardAddChart.setVisibility(View.GONE);
+            mButtonAddChart.setClickable(false);
+            if (!chartItemAdapter.isBackCardVisible())
+                mSwipeRefreshLayout.setEnabled(true);
+        });
+    }
+
+    private void initBackViews() {
+        // Dialog to add new pollutants
+        mButtonAddChart = mRootView.findViewById(R.id.buttonAddElement);
+        mCardAddChart = mRootView.findViewById(R.id.CardDialogNewChart);
+
+        // Init Spinner
+        mSpinnerNameSensors = mRootView.findViewById(R.id.SPnameSensors);
+        mSpinnerDataType = mRootView.findViewById(R.id.SPdataType);
+        mSpinnerDataUnits = mRootView.findViewById(R.id.SPdataUnits);
+
+        // Init ImageButton
+        mImageButtonFront = mRootView.findViewById(R.id.buttonEditFront);
+        mImageButtonBack = mRootView.findViewById(R.id.buttonEditBack);
+        mImageButtonAddChart = mRootView.findViewById(R.id.buttonAddBack);
 
         // Functions Onclick on ImageButton
         mImageButtonFront.setOnClickListener(v->flipCard());
@@ -181,7 +259,6 @@ public class HomeFragment extends Fragment {
             mCoverView.setVisibility(View.VISIBLE);
             mButtonAddChart.setClickable(true);
         });
-
         mButtonAddChart.setOnClickListener(v -> {
             Random rnd = new Random();
             boolean existing = false;
@@ -209,86 +286,6 @@ public class HomeFragment extends Fragment {
 
         });
 
-        // Swipe to Refresh Data in DataBase and Chart
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            //mDataModel.loadDataTypeUnits();
-            mDataModel.syncAll();
-            aqiModel.loadAQI();
-            mDataModel.refresh.observe(this, refreshValue ->
-                    mSwipeRefreshLayout.setRefreshing(refreshValue));
-        });
-
-        mDataModel.updateChartList.observe(this, updateChartListValue -> {
-            if (updateChartListValue){
-                chartItemAdapter.notifyDataSetChanged();
-                mDataModel.syncAll();
-                aqiModel.loadAQI();
-
-                List<String> listTypes = new ArrayList<>();
-                List<String> listUnits = new ArrayList<>();
-                for (int i = 0; i < mDataModel.chartList.size(); i++)
-                {
-                    if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getType())) {
-                        listTypes.add(mDataModel.chartList.get(i).getValue().getType());
-                    }
-                    if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getUnit())) {
-                        listUnits.add(mDataModel.chartList.get(i).getValue().getUnit());
-                    }
-                }
-                ArrayAdapter<String> listTypeAdapter = new ArrayAdapter<>(getContext(),
-                        android.R.layout.simple_spinner_dropdown_item, listTypes);
-                ArrayAdapter<String> listUnitAdapter = new ArrayAdapter<>(getContext(),
-                        android.R.layout.simple_spinner_dropdown_item, listUnits);
-                mSpinnerDataType.setAdapter(listTypeAdapter);
-                mSpinnerDataUnits.setAdapter(listUnitAdapter);
-            }
-        });
-
-        return mRootView;
-    }
-
-
-    private void initAdapter() {
-        // Create the adapter to convert the array of pollutant into views, bind it to gridview
-        chartItemAdapter = new ChartItemAdapter(getActivity(), mDataModel.chartList, mChartHelper);
-        mGridView = mRootView.findViewById(R.id.chartlist);
-        mGridView.setAdapter(chartItemAdapter);
-    }
-
-    private void initDialogChart() {
-        int chartTextColor = getResources().getColor(R.color.primaryTextColor);
-        int chartBackgroundColor = Color.WHITE;
-
-        //Init buttons
-        mButtonDay = mRootView.findViewById(R.id.day_bt);
-        mButtonMonth = mRootView.findViewById(R.id.month_bt);
-        mButtonYear = mRootView.findViewById(R.id.year_bt);
-
-        // Init popup
-        mCoverView = mRootView.findViewById(R.id.cover);
-        mSelectedDateView = mRootView.findViewById(R.id.SelectedDate);
-        mSelectedValueView = mRootView.findViewById(R.id.SelectedValue);
-
-        //init chart
-        mChartDialog = mRootView.findViewById(R.id.lineChartDialog);
-        mChartHelper.initChartDialog(mChartDialog, chartBackgroundColor, chartTextColor);
-        mChartViewDialog = mRootView.findViewById(R.id.viewDialog);
-    }
-
-    private void initBackViews() {
-        // Dialog to add new pollutants
-        mButtonAddChart = mRootView.findViewById(R.id.buttonAddElement);
-        mCardAddChart = mRootView.findViewById(R.id.CardDialogNewChart);
-
-        // Init Spinner
-        mSpinnerNameSensors = mRootView.findViewById(R.id.SPnameSensors);
-        mSpinnerDataType = mRootView.findViewById(R.id.SPdataType);
-        mSpinnerDataUnits = mRootView.findViewById(R.id.SPdataUnits);
-
-        // Init ImageButton
-        mImageButtonFront = mRootView.findViewById(R.id.buttonEditFront);
-        mImageButtonBack = mRootView.findViewById(R.id.buttonEditBack);
-        mImageButtonAddChart = mRootView.findViewById(R.id.buttonAddBack);
     }
 
     private void initViews() {
@@ -301,14 +298,22 @@ public class HomeFragment extends Fragment {
         mCardCitiesFront = mRootView.findViewById(R.id.CardFront);
         mCardCitiesBack = mRootView.findViewById(R.id.CardBack);
 
+        // Init SwipeRefreshLayout to Refresh Data in DataBase and Chart
+        mSwipeRefreshLayout = mRootView.findViewById(R.id.swipeRefreshHomeFragment);
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            //mDataModel.loadDataTypeUnits();
+            mDataModel.syncAll(getContext());
+            aqiModel.loadAQI(getContext());
+
+            mDataModel.refreshChart.observe(this,
+                    refreshValue -> mSwipeRefreshLayout.setRefreshing(refreshValue));
+        });
+
         // Init Animation
         mSetRightOut = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.out_animation);
         mSetLeftIn = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.in_animation);
         //For animation change the distance
         changeCameraDistance();
-
-        // Init SwipeRefreshLayout
-        mSwipeRefreshLayout = mRootView.findViewById(R.id.swiperefresh);
     }
 
     public void flipCard() {

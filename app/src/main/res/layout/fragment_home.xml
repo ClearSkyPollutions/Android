@@ -5,16 +5,18 @@
     tools:context="com.example.android.fragments.HomeFragment">
 
     <data>
+
         <variable
             name="lastData"
             type="com.example.android.viewModels.DataModel" />
+
         <variable
             name="aqiUI"
             type="com.example.android.viewModels.AQIModel" />
     </data>
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swiperefresh"
+        android:id="@+id/swipeRefreshHomeFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="54dp">
@@ -22,7 +24,6 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
 
             <android.support.v7.widget.CardView
                 android:id="@+id/viewDialog"
@@ -174,6 +175,7 @@
                         android:layout_height="0dp"
                         android:layout_alignParentTop="true"
                         android:layout_marginBottom="24dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:background="@null"
                         android:clickable="true"
@@ -182,8 +184,7 @@
                         app:layout_constraintBottom_toBottomOf="@+id/EditCities"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/EditCities"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:layout_marginLeft="32dp" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageButton
                         android:id="@+id/buttonAddBack"
@@ -192,15 +193,15 @@
                         android:layout_alignParentTop="true"
                         android:layout_marginBottom="24dp"
                         android:layout_marginEnd="32dp"
+                        android:layout_marginRight="32dp"
                         android:background="@null"
                         android:clickable="true"
                         android:scaleType="fitXY"
-                        app:srcCompat="@drawable/ic_add_circle_black_24dp"
                         app:layout_constraintBottom_toBottomOf="@+id/EditCities"
                         app:layout_constraintEnd_toStartOf="@+id/EditCities"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        android:layout_marginRight="32dp" />
+                        app:srcCompat="@drawable/ic_add_circle_black_24dp" />
 
                 </android.support.constraint.ConstraintLayout>
             </android.support.v7.widget.CardView>
@@ -288,7 +289,7 @@
                         app:layout_constraintEnd_toStartOf="@+id/ica"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/date"/>
+                        app:layout_constraintTop_toBottomOf="@+id/date" />
 
                     <TextView
                         android:id="@+id/labelICA"
@@ -306,8 +307,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
 
-                        android:textStyle="bold"
                         android:text='@{lastData.lastTempValueReceived, default="25"}'
+                        android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/ica"
@@ -329,6 +330,7 @@
                         android:layout_height="0dp"
                         android:layout_alignParentTop="true"
                         android:layout_marginBottom="24dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:background="@null"
                         android:clickable="true"
@@ -337,14 +339,22 @@
                         app:layout_constraintBottom_toTopOf="@+id/date"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/ville"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:layout_marginLeft="32dp" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 </android.support.constraint.ConstraintLayout>
             </android.support.v7.widget.CardView>
 
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/grenb"
+                app:layout_constraintBottom_toTopOf="@id/chartList" />
+
             <GridView
-                android:id="@+id/chartlist"
+                android:id="@+id/chartList"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="32dp"
@@ -355,15 +365,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/CardFront" />
-
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/grenb"
-                app:layout_constraintBottom_toTopOf="@id/chartlist" />
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cover"
@@ -391,7 +392,7 @@
                 android:visibility="gone"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="6dp"
-                app:layout_constraintBottom_toBottomOf="@+id/chartlist"
+                app:layout_constraintBottom_toBottomOf="@+id/chartList"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/CardBack">
@@ -444,12 +445,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
                         android:layout_marginTop="16dp"
                         android:text="@string/add"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/SPdataUnits"
-                        android:layout_marginRight="8dp" />
+                        app:layout_constraintTop_toBottomOf="@+id/SPdataUnits" />
 
                 </android.support.constraint.ConstraintLayout>
             </android.support.v7.widget.CardView>
