@@ -39,7 +39,6 @@ public class Settings {
         this.sensors.add(sensors);
     }
 
-
     public int getFrequency() {
         return frequency;
     }

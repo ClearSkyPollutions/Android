@@ -5,9 +5,9 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.graphics.Color;
 
-import com.example.android.activities.BuildConfig;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.helpers.HashHelper;
+import com.example.android.helpers.JSONParser;
 import com.example.android.models.Chart;
 import com.example.android.models.Data;
 import com.example.android.network.NetworkHelper;

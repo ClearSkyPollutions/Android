@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.android.fragments.SliderFragment;
 import com.example.android.network.RequestQueueSingleton;
@@ -51,11 +50,10 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Create or get the ViewModel for our charts, and put defaults values in it
         mSettingsModel = ViewModelProviders.of(this).get(SettingsModel.class);
-        mSettingsModel.fetchPrefsSettings(sharedPref);
+        mSettingsModel.getLocalSettings(sharedPref);
 
         RequestQueueSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
 
-        Log.d("SettingsModel", "" + mSettingsModel.getSetting().getValue().getFrequency());
         //Setup sliders
         mPager = findViewById(R.id.viewPager);
         mAdapter = new SlideAdapter(getSupportFragmentManager());

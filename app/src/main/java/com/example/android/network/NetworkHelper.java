@@ -9,7 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.android.activities.R;
 import com.example.android.models.Address;
-import com.example.android.viewModels.JSONParser;
+import com.example.android.helpers.JSONParser;
 
 import org.json.JSONObject;
 

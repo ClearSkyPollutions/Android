@@ -1,4 +1,4 @@
-package com.example.android.customOnClickListener;
+package com.example.android.customViews;
 
 import android.util.Log;
 import android.view.View;

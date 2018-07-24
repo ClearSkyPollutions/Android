@@ -1,4 +1,4 @@
-package com.example.android.viewModels;
+package com.example.android.helpers;
 
 @FunctionalInterface
 public interface JSONParser<T> {

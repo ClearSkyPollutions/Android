@@ -81,7 +81,7 @@
     <string name="day">DAY</string>
     <string name="month">MONTH</string>
     <string name="new_sensor">New Sensor</string>
-    <string name="ip_address">IP Address</string>
+    <string name="ip_address">IP Addresses</string>
     <string name="raspberry_pi">Raspberry PI</string>
     <string name="server">Server</string>
     <string name="port_address">Port</string>

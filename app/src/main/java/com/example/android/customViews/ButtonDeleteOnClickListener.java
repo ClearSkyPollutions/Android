@@ -1,9 +1,8 @@
-package com.example.android.customOnClickListener;
+package com.example.android.customViews;
 
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
 import android.util.Log;
 import android.view.View;
 

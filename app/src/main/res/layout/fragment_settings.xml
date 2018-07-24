@@ -97,7 +97,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/frequency" />
 
-                <com.example.android.listview.SensorsListView
+                <com.example.android.customViews.SensorsListView
                     android:id="@+id/list_sensors"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

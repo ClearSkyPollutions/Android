@@ -3,9 +3,8 @@ package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
-import android.util.Log;
 
-import com.example.android.activities.BuildConfig;
+import com.example.android.helpers.JSONParser;
 import com.example.android.models.RPI;
 import com.example.android.models.SharedData;
 import com.example.android.network.NetworkHelper;

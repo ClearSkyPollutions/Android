@@ -4,9 +4,10 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
+import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
+import com.example.android.helpers.JSONParser;
 import com.example.android.models.Address;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
@@ -53,7 +54,7 @@ public class SettingsModel extends ViewModel {
         }
     };
 
-    public void fetchPrefsSettings(SharedPreferences sharedPref) {
+    public void getLocalSettings(SharedPreferences sharedPref) {
         ArrayList<String> sensors = new ArrayList<>(sharedPref.getStringSet("sensors", new HashSet<>()));
 
         int frequency = sharedPref.getInt("frequency", 15);
@@ -69,7 +70,7 @@ public class SettingsModel extends ViewModel {
                 raspberryPiAddress, serverAddress, isDataShared));
     }
 
-    public void storeSettings(SharedPreferences sharedPref) {
+    public void setLocalSettings(SharedPreferences sharedPref) {
         Settings settings = setting.getValue();
         Set<String> sensorsSet = new HashSet<>(settings.getSensors());
 
@@ -88,7 +89,29 @@ public class SettingsModel extends ViewModel {
         network.sendRequestRPI(context, path, null, method, parseSettings, configToSend);
     }
 
-    public boolean checkInput(){
+    public void sendNewSettings(Context context) {
+        Settings settings = getSetting().getValue();
+
+        JSONArray sensorsJson = new JSONArray(settings.getSensors());
+        JSONObject serverAddressJson = new JSONObject();
+
+        JSONObject jsonSend = new JSONObject();
+        try {
+            serverAddressJson.put("ip", settings.getServerAddress().getIp());
+            serverAddressJson.put("port", settings.getServerAddress().getPort());
+
+            jsonSend.put("sensors", sensorsJson);
+            jsonSend.put("frequency", settings.getFrequency());
+            jsonSend.put("serverAddress", serverAddressJson);
+            jsonSend.put("isDataShared", settings.isDataShared());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        communication(context, "config.php", Request.Method.PUT, jsonSend);
+    }
+
+    //@TODO : Check validity of Add IP (XXX.XXX.XXX.XXX) and port (<~36k)
+    public boolean checkRPiAddr(){
         Address addressRPI = getSetting().getValue().getRaspberryPiAddress();
         Address addressServer = getSetting().getValue().getServerAddress();
 
@@ -100,7 +123,5 @@ public class SettingsModel extends ViewModel {
         }else {
             return false;
         }
-
     }
-
 }
