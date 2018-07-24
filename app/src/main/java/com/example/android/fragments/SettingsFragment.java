@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,23 +62,15 @@ public class SettingsFragment extends Fragment {
         mSettingsModel.getLocalSettings(mPrefSettings);
 
         mSettingsModel.refreshSettings.observe(this, updateSettingsValue -> {
-            mSwipeRefreshLayout.setRefreshing(updateSettingsValue);
-            sensorsItemAdapter.notifyDataSetChanged();
-            Toast.makeText(getActivity(), R.string.toast_data_updated,
-                    Toast.LENGTH_SHORT).show();
+            if (!updateSettingsValue) {
+                mSwipeRefreshLayout.setRefreshing(updateSettingsValue);
+                sensorsItemAdapter.notifyDataSetChanged();
+                Toast.makeText(getActivity(), R.string.toast_data_updated,
+                        Toast.LENGTH_SHORT).show();
+            }
         });
 
-        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
-        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
-                this,
-                connectionValue -> {
-                    if (connectionValue) {
-                        mSettingsModel.communication(getContext(), "config.json", Request.Method.GET, null);
-                    } else {
-                        Toast.makeText(getActivity(), R.string.toast_data_storage,
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+        refreshSettings();
     }
 
     @Override
@@ -99,7 +92,7 @@ public class SettingsFragment extends Fragment {
         super.onPause();
         mSettingsModel.refreshSettings.removeObservers(this);
         Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
-        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).removeObservers(this);
+        mNetworkHelper.checkConnection(addressRPI).removeObservers(this);
     }
 
     private void initPopup(View rootView) {
@@ -253,7 +246,7 @@ public class SettingsFragment extends Fragment {
             Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
 
             if (mSettingsModel.checkRPiAddr()) {
-                mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
+                mNetworkHelper.checkConnection(addressRPI).observe(
                         this,
                         connectionValue -> {
                             if (connectionValue) {
@@ -299,11 +292,8 @@ public class SettingsFragment extends Fragment {
     private void initSwipeRefresh(View rootView) {
         mSwipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshSettingsFragment);
 
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            // Recover data from the file config.json in Raspberry Pi
-            mSettingsModel.communication(getContext(), "config.json",
-                    Request.Method.GET, null);
-        });
+        // Recover data from the file config.json in Raspberry Pi
+        mSwipeRefreshLayout.setOnRefreshListener(this::refreshSettings);
     }
 
     private void initViews(View rootView) {
@@ -313,5 +303,20 @@ public class SettingsFragment extends Fragment {
         initConfirmDialog(rootView);
         initSwitch(rootView);
         initSwipeRefresh(rootView);
+    }
+
+    private void refreshSettings() {
+        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
+        mNetworkHelper.checkConnection(addressRPI).observe(
+                this,
+                connectionValue -> {
+                    if (connectionValue) {
+                        mSettingsModel.communication(getContext(), "config.json", Request.Method.GET, null);
+                    } else {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(getActivity(), R.string.toast_data_storage,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

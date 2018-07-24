@@ -179,8 +179,7 @@ public class SliderFragment extends Fragment {
             confirm.setOnClickListener(v -> {
 
                 NetworkHelper netHelper = new NetworkHelper();
-                netHelper.checkConnection(mSettings.getValue().getRaspberryPiAddress().getIp(),
-                        mSettings.getValue().getRaspberryPiAddress().getPort()).observe(this, connected ->
+                netHelper.checkConnection(mSettings.getValue().getRaspberryPiAddress()).observe(this, connected ->
                 {
                     if (!connected) {
                         Toast.makeText(getContext(),

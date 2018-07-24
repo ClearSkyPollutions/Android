@@ -13,7 +13,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.android.models.Address;
+import com.example.android.network.NetworkHelper;
 import com.example.android.overlay.CircleOverlay;
 import com.example.android.activities.BuildConfig;
 import com.example.android.activities.R;
@@ -51,6 +54,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this.getActivity();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -59,7 +63,27 @@ public class MapFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         mapModel = ViewModelProviders.of(getActivity()).get(MapModel.class);
-        mapModel.syncMapData(getContext());
+
+        SharedPreferences sharedPref = mContext.getSharedPreferences(
+                mContext.getString(R.string.settings_rpi_file_key), Context.MODE_PRIVATE);
+
+        Address addressServer = new Address(
+                sharedPref.getString("serverAddressIp",""),
+                sharedPref.getInt("serverAddressPort", 0));
+        NetworkHelper networkHelper = new NetworkHelper();
+
+        networkHelper.checkConnection(addressServer).observe(this,
+                connectionValueServer -> {
+                    if (connectionValueServer) {
+                        mapModel.syncMapData(getContext());
+                        Toast.makeText(getActivity(), R.string.toast_data_updated_Server,
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getActivity(), R.string.toast_could_not_connect_MAP,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         map = rootView.findViewById(R.id.mapView);
 
@@ -102,10 +126,9 @@ public class MapFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mContext = this.getActivity();
         dm = mContext.getResources().getDisplayMetrics();
-        mPrefs = mContext.getSharedPreferences(getString(R.string.map_file_key), Context.MODE_PRIVATE);
-
+        mPrefs = mContext.getSharedPreferences(getString(R.string.map_file_key),
+                Context.MODE_PRIVATE);
 
         map.setBuiltInZoomControls(false);
         map.setMaxZoomLevel(12.0);

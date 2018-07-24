@@ -32,7 +32,7 @@ public class InfoFragment extends Fragment {
 
     @Override
     public void onPause(){
-        num_pages = 0;
+        //num_pages = 0;
         mAdapter.notifyDataSetChanged();
         super.onPause();
     }

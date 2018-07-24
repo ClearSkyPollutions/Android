@@ -62,9 +62,9 @@ public class NetworkHelper implements Request.Method {
         Log.d(NetworkHelper.class.toString(), buildUrl(serverAddress.getIp(), serverAddress.getPort(), path, query).toString());
     }
 
-    public MutableLiveData<Boolean> checkConnection(String ipAddress, int portHTTP) {
+    public MutableLiveData<Boolean> checkConnection(Address address) {
         MutableLiveData<Boolean> connection = new MutableLiveData<>();
-        URL url = buildUrl(ipAddress, portHTTP, "api.php", "");
+        URL url = buildUrl(address.getIp(), address.getPort(), "api.php", "");
         if(url == null) {
             connection.postValue(false);
         }
@@ -77,7 +77,7 @@ public class NetworkHelper implements Request.Method {
                     error -> connection.postValue(false)
             );
             RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
-            Log.d(NetworkHelper.class.toString(), buildUrl(ipAddress, portHTTP, "api.php", null).toString());
+            Log.d(NetworkHelper.class.toString(), buildUrl(address.getIp(), address.getPort(), "api.php", null).toString());
         }
         return connection;
     }
