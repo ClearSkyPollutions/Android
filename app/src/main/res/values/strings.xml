@@ -27,7 +27,7 @@
     <string name="title_info">Info</string>
     <string name="frag_cardNames">Sensors Settings</string>
     <string name="frequency">Frequency</string>
-    <string name="unitfrequency">measurement/min</string>
+    <string name="unitfrequency">measures/min</string>
     <string name="wifisettings">Wifi Settings</string>
     <string name="ssid">SSID</string>
     <string name="security">Security</string>
@@ -38,6 +38,8 @@
     <string name="add">ADD</string>
     <string name="validate">Validate</string>
     <string name="networkSecurity_prompt">Choose a Network Security</string>
+    <string name="pollutant_title_page">Pollutants</string>
+    <string name="sensor_title_page">Sensors</string>
 
     <string name="ok">Start</string>
 
@@ -75,16 +77,17 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="temperature">Temperature</string>
     <string name="humidity">Humidity</string>
-    <string name="pm25">PM 2.5</string>
-    <string name="pm10">PM 10</string>
+    <string name="pm25">PM25</string>
+    <string name="pm10">PM10</string>
     <string name="hour">HOUR</string>
     <string name="day">DAY</string>
     <string name="month">MONTH</string>
     <string name="new_sensor">New Sensor</string>
-    <string name="ip_address">IP Addresses</string>
-    <string name="raspberry_pi">Raspberry PI</string>
+    <string name="ip_addresses">IP addresses</string>
+    <string name="raspberry_pi">Raspberry Pi</string>
     <string name="server">Server</string>
     <string name="port_address">Port</string>
+    <string name="ip_address">IP Address</string>
     <string name="share_your_data">Share your Data</string>
     <string name="share_data">Share Data</string>
     <string name="confirm_these_changes">Confirm these changes ?</string>

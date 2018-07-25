@@ -107,8 +107,9 @@ public class HomeFragment extends Fragment {
                 List<String> listUnits = new ArrayList<>();
                 for (int i = 0; i < mDataModel.chartList.size(); i++)
                 {
-                    if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getType())) {
-                        listTypes.add(mDataModel.chartList.get(i).getValue().getType());
+                    Integer type = mDataModel.chartList.get(i).getValue().getType();
+                    if (!listTypes.contains(chartItemAdapter.getTypeString(type))) {
+                        listTypes.add(chartItemAdapter.getTypeString(type));
                     }
                     if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getUnit())) {
                         listUnits.add(mDataModel.chartList.get(i).getValue().getUnit());
@@ -264,11 +265,13 @@ public class HomeFragment extends Fragment {
             boolean existing = false;
             int i = 0;
             while (!existing && i < mDataModel.chartList.size()) {
-                existing = mDataModel.chartList.get(i).getValue().getType().equals(mSpinnerDataType.getSelectedItem());
+                Integer type = mDataModel.chartList.get(i).getValue().getType();
+                Integer selectedType = Integer.parseInt(mSpinnerDataType.getSelectedItem().toString());
+                existing = (type.intValue() == selectedType.intValue());
                 i++;
             }
             if (!existing) {
-                Chart chart = new Chart(mSpinnerDataType.getSelectedItem().toString(),
+                Chart chart = new Chart(Integer.valueOf(mSpinnerDataType.getSelectedItem().toString()),
                         mSpinnerDataUnits.getSelectedItem().toString(),
                         Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)),
                         DataModel.AVG_HOUR);

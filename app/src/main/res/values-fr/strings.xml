@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ClearSky</string>
+
+    <string name="map_file_key">com.example.android.preferences</string>
+    <string name="slider_file_key">com.example.android.slider</string>
+    <string name="settings_rpi_file_key">com.example.android.settingsRPi</string>
+    <string name="prefs_zoom_level_double">zoomLevelDouble</string>
+    <string name="prefs_zoom_level">zoomLevel</string>
+    <string name="prefs_orientation">orientation</string>
+    <string name="prefs_latitude_string">latitudeString</string>
+    <string name="prefs_longitude_string">longitudeString</string>
+    <string name="prefs_scroll_x">scrollX</string>
+    <string name="prefs_scroll_y">scrollY</string>
+    <string name="prefs_tile_source">tilesource</string>
+
+
+    <string name="title_home">Accueil</string>
+    <string name="title_settings">Paramètres</string>
+    <string name="title_map">Carte</string>
+    <string name="title_info">Informations</string>
+    <string name="frag_cardNames">Configuration des capteurs</string>
+    <string name="frequency">Fréquence</string>
+    <string name="unitfrequency">mesures/min</string>
+    <string name="wifisettings">Configuration du Wi-Fi</string>
+    <string name="ssid">SSID</string>
+    <string name="security">Securité</string>
+    <string name="password">Mot de passe</string>
+    <string name="sensorchoice">Choix des capteurs</string>
+    <string name="othersensors">Autres capteurs</string>
+    <string name="writeNewSensors">Ajouter un capteur</string>
+    <string name="add">Ajouter</string>
+    <string name="validate">Confirmer</string>
+    <string name="networkSecurity_prompt">Option de sécurité</string>
+    <string name="pollutant_title_page">Polluants</string>
+    <string name="sensor_title_page">Capteurs</string>
+
+    <string name="ok">Lancer</string>
+
+    <string-array name="networkSecurity">
+        <item>WEP</item>
+        <item>WPA-PSK</item>
+        <item>WPA2</item>
+        <item>WPA Enterprise</item>
+        <item>WPA2 Enterprise</item>
+    </string-array>
+
+    <string name="nameSensors_prompt">Donner le nom du capteur</string>
+    <string-array name="nameSensors">
+        <item>SDS011</item>
+        <item>DHT22</item>
+        <item>MQ2</item>
+    </string-array>
+    <string-array name="dataType">
+        <item>PM10</item>
+        <item>PM25</item>
+        <item>Température</item>
+        <item>Humidité</item>
+    </string-array>
+    <string-array name="dataUnits">
+        <item>µg/m^3</item>
+        <item>°C</item>
+        <item>%</item>
+    </string-array>
+    <string name="dataType_prompt">Sélectionner un polluant</string>
+
+    <string name="sensor">Capteurs</string>
+
+
+    <string name="temperature">Température</string>
+    <string name="humidity">Humidité</string>
+    <string name="pm25">PM25</string>
+    <string name="pm10">PM10</string>
+    <string name="hour">Heure</string>
+    <string name="day">Jour</string>
+    <string name="month">Mois</string>
+    <string name="new_sensor">Nouveau capteur</string>
+    <string name="ip_addresses">Adresses IP</string>
+    <string name="raspberry_pi">Raspberry Pi</string>
+    <string name="server">Serveur</string>
+    <string name="port_address">Port</string>
+    <string name="ip_address">Adresse IP</string>
+    <string name="share_your_data">Partager vos données</string>
+    <string name="share_data">Partager</string>
+    <string name="confirm_these_changes">Êtes-vous sûr(e)?</string>
+    <string name="accept">Confirmer</string>
+    <string name="cancel">Annuler</string>
+    <string name="toast_name_empty">Veuillez saisir le nom du capteur</string>
+    <string name="toast_port_empty">Veuillez préciser le port</string>
+    <string name="toast_ip_empty">Veuillez préciser l\'adresse IP</string>
+    <string name="toast_cancel_configuration">Les modifications sont annulées</string>
+    <string name="toast_configuration_changed">Le changement de configuration est validé</string>
+    <string name="toast_could_not_connect_RPI">Échec de la connexion au Raspberry Pi.\nVeuillez saisir une autre adresse.</string>
+    <string name="toast_connection_successful_RPI">Connexion au Raspberry Pi établie</string>
+    <string name="toast_data_updated">Les paramètres sont synchonisés avec la Raspberry Pi</string>
+    <string name="toast_data_storage">Échec de la synchronisation.\nLes derniers paramètres connus sont affichés.</string>
+
+    <!-- Notification -->
+    <string name="notification">Notification sur la qualité de l\'air</string>
+    <string name="notification_title">Qualité de l\'air</string>
+    <string name="notification_desc">Indice: </string>
+
+
+    //Integer
+    <integer name="anim_length">1000</integer>
+    <integer name="anim_length_half">500</integer>
+</resources>

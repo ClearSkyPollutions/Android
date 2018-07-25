@@ -84,9 +84,16 @@ public class SliderFragment extends Fragment {
         //Init views Title/description/image shared by all slides
         initSlides(rootView);
 
+        switch (mLayout) {
+            case R.layout.fragment_slider_sensor:
+                ListView listView = rootView.findViewById(R.id.listSensors);
+                listView.setAdapter(setup_list_sensors());
+                break;
+            case R.layout.fragment_slider_rpi:
+        }
+
         if (mLayout == R.layout.fragment_slider_sensor) {
-            ListView listView = rootView.findViewById(R.id.listSensors);
-            listView.setAdapter(setup_list_sensors());
+
         }
 
         if (mLayout == R.layout.fragment_slider_rpi) {

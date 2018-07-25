@@ -1,5 +1,7 @@
 package com.example.android.fragments;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,12 +29,11 @@ public class InfoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        mAdapter = new InfoAdapter(getFragmentManager());
+        mAdapter = new InfoAdapter(getContext(), getFragmentManager());
     }
 
     @Override
     public void onPause(){
-        num_pages = 0;
         mAdapter.notifyDataSetChanged();
         super.onPause();
     }
@@ -43,7 +44,6 @@ public class InfoFragment extends Fragment {
         infoView = inflater.inflate(R.layout.fragment_info, container, false);
 
         pager = infoView.findViewById(R.id.pager);
-
         PagerTitleStrip mTitle = infoView.findViewById(R.id.pager_title_strip);
         mTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         pager.setAdapter(mAdapter);
@@ -53,8 +53,11 @@ public class InfoFragment extends Fragment {
     }
 
     public static class InfoAdapter extends FragmentStatePagerAdapter {
-        public InfoAdapter(FragmentManager fm) {
+        private Context context;
+
+        public InfoAdapter(Context context, FragmentManager fm) {
             super(fm);
+            this.context = context;
         }
 
         @Override
@@ -77,9 +80,9 @@ public class InfoFragment extends Fragment {
         public CharSequence getPageTitle(int position){
             switch(position){
                 case POLLUTANT_NUM:
-                    return "Pollutants";
+                    return context.getResources().getString(R.string.pollutant_title_page);
                 case SENSOR_NUM:
-                    return "Sensors";
+                    return context.getResources().getString(R.string.sensor_title_page);
             }
             return null;
         }
