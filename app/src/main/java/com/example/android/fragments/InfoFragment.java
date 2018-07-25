@@ -32,7 +32,7 @@ public class InfoFragment extends Fragment {
 
     @Override
     public void onPause(){
-        //num_pages = 0;
+        num_pages = 0;
         mAdapter.notifyDataSetChanged();
         super.onPause();
     }
@@ -40,6 +40,7 @@ public class InfoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              Bundle savedInstanceState) {
+        num_pages = 2;
         infoView = inflater.inflate(R.layout.fragment_info, container, false);
 
         pager = infoView.findViewById(R.id.pager);

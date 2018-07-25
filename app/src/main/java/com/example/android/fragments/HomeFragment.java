@@ -353,13 +353,13 @@ public class HomeFragment extends Fragment {
                                     }else {
                                         mDataModel.loadDataTypeUnits();
                                         Toast.makeText(getActivity(), R.string.toast_could_not_connect,
-                                                Toast.LENGTH_SHORT).show();
+                                                Toast.LENGTH_LONG).show();
                                     }
                                 });
                     }else {
                         mDataModel.loadDataTypeUnits();
                         Toast.makeText(getActivity(), R.string.toast_could_not_connect,
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_LONG).show();
                     }
                 });
     }

@@ -125,7 +125,6 @@ public class MapFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         dm = mContext.getResources().getDisplayMetrics();
         mPrefs = mContext.getSharedPreferences(getString(R.string.map_file_key),
                 Context.MODE_PRIVATE);
