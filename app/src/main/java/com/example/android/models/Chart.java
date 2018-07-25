@@ -5,14 +5,14 @@ import java.util.Date;
 
 public class Chart {
 
-    private String type;
+    private Integer type;
     private String unit;
     private String scale;
     private Integer color;
     private ArrayList<Date> xAxis;
     private ArrayList<Float> yAxis;
 
-    public Chart(String dataType, String dataUnit, Integer lineColor, String scale) {
+    public Chart(Integer dataType, String dataUnit, Integer lineColor, String scale) {
         type = dataType;
         unit = dataUnit;
         color = lineColor;
@@ -30,11 +30,11 @@ public class Chart {
         this.scale = copy.scale;
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 

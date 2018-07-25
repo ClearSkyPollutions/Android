@@ -18,6 +18,7 @@ import com.example.android.models.Chart;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,15 +91,30 @@ public class ChartItemAdapter extends BaseAdapter {
         TextView chartTitleFront = itemView.findViewById(R.id.chartTitleFront);
         TextView chartTitleBack = itemView.findViewById(R.id.chartTitleBack);
 
-        String type = mChartList.get(position).getValue().getType();
-        chartTitleFront.setText(type);
-        chartTitleBack.setText(type);
+        Integer type = mChartList.get(position).getValue().getType();
+        chartTitleFront.setText(getTypeString(type));
+        chartTitleBack.setText(getTypeString(type));
+    }
+
+    public String getTypeString(Integer type) {
+        switch (type) {
+            case 1:
+                return mContext.getResources().getString(R.string.pm10);
+            case 2:
+                return mContext.getResources().getString(R.string.pm25);
+            case 3:
+                return mContext.getResources().getString(R.string.temperature);
+            case 4:
+                return mContext.getResources().getString(R.string.humidity);
+            default:
+                return "Unknown";
+        }
     }
 
     private void initButtons(int position, View itemView){
         ImageButton mButtonDelete = itemView.findViewById(R.id.buttonDelete);
         ImageButton mButtonFavorite = itemView.findViewById(R.id.buttonFavori);
-        String type = mChartList.get(position).getValue().getType();
+        String type = getTypeString(mChartList.get(position).getValue().getType());
 
         if (favorite.contains(type)) {
             mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);

@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class DataModel extends ViewModel {
     private static final String POLLUTANT = "POLLUTANT";
     private static final String DATE = "date";
     private static final String VALUE = "value";
-    private static final String POLLUTANT_NAME = "name";
+    private static final String POLLUTANT_ID = "id";
     private static final String POLLUTANT_UNIT = "unit";
 
     public DataModel() {
@@ -55,7 +56,7 @@ public class DataModel extends ViewModel {
     }
 
     public void loadDataTypeUnits() {
-        ArrayList<String> dataType = new ArrayList<>();
+        ArrayList<Integer> dataType = new ArrayList<>();
         ArrayList<String> dataUnit = new ArrayList<>();
         ArrayList<Chart> charts = new ArrayList<>();
 
@@ -140,10 +141,10 @@ public class DataModel extends ViewModel {
                     SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                     Date date = ft.parse(dateString);
                     JSONArray pollutant = jsonObject.getJSONArray(POLLUTANT);
-                    String type = pollutant.getJSONObject(0).getString(POLLUTANT_NAME);
+                    Integer type = pollutant.getJSONObject(0).getInt(POLLUTANT_ID);
                     String unit = pollutant.getJSONObject(0).getString(POLLUTANT_UNIT);
                     Float val = (float) jsonObject.getDouble(VALUE);
-                    data.setId(HashHelper.generateMD5(dateString + type + scale));
+                    data.setId(HashHelper.generateMD5(dateString + type.intValue() + scale));
                     data.setDate(date);
                     data.setValue(val);
                     data.setDataType(type);
@@ -168,7 +169,7 @@ public class DataModel extends ViewModel {
             Data lastData = realmDb
                     .where(Data.class)
                     .equalTo("scale", AVG_HOUR)
-                    .equalTo("dataType", "temperature")
+                    .equalTo("dataType", 1)
                     .sort("date", Sort.DESCENDING)
                     .findFirst();
             if (lastData != null) {
@@ -188,7 +189,7 @@ public class DataModel extends ViewModel {
         realm.executeTransactionAsync(realmDb -> {
             RealmResults<Data> dataList = realmDb
                     .where(Data.class)
-                    .equalTo("dataType", liveChart.getValue().getType())
+                    .equalTo("dataType", liveChart.getValue().getType().intValue())
                     .equalTo("scale", scale)
                     .sort("date", Sort.DESCENDING)
                     .findAll();
@@ -222,9 +223,9 @@ public class DataModel extends ViewModel {
         }
     }
 
-    private boolean containsType(String type){
+    private boolean containsType(Integer type){
         for (int position = 0; position < chartList.size(); position++) {
-            if (chartList.get(position).getValue().getType().equals(type)) {
+            if (chartList.get(position).getValue().getType().intValue() == type.intValue()) {
                 return true;
             }
         }
