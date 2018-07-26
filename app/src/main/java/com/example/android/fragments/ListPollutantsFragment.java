@@ -1,5 +1,6 @@
 package com.example.android.fragments;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -24,17 +25,27 @@ public class ListPollutantsFragment extends Fragment {
 
     ArrayList<Pollutant> listPollutant= new ArrayList<>();
 
+    static ListPollutantsFragment newInstance(int num) {
+        ListPollutantsFragment f = new ListPollutantsFragment();
+
+        // Supply num input as an argument.
+        Bundle args = new Bundle();
+        args.putInt("num", num);
+        f.setArguments(args);
+
+        return f;
+    }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView= inflater.inflate(R.layout.fragment_list_pollutants, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_pollutants, container, false);
         // Construct the data source
-        listPollutant = getPollutantsData();
+        getPollutantsData();
 
         // Create the adapter to convert the array to views
-        PollutantItemAdapter pollutantAdapter = new PollutantItemAdapter(getActivity(), listPollutant);
+        PollutantItemAdapter pollutantAdapter = new PollutantItemAdapter(getContext(), listPollutant);
 
         // Attach the adapter to the ListView
         ListView listView = rootView.findViewById(R.id.listPollutantView);
@@ -50,7 +61,6 @@ public class ListPollutantsFragment extends Fragment {
                         listPollutant.get(position).getName(),
                         listPollutant.get(position).getDesc(),
                          getActivity()).show();
-
             }
         });
 
@@ -58,8 +68,8 @@ public class ListPollutantsFragment extends Fragment {
     }
 
 
-    private ArrayList<Pollutant> getPollutantsData() {
-        String json = JsonReaderHelper.loadJSONFromAsset("pollutants.json", getActivity());
+    private void getPollutantsData() {
+        String json = JsonReaderHelper.loadJSONFromAsset("pollutants.json", getContext());
 
         try {
             JSONObject obj = new JSONObject(json);
@@ -85,6 +95,5 @@ public class ListPollutantsFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return listPollutant;
     }
 }
