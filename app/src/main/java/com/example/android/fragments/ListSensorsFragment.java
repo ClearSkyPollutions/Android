@@ -1,5 +1,7 @@
 package com.example.android.fragments;
 
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,10 +24,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ListSensorsFragment extends Fragment {
 
     ArrayList<Sensor> listSensors = new ArrayList<>();
+    private Locale mLocale;
 
 
     public static ListSensorsFragment newInstance() {
@@ -82,7 +86,18 @@ public class ListSensorsFragment extends Fragment {
     }
 
     private void getSensorsData() {
-        String json = JsonReaderHelper.loadJSONFromAsset("sensors.json", getContext());
+        String json;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mLocale = Resources.getSystem().getConfiguration().getLocales().get(0);
+        } else {
+            //noinspection deprecation
+            mLocale = Resources.getSystem().getConfiguration().locale;
+        }
+        if (Locale.FRANCE.getDisplayLanguage().equals(mLocale.getDisplayLanguage())) {
+            json = JsonReaderHelper.loadJSONFromAsset("sensors-fr.json", getContext());
+        } else {
+            json = JsonReaderHelper.loadJSONFromAsset("sensors-en.json", getContext());
+        }
 
         try {
             JSONObject obj = new JSONObject(json);

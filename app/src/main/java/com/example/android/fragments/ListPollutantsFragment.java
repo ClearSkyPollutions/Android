@@ -1,5 +1,7 @@
 package com.example.android.fragments;
 
+import android.content.res.Resources;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,10 +22,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ListPollutantsFragment extends Fragment {
 
-    ArrayList<Pollutant> listPollutant= new ArrayList<>();
+    private ArrayList<Pollutant> listPollutant= new ArrayList<>();
+    private Locale mLocale;
 
     static ListPollutantsFragment newInstance(int num) {
         ListPollutantsFragment f = new ListPollutantsFragment();
@@ -69,7 +73,18 @@ public class ListPollutantsFragment extends Fragment {
 
 
     private void getPollutantsData() {
-        String json = JsonReaderHelper.loadJSONFromAsset("pollutants.json", getContext());
+        String json;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mLocale = Resources.getSystem().getConfiguration().getLocales().get(0);
+        } else {
+            //noinspection deprecation
+            mLocale = Resources.getSystem().getConfiguration().locale;
+        }
+        if (Locale.FRANCE.getDisplayLanguage().equals(mLocale.getDisplayLanguage())) {
+            json = JsonReaderHelper.loadJSONFromAsset("pollutants-fr.json", getContext());
+        } else {
+            json = JsonReaderHelper.loadJSONFromAsset("pollutants-en.json", getContext());
+        }
 
         try {
             JSONObject obj = new JSONObject(json);

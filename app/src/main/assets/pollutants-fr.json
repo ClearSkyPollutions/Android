@@ -1,0 +1,42 @@
+{
+  "pollutants" : [
+    {
+      "name": "PM25",
+      "desc": "<b>Sources primaires:</b> Résidences (feu de cheminée, cuisine, etc) <p><b>Effets sur la santé:</b>  Asthme, cancer du poumon, maladies cardio-vasculaires, complications de la grossesse. Ces particules peuvent s'infiltrer dans les bronches.",
+      "source": "Résidences (feu de cheminée, cuisine, etc)",
+      "image": "pm25"
+    },
+    {
+      "name": "PM10",
+      "desc": "<b>Sources primaires:</b> Résidences, usines, traffic routier, agro-industrie. <p><b>Effets sur la santé:</b> Asthme, cancer du poumon, maladies cardio-vasculaires, complications de la grossesse. Ces particules peuvent s'accumuler dans les voies respiratoires mais n'atteigent pas les bronches.",
+      "source": "Résidences, usines, traffic routier, agro-industrie.",
+      "image": "pm10"
+    },
+    {
+      "name": "Nitrogne oxide",
+      "desc": "<b>Sources primaires:</b> Traffic routier <p><b>Effets sur la santé:</b> Respiratory diseases, bronchial irritation, increased asthmatic reactions in children.",
+      "source": "Traffic routier",
+      "image": "nox"
+    },
+    {
+      "name": "Sulfur dioxide",
+      "desc": "<b>Sources primaires:</b> Usines <p><b>Effets sur la santé:</b> Breathing difficulties, increased asmathic sensitivity, gastric irritations, itches, hot flashes, death in case of strong intoxication.",
+      "source": "Usines",
+      "image": "so2"
+    },
+    {
+      "name": "Carbon monoxide",
+      "desc": "<b>Sources primaires:</b> Résidences, usines. <p><b>Effets sur la santé:</b>  It has no taste or smell and cannot be seen but can be lethal for human. It reduces the amount of oxygen transported to vital organs leading to headaches, clumsiness,  loss of consciousness and eventually death. ",
+      "source": "Résidences, usines",
+      "image": "co"
+    },
+    {
+      "name": "Noise",
+      "desc": "<b>Sources primaires:</b> Traffic routier, travaux, bureau, voisinage. <p><b>Effets sur la santé:</b> hearing loss, sleep disturbances, high blood pressure, heart attack, strokes.",
+      "source": "Traffic routier, travaux, bureau, voisinage",
+      "image": "noise"
+    }
+
+  ]
+
+}

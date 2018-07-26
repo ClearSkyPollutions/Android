@@ -18,7 +18,7 @@
         "  * Pi 3 : Wifi & ethernet<br>",
         "  * Pi 0 : Wifi           <br>",
         "  * Pi + Wifi adapter     <br>",
-        "<p>We recommend heading over to https://projects.raspberrypi.org for a quick tutorial on getting started.</p>"
+        "<p>We recommend heading over to this <a href=https://projects.raspberrypi.org >site</a> for a quick tutorial on getting started.</p>"
   ],
         "image": "setuprpi"
     },

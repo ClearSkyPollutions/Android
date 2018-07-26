@@ -1,0 +1,61 @@
+{
+  "slide" : [
+    {
+      "position": 1,
+      "title": "Bienvenue sur ClearSky !",
+      "lines":
+      [
+      "<p>Voici un petit guide pour vous permettre de mettre en place votre système de détection multi-pollutions.</p>",
+      "<p>En fonction de votre niveau de familiarité avec la Raspberry Pi, cela peut prendre jusqu'à 15 minutes.</p>"
+      ],
+        "image": "slide1"
+    },
+    {
+      "position": 2,
+      "title": "Installation de la Raspberry Pi",
+      "lines": [
+        "Premièrement, Il vous faut une Raspberry Pi avec une connexion internet<br>",
+        "  * Pi 3 : Wifi & ethernet<br>",
+        "  * Pi 0 : Wifi           <br>",
+        "  * Pi + Wifi adapter     <br>",
+        "<p>Nous vous recommendons d'aller sur ce <a href=https://projects.raspberrypi.org >site</a> pour accéder à un tutoriel d'installation rapide.</p>"
+  ],
+        "image": "setuprpi"
+    },
+    {
+      "position": 3,
+      "title": "Les capteurs de pollutions",
+      "lines": [
+        "Pour mesurer les principaux types de polluants, il vous faut vous procurer quelques capteurs."
+      ],
+      "image": "pm25"
+    },
+    {
+      "position": 4,
+      "title": "Installation de ClearSky",
+      "lines": [
+        "Télécharger et installer ClearSky dans votre Raspberry Pi.<br>",
+        "Après le redémarrage, votre Raspberry devrait maintenant commencer à lire les données des capteurs.<br>",
+        "Enfin, vous pouvez configurer l'application pour visualiser vos données !"
+      ],
+      "image": "slide2"
+    },
+    {
+      "position": 5,
+      "title": "Adresses Internet",
+      "lines": [
+        "Saisir l'adresse internet de votre Raspberry Pi. (Aide?)"
+      ],
+      "image": "slide1"
+    },
+    {
+      "position": 6,
+      "title": "Partagez vos données",
+      "lines": [
+        "Aidez-nous à diffuser la connaissance et les données sur l'air que nous respirons!<br>",
+        "Nous constituons une carte des données collectées pour nos utilisateurs à travers le monde.<br>"
+      ],
+      "image": "slide1"
+    }
+    ]
+}

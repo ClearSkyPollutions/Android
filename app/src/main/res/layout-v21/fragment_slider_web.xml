@@ -33,6 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:textAppearance="@android:style/TextAppearance.Material.Title"
             app:layout_constraintEnd_toStartOf="@+id/share"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -47,6 +48,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="4dp"
             android:gravity="fill_horizontal|fill"
+            android:textAppearance="@android:style/TextAppearance.Material.Body1"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/rpi"
             app:layout_constraintEnd_toEndOf="parent"
