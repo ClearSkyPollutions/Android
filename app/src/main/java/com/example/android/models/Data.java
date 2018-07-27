@@ -16,7 +16,7 @@ public class Data extends RealmObject {
     @Required
     private Float value;
     @Required
-    private Integer dataType;
+    private String dataType;
     @Required
     private String dataUnit;
     @Required
@@ -46,11 +46,11 @@ public class Data extends RealmObject {
         this.value = value;
     }
 
-    public Integer getDataType() {
+    public String getDataType() {
         return dataType;
     }
 
-    public void setDataType(Integer dataType) {
+    public void setDataType(String dataType) {
         this.dataType = dataType;
     }
 

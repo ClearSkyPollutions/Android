@@ -18,7 +18,6 @@ import com.example.android.models.Chart;
 import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
-import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,30 +90,15 @@ public class ChartItemAdapter extends BaseAdapter {
         TextView chartTitleFront = itemView.findViewById(R.id.chartTitleFront);
         TextView chartTitleBack = itemView.findViewById(R.id.chartTitleBack);
 
-        Integer type = mChartList.get(position).getValue().getType();
-        chartTitleFront.setText(getTypeString(type));
-        chartTitleBack.setText(getTypeString(type));
-    }
-
-    public String getTypeString(Integer type) {
-        switch (type) {
-            case 1:
-                return mContext.getResources().getString(R.string.pm10);
-            case 2:
-                return mContext.getResources().getString(R.string.pm25);
-            case 3:
-                return mContext.getResources().getString(R.string.temperature);
-            case 4:
-                return mContext.getResources().getString(R.string.humidity);
-            default:
-                return "Unknown";
-        }
+        String type = mChartList.get(position).getValue().getType();
+        chartTitleFront.setText(getTranslation(type));
+        chartTitleBack.setText(getTranslation(type));
     }
 
     private void initButtons(int position, View itemView){
         ImageButton mButtonDelete = itemView.findViewById(R.id.buttonDelete);
         ImageButton mButtonFavorite = itemView.findViewById(R.id.buttonFavori);
-        String type = getTypeString(mChartList.get(position).getValue().getType());
+        String type = mChartList.get(position).getValue().getType();
 
         if (favorite.contains(type)) {
             mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
@@ -157,6 +141,35 @@ public class ChartItemAdapter extends BaseAdapter {
                 mChartHelper.addEntry(lineChart, entry, newChart.getColor(), false);
             }
         });
+    }
+
+    public String getTranslation(String type) {
+        switch (type) {
+            case "pm10":
+                return mContext.getResources().getString(R.string.pm10);
+            case "pm25":
+                return mContext.getResources().getString(R.string.pm25);
+            case "temperature":
+                return mContext.getResources().getString(R.string.temperature);
+            case "humidity":
+                return mContext.getResources().getString(R.string.humidity);
+            default:
+                return type;
+        }
+    }
+
+    public String revertTranslation(String type) {
+        if ( type.equals(getTranslation("pm25"))) {
+            return "pm25";
+        } else if ( type.equals(getTranslation("pm10"))) {
+            return "pm10";
+        } else if ( type.equals(getTranslation("temperature"))) {
+            return "temperature";
+        } else if ( type.equals(getTranslation("humidity"))) {
+            return "humidity";
+        } else {
+            return type;
+        }
     }
 }
 
