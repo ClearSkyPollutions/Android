@@ -10,14 +10,14 @@
     {
       "name": "DHT22",
       "smalldesc": "Capteur de température et d'humidité",
-      "desc": "<b> Pour :</b> Temperature, humididité <p><b>Informations :</b> Utilises une capacité pour mesurer l'humidité de l'air et une thermoresistance pour la mesure de la températurer. Les données sont lues toutes les 2 secondes.",
+      "desc": "<b> Pour :</b> Température, humididité <p><b>Informations :</b> Utilises une capacité pour mesurer l'humidité de l'air et une thermoresistance pour mesurer la température. Les données sont lues toutes les 2 secondes.",
       "image": "dht22",
       "help": "text pour setup"
     },
     {
       "name": "MQ-2",
       "smalldesc": "Capteur de composés organiques volatiles (COV)",
-      "desc": "<b>Pour :</b> COV - Methane, Butane, LPG, fumée <p><b>Informations :</b> Mesure la concentration en gaz, la conductivité du capteur depend de cet concentration dans l'air.",
+      "desc": "<b>Pour :</b> COV - Methane, Butane, LPG, fumée <p><b>Informations :</b> Mesure la concentration en gaz, la conductivité du capteur depend de la concentration dans l'air.",
       "image": "mq2",
       "help": "text pour setup"
     },
