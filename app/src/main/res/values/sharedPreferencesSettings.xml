@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="settings_rpi_file_key">com.example.android.settingsRPi</string>
+
+    <string name="key_sensors">sensors</string>
+    <string name="key_frequency">frequency</string>
+    <string name="key_raspberryPiAddressIp">raspberryPiAddressIp</string>
+    <string name="key_raspberryPiAddressPort">raspberryPiAddressPort</string>
+    <string name="key_serverAddressIp">serverAddressIp</string>
+    <string name="key_serverAddressPort">serverAddressPort</string>
+    <string name="key_isDataShared">isDataShared</string>
+    <string name="key_positionSensorLatitude">positionSensorLatitude</string>
+    <string name="key_positionSensorLongitude">positionSensorLongitude</string>
+
+    <string name="json_serverAddress">serverAddress</string>
+
+</resources>

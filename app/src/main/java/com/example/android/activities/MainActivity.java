@@ -27,40 +27,35 @@ import com.example.android.viewModels.AQIModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    //Permision code that will be checked in the method onRequestPermissionsResult
+    //Permission code that will be checked in the method onRequestPermissionsResult
     private int STORAGE_PERMISSION_CODE = 23;
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment selectedFragment = null;
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    selectedFragment = new HomeFragment();
-                    setTitle(R.string.title_home);
-                    break;
-                case R.id.navigation_map:
-                    selectedFragment = new MapFragment();
-                    setTitle(R.string.title_map);
-
-                    //If the app has not the permission then asking for the permission
-                    requestStoragePermission();
-                    break;
-                case R.id.navigation_info:
-                    selectedFragment = new InfoFragment();
-                    setTitle(R.string.title_info);
-                    break;
-                case R.id.navigation_settings:
-                    selectedFragment = new SettingsFragment();
-                    setTitle(R.string.title_settings);
-                    break;
-            }
-            loadFragment(selectedFragment);
-            return true;
-        }
-    };
+            = item -> {
+                Fragment selectedFragment = null;
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        selectedFragment = new HomeFragment();
+                        setTitle(R.string.title_home);
+                        break;
+                    case R.id.navigation_map:
+                        selectedFragment = new MapFragment();
+                        setTitle(R.string.title_map);
+                        //If the app has not the permission then asking for the permission
+                        requestStoragePermission();
+                        break;
+                    case R.id.navigation_info:
+                        selectedFragment = new InfoFragment();
+                        setTitle(R.string.title_info);
+                        break;
+                    case R.id.navigation_settings:
+                        selectedFragment = new SettingsFragment();
+                        setTitle(R.string.title_settings);
+                        break;
+                }
+                loadFragment(selectedFragment);
+                return true;
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,19 +80,6 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    //We are calling this method to check the permission status
-    private boolean isReadStorageAllowed() {
-        //Getting the permission status
-        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        //If permission is granted returning true
-        if (result == PackageManager.PERMISSION_GRANTED)
-            return true;
-
-        //If permission is not granted returning false
-        return false;
-    }
-
     //Requesting permission
     private void requestStoragePermission(){
 
@@ -108,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //And finally ask for the permission
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_CODE);
     }
 
     //This method will be called when the user will tap on allow or deny
@@ -117,11 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Checking the request code of our request
         if(requestCode == STORAGE_PERMISSION_CODE){
-
             //If permission is granted
             if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 loadFragment(new MapFragment());
-            }else{
+            }else {
                 //Displaying another toast if permission is not granted
                 Toast.makeText(this,"Oops you just denied the permission But is need for Maps",Toast.LENGTH_LONG).show();
             }

@@ -28,7 +28,6 @@ android {
             buildConfigField 'String', 'IPADDR_SERVER', '"192.168.2.118"'
             buildConfigField 'int', 'PortHTTP_SERVER', '5000'
             buildConfigField 'int', 'PortDB_SERVER', '5001'
-            buildConfigField 'String','DataBaseRPI_Name','"capteur_multi_pollutions"'
         }
         release {
             minifyEnabled false
@@ -52,6 +51,7 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:design:27.1.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
