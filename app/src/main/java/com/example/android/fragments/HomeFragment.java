@@ -38,6 +38,7 @@ import com.example.android.models.Chart;
 import com.example.android.network.NetworkHelper;
 import com.example.android.viewModels.AQIModel;
 import com.example.android.viewModels.DataModel;
+import com.example.android.viewModels.SettingsModel;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.sql.Timestamp;
@@ -335,6 +336,8 @@ public class HomeFragment extends Fragment {
                 connectionValue -> {
                     if (connectionValue) {
                         mDataModel.syncAllRPI(context);
+                        SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+                        settingsModel.getSystemIDtoRPI(getActivity());
                         aqiModel.loadAQI(context);
                         Toast.makeText(getActivity(), R.string.toast_data_updated_RPI,
                                 Toast.LENGTH_SHORT).show();

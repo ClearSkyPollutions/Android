@@ -106,7 +106,7 @@ public class SliderFragment extends Fragment {
         StringBuilder txt = new StringBuilder();
 
         try {
-            String json = JsonReaderHelper.loadJSONFromAsset("slides.json", getContext());
+            String json = JsonReaderHelper.loadJSONFromAsset("slides.json", getActivity());
             JSONObject root = new JSONObject(json);
             JSONObject slide = root.getJSONArray("slide").getJSONObject(mPosition);
 
@@ -182,19 +182,27 @@ public class SliderFragment extends Fragment {
                 netHelper.checkConnection(mSettings.getValue().getRaspberryPiAddress()).observe(this, connected ->
                 {
                     if (!connected) {
-                        Toast.makeText(getContext(),
+                        Toast.makeText(getActivity(),
                                 getString(R.string.toast_could_not_connect_RPI), Toast.LENGTH_LONG).show();
                     } else {
-                        SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                                getString(R.string.settings_rpi_file_key),
-                                Context.MODE_PRIVATE);
+                        //SystemID
+                        mSettingsModel.getSystemIDtoRPI(getActivity());
 
-                        //Save new sharedPreferences and send the config to the RPI
-                        mSettingsModel.setLocalSettings(sharedPref);
-                        mSettingsModel.sendNewSettings(getContext());
+                        mSettingsModel.refreshSystemID.observe(this, refreshSystemIDValue -> {
+                            if (refreshSystemIDValue){
+                                SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                                        getString(R.string.settings_rpi_file_key),
+                                        Context.MODE_PRIVATE);
 
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
+                                //Save new sharedPreferences and send the config to the RPI
+                                mSettingsModel.setLocalSettings(sharedPref);
+                                mSettingsModel.sendNewSettings(getActivity());
+
+                                Intent intent = new Intent(getActivity(), MainActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+
                     }
                 });
             });
@@ -235,14 +243,14 @@ public class SliderFragment extends Fragment {
             getSensorsData();
         }
         // Create an adapter class extending ArrayAdapter :
-        ArrayAdapter<Sensor> adapter = new ArrayAdapter<Sensor>(getContext(), R.layout.item_adapter_sensor, listSensors) {
+        ArrayAdapter<Sensor> adapter = new ArrayAdapter<Sensor>(getActivity(), R.layout.item_adapter_sensor, listSensors) {
 
             @NonNull
             @Override
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 Sensor sensor = getItem(position);
 
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_adapter_sensor_slider, parent, false);
+                    convertView = LayoutInflater.from(getActivity()).inflate(R.layout.item_adapter_sensor_slider, parent, false);
                     TextView name = convertView.findViewById(R.id.nameSensor);
                     Switch toggle = convertView.findViewById(R.id.switchSensor);
 
@@ -266,7 +274,7 @@ public class SliderFragment extends Fragment {
     }
 
     private void getSensorsData() {
-        String json = JsonReaderHelper.loadJSONFromAsset("sensors.json", getContext());
+        String json = JsonReaderHelper.loadJSONFromAsset("sensors.json", getActivity());
 
         try {
             JSONObject obj = new JSONObject(json);

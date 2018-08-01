@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         aqiModel.getAqi().observe(this, aqi -> {
             Notification.Builder builder = new Notification.Builder(this)
                     .setWhen(System.currentTimeMillis())
-                    .setSmallIcon(R.drawable.icon_notification_20x20)
+                    .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(getResources().getString(R.string.notification_title))
                     .setContentText(getResources().getString(R.string.notification_desc) + aqiModel.getLabel().getValue() + " (" + aqi + ")" )
                     .setContentIntent(pendingIntent);

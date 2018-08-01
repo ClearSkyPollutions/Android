@@ -9,6 +9,8 @@ public class Settings {
     private Address raspberryPiAddress;
     private Address serverAddress;
     private boolean isDataShared;
+    private String systemID;
+    private String systemName;
 
     public Settings(ArrayList<String> sensors, int frequency,
                     Address raspberryPiAddress, Address serverAddress, boolean isDataShared) {
@@ -69,5 +71,21 @@ public class Settings {
 
     public void setDataShared(boolean dataShared) {
         this.isDataShared = dataShared;
+    }
+
+    public String getSystemID() {
+        return systemID;
+    }
+
+    public void setSystemID(String systemID) {
+        this.systemID = systemID;
+    }
+
+    public String getSystemName() {
+        return systemName;
+    }
+
+    public void setSystemName(String systemName) {
+        this.systemName = systemName;
     }
 }

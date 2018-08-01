@@ -112,6 +112,7 @@ public class DataModel extends ViewModel {
         syncChartDataRPI(context, AVG_HOUR);
         syncChartDataRPI(context, AVG_DAY);
         syncChartDataRPI(context, AVG_MONTH);
+
     }
 
     private void syncChartDataRPI(Context context, String scale) {
@@ -139,6 +140,9 @@ public class DataModel extends ViewModel {
     }
 
     private void syncChartDataServer(Context context, String scale) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
+        String systemID = sharedPref.getString("systemID", "6a923685-f2ee-4b12-8373-8216c895a53e");
         realm.executeTransaction(realmDb -> {
             Data lastData = realmDb
                     .where(Data.class)
@@ -149,7 +153,7 @@ public class DataModel extends ViewModel {
                 lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
             }
             String query = "filter[]=" + DATE + ",gt," + lastDateUrlParam +
-                    "&filter[]="+ SYSTEMID + ",eq," + "6a923685-f2ee-4b12-8373-8216c895a53e" +
+                    "&filter[]="+ SYSTEMID + ",eq," + systemID +
                     "&order=" + DATE + ",desc&include=" + POLLUTANT + "&transform=1";
             network.sendRequestServer(context, scale, query,
                     NetworkHelper.GET, parseChartData, null);

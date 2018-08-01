@@ -27,6 +27,7 @@ public class SettingsModel extends ViewModel {
     private NetworkHelper network = new NetworkHelper();
 
     public MutableLiveData<Boolean> refreshSettings = new MutableLiveData<>();
+    public MutableLiveData<Boolean> refreshSystemID = new MutableLiveData<>();
 
     public MutableLiveData<Settings> getSetting() {
         return setting;
@@ -54,6 +55,22 @@ public class SettingsModel extends ViewModel {
         }
     };
 
+    private JSONParser<JSONObject> parseSystemID = (JSONObject response) -> {
+        try {
+            JSONObject systemObject = response.getJSONObject("SYSTEM");
+
+            String id = response.getString("id");
+            String name = response.getString("name");
+
+            getSetting().getValue().setSystemID(id);
+            getSetting().getValue().setSystemName(name);
+
+            refreshSystemID.postValue(true);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    };
+
     public void getLocalSettings(SharedPreferences sharedPref) {
         ArrayList<String> sensors = new ArrayList<>(sharedPref.getStringSet("sensors", new HashSet<>()));
 
@@ -65,9 +82,13 @@ public class SettingsModel extends ViewModel {
                 sharedPref.getString("serverAddressIp", BuildConfig.IPADDR_SERVER),
                 sharedPref.getInt("serverAddressPort", BuildConfig.PortHTTP_SERVER));
         boolean isDataShared = sharedPref.getBoolean("isDataShared", false);
+        String systemID = sharedPref.getString("systemID", "-1");
+        String systemName = sharedPref.getString("systemName" , "Rpi");
 
         getSetting().setValue(new Settings(sensors, frequency,
                 raspberryPiAddress, serverAddress, isDataShared));
+        getSetting().getValue().setSystemID(systemID);
+        getSetting().getValue().setSystemName(systemName);
     }
 
     public void setLocalSettings(SharedPreferences sharedPref) {
@@ -82,7 +103,16 @@ public class SettingsModel extends ViewModel {
         editor.putString("serverAddressIp", settings.getServerAddress().getIp());
         editor.putInt("serverAddressPort", settings.getServerAddress().getPort());
         editor.putBoolean("isDataShared", settings.isDataShared());
+        editor.putString("systemID", settings.getSystemID());
+        editor.putString("systemName", settings.getSystemName());
         editor.apply();
+    }
+
+    public void getSystemIDtoRPI(Context context){
+        String path = "SYSTEM";
+        String query = "?transform=1";
+
+        network.sendRequestRPI(context, path, query, Request.Method.GET, parseSystemID,null);
     }
 
     public void communication(Context context, String path, int method, JSONObject configToSend) {

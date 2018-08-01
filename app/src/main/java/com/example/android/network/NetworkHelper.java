@@ -70,7 +70,7 @@ public class NetworkHelper implements Request.Method {
         }
         else {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                    this.GET,
+                    Request.Method.GET,
                     url.toString(),
                      null,
                     success -> connection.postValue(true),
