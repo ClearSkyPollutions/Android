@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
@@ -19,7 +20,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
 
 public class SettingsModel extends ViewModel {
 
@@ -47,7 +47,11 @@ public class SettingsModel extends ViewModel {
             Address serverAddress = new Address(objectServerAddress.getString("ip"),
                     objectServerAddress.getInt("port"));
             boolean isDataShared = response.getBoolean("isDataShared");
-            getSetting().postValue(new Settings(sensors, frequency, getSetting().getValue().getRaspberryPiAddress(), serverAddress, isDataShared));
+            getSetting().postValue(new Settings(sensors, frequency,
+                    getSetting().getValue().getRaspberryPiAddress(),
+                    serverAddress, isDataShared,
+                    getSetting().getValue().getSystemID(),
+                    getSetting().getValue().getSystemName()));
 
             refreshSettings.postValue(false);
         } catch (JSONException e) {
@@ -57,13 +61,20 @@ public class SettingsModel extends ViewModel {
 
     private JSONParser<JSONObject> parseSystemID = (JSONObject response) -> {
         try {
-            JSONObject systemObject = response.getJSONObject("SYSTEM");
+            JSONArray systemArray = response.getJSONArray("SYSTEM");
+            JSONObject systemObject = systemArray.getJSONObject(0);
+            String id = systemObject.getString("id");
+            String name = systemObject.getString("name");
 
-            String id = response.getString("id");
-            String name = response.getString("name");
+            Log.d("System", "id: " + id + " name: " + name);
+            getSetting().setValue(new Settings(getSetting().getValue().getSensors(),
+                    getSetting().getValue().getFrequency(),
+                    getSetting().getValue().getRaspberryPiAddress(),
+                    getSetting().getValue().getServerAddress(),
+                    getSetting().getValue().isDataShared(),
+                    id,
+                    name));
 
-            getSetting().getValue().setSystemID(id);
-            getSetting().getValue().setSystemName(name);
 
             refreshSystemID.postValue(true);
         } catch (JSONException e) {
@@ -86,9 +97,7 @@ public class SettingsModel extends ViewModel {
         String systemName = sharedPref.getString("systemName" , "Rpi");
 
         getSetting().setValue(new Settings(sensors, frequency,
-                raspberryPiAddress, serverAddress, isDataShared));
-        getSetting().getValue().setSystemID(systemID);
-        getSetting().getValue().setSystemName(systemName);
+                raspberryPiAddress, serverAddress, isDataShared, systemID, systemName));
     }
 
     public void setLocalSettings(SharedPreferences sharedPref) {
@@ -110,7 +119,7 @@ public class SettingsModel extends ViewModel {
 
     public void getSystemIDtoRPI(Context context){
         String path = "SYSTEM";
-        String query = "?transform=1";
+        String query = "transform=1";
 
         network.sendRequestRPI(context, path, query, Request.Method.GET, parseSystemID,null);
     }

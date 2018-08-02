@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -185,15 +186,17 @@ public class SliderFragment extends Fragment {
                         Toast.makeText(getActivity(),
                                 getString(R.string.toast_could_not_connect_RPI), Toast.LENGTH_LONG).show();
                     } else {
+                        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                                getString(R.string.settings_rpi_file_key),
+                                Context.MODE_PRIVATE);
+
+                        mSettingsModel.setLocalSettings(sharedPref);
                         //SystemID
                         mSettingsModel.getSystemIDtoRPI(getActivity());
 
                         mSettingsModel.refreshSystemID.observe(this, refreshSystemIDValue -> {
                             if (refreshSystemIDValue){
-                                SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                                        getString(R.string.settings_rpi_file_key),
-                                        Context.MODE_PRIVATE);
-
+                                Log.d("re System", "dedanss");
                                 //Save new sharedPreferences and send the config to the RPI
                                 mSettingsModel.setLocalSettings(sharedPref);
                                 mSettingsModel.sendNewSettings(getActivity());

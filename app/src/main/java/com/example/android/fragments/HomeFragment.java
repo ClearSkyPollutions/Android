@@ -337,6 +337,7 @@ public class HomeFragment extends Fragment {
                     if (connectionValue) {
                         mDataModel.syncAllRPI(context);
                         SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+                        settingsModel.getLocalSettings(sharedPref);
                         settingsModel.getSystemIDtoRPI(getActivity());
                         aqiModel.loadAQI(context);
                         Toast.makeText(getActivity(), R.string.toast_data_updated_RPI,

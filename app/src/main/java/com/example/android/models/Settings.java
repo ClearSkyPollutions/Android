@@ -13,12 +13,15 @@ public class Settings {
     private String systemName;
 
     public Settings(ArrayList<String> sensors, int frequency,
-                    Address raspberryPiAddress, Address serverAddress, boolean isDataShared) {
+                    Address raspberryPiAddress, Address serverAddress, boolean isDataShared,
+                    String systemID, String systemName) {
         this.sensors = sensors;
         this.frequency = frequency;
         this.raspberryPiAddress = raspberryPiAddress;
         this.serverAddress = serverAddress;
         this.isDataShared = isDataShared;
+        this.systemID = systemID;
+        this.systemName = systemName;
     }
 
     public Settings(Settings copy) {
@@ -27,6 +30,8 @@ public class Settings {
         this.raspberryPiAddress = copy.raspberryPiAddress;
         this.serverAddress = copy.serverAddress;
         this.isDataShared = copy.isDataShared;
+        this.systemID = copy.systemID;
+        this.systemName = copy.systemName;
     }
 
     public ArrayList<String> getSensors() {
