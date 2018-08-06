@@ -13,16 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.android.fragments.SliderFragment;
-import com.example.android.network.RequestQueueSingleton;
 import com.example.android.viewModels.SettingsModel;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    private SlideAdapter mAdapter;
-    private ViewPager mPager;
-    private SettingsModel mSettingsModel;
-
-    // Using an array here in case we need to do differents layouts.
+    // Using an array here in case we need to do different layouts.
     // If not, should probably just inflate the right layout in SliderFragment.java
     private static final int[] LAYOUTS = {
             R.layout.fragment_slider,
@@ -30,7 +25,7 @@ public class WelcomeActivity extends AppCompatActivity {
             R.layout.fragment_slider_sensor,
             R.layout.fragment_slider,
             R.layout.fragment_slider_rpi,
-            R.layout.fragment_slider_web}; ;
+            R.layout.fragment_slider_web};
     static final int NUM_SLIDES = LAYOUTS.length;
 
     @Override
@@ -49,23 +44,21 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_welcome);
 
         // Create or get the ViewModel for our charts, and put defaults values in it
-        mSettingsModel = ViewModelProviders.of(this).get(SettingsModel.class);
-        mSettingsModel.getLocalSettings(sharedPref);
-
-        RequestQueueSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
+        SettingsModel settingsModel = ViewModelProviders.of(this).get(SettingsModel.class);
+        settingsModel.getLocalSettings(sharedPref);
 
         //Setup sliders
-        mPager = findViewById(R.id.viewPager);
-        mAdapter = new SlideAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mAdapter);
+        ViewPager pager = findViewById(R.id.viewPager);
+        SlideAdapter adapter = new SlideAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
 
         // "Little dots" for navigation
         TabLayout tabLayout = findViewById(R.id.tabDots);
-        tabLayout.setupWithViewPager(mPager, true);
+        tabLayout.setupWithViewPager(pager, true);
     }
 
     public static class SlideAdapter extends FragmentPagerAdapter {
-        public SlideAdapter(FragmentManager fm) {
+        SlideAdapter(FragmentManager fm) {
             super(fm);
         }
 

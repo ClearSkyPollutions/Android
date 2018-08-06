@@ -2,7 +2,6 @@ package com.example.android.helpers;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
-import android.util.Log;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -26,7 +25,7 @@ import java.util.Locale;
 
 public class ChartHelper implements IAxisValueFormatter, OnChartValueSelectedListener {
 
-    public MutableLiveData<Integer> selected;
+    private MutableLiveData<Integer> selected;
     private ArrayList<Float> entries = new ArrayList<>();
 
     public void initChart(LineChart mChart, int BackgroundColor, int TextColor) {

@@ -107,6 +107,7 @@
     <string name="notification">Notification Air quality</string>
     <string name="notification_title">Air quality</string>
     <string name="notification_desc">Index: </string>
+    <string name="toast_permission_denied">We need your permission to show the map</string>
 
     //Integer
     <integer name="anim_length">1000</integer>
