@@ -94,6 +94,8 @@ public class WelcomeActivityTest {
                         isDisplayed()));
         startButton.perform(click());
         startButton.perform(click());
+        startButton.perform(click());
+        startButton.perform(click());
 
 
         try {
@@ -202,8 +204,8 @@ public class WelcomeActivityTest {
                                         withId(R.id.CardFront),
                                         0),
                                 0),
-                        isDisplayed()));
-        textView.check(matches(isDisplayed()));
+                        isDisplayed()))
+                .check(matches(isDisplayed()));
 
     }
 
@@ -257,9 +259,7 @@ public class WelcomeActivityTest {
             if ((type == WindowManager.LayoutParams.TYPE_TOAST)) {
                 IBinder windowToken = root.getDecorView().getWindowToken();
                 IBinder appToken = root.getDecorView().getApplicationWindowToken();
-                if (windowToken == appToken) {
-                    return true;
-                }
+                return windowToken == appToken;
             }
             return false;
         }
