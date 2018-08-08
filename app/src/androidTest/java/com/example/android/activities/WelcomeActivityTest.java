@@ -93,16 +93,22 @@ public class WelcomeActivityTest {
                                 2),
                         isDisplayed()));
         startButton.perform(click());
-        startButton.perform(click());
-        startButton.perform(click());
-        startButton.perform(click());
-
 
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        onView(
+                allOf(withId(R.id.ville),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.CardFront),
+                                        0),
+                                0),
+                        isDisplayed()))
+                .check(matches(not(isDisplayed())));
 
         onView(withText(R.string.toast_could_not_connect_RPI)).inRoot(new ToastMatcher())
                     .check(matches(isDisplayed()));
