@@ -104,11 +104,13 @@ public class WelcomeActivityTest {
         previousSlide();
 
         onData(
-                allOf(is(instanceOf(Sensor.class)), withName(equalTo("DHT22"))))
+                allOf(
+                        is(instanceOf(Sensor.class)), withName(equalTo("DHT22"))))
                 .onChildView(allOf(withId(R.id.switchSensor), isDisplayed()))
                 .perform(click());
         onData(
-                allOf(is(instanceOf(Sensor.class)), withName(equalTo("MQ-3"))))
+                allOf(
+                        is(instanceOf(Sensor.class)), withName(equalTo("MQ-3"))))
                 .onChildView(allOf(withId(R.id.switchSensor), isDisplayed()))
                 .perform(click());
 
