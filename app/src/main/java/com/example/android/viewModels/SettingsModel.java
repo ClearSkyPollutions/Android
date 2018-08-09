@@ -62,8 +62,8 @@ public class SettingsModel extends ViewModel {
                 sharedPref.getString("raspberryPiAddressIp", "192.168.0."),
                 sharedPref.getInt("raspberryPiAddressPort", 80));
         Address serverAddress = new Address(
-                sharedPref.getString("serverAddressIp", BuildConfig.IPADDR_SERVER),
-                sharedPref.getInt("serverAddressPort", BuildConfig.PortHTTP_SERVER));
+                sharedPref.getString("serverAddressIp", "127.0.0.1"),
+                sharedPref.getInt("serverAddressPort", 7001));
         boolean isDataShared = sharedPref.getBoolean("isDataShared", false);
 
         getSetting().setValue(new Settings(sensors, frequency,

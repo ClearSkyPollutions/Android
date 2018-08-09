@@ -24,13 +24,14 @@ before_script:
   - adb shell input keyevent 82 &
 
 after_script:
-  - wget 127.0.0.1:4000/api.php
+  - docker exec -it rpi cat /var/log/apache2/access.log
 
 services:
   - docker
 
 before_install:
-  - docker run -d -p 4000:80 -p 5000:3306 ftamagny/embedded
+  - docker run -d -p 4000:80 -p 5000:3306 ftamagny/embedded -t rpi
+  - yes | sdkmanager --update
   - yes | sdkmanager "platforms;android-27"
   - wget 127.0.0.1:4000/api.php 
 
