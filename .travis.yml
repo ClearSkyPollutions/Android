@@ -35,4 +35,4 @@ before_install:
   - wget 127.0.0.1:4000/api.php 
 
 script:
-  - "./gradlew clean build connectedAndroidTest --stacktrace"   
+  - "./gradlew clean build connectedAndroidTest --debug"   
