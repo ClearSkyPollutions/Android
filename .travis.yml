@@ -34,4 +34,5 @@ before_install:
   - yes | sdkmanager "platforms;android-27"
   - wget 127.0.0.1:4000/api.php 
 
-script: ./gradlew connectedAndroidTest
+script:
+  - "./gradlew clean build connectedAndroidTest --stacktrace"   
