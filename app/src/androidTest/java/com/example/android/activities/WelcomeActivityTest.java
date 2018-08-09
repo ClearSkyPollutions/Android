@@ -140,7 +140,7 @@ public class WelcomeActivityTest {
                         isDisplayed()))
                 .perform(click())
                 .perform(click())
-                .perform(replaceText("127.0.0.1"))
+                .perform(replaceText("192.168.2.118"))
                 .perform(closeSoftKeyboard())
                 .perform(pressImeActionButton());
 
@@ -154,7 +154,7 @@ public class WelcomeActivityTest {
                                 0),
                         isDisplayed()))
                 .perform(click())
-                .perform(replaceText("80"))
+                .perform(replaceText("4000"))
                 .perform(closeSoftKeyboard())
                 .perform(pressImeActionButton());
 
@@ -196,10 +196,20 @@ public class WelcomeActivityTest {
         startButton.perform(click());
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        onView(
+                allOf(withId(R.id.add_port_input),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.add_port),
+                                        0),
+                                0),
+                        isDisplayed()))
+                .check(doesNotExist());
 
         onView(
                 allOf(withId(R.id.ville),
