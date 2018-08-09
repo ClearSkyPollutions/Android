@@ -111,9 +111,6 @@ public class WelcomeActivityTest {
                         isDisplayed()))
                 .check(doesNotExist());
 
-        onView(withText(R.string.toast_could_not_connect_RPI)).inRoot(new ToastMatcher())
-                    .check(matches(isDisplayed()));
-
         previousSlide();
         previousSlide();
         previousSlide();
