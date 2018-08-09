@@ -41,8 +41,8 @@ android {
         }
         env_test {
             buildConfigField 'String', 'IPADDR_RPI', '"192.168.2.118"'
-            buildConfigField 'String', 'PortHTTP_RPI', '80'
-            buildConfigField 'String', 'PortDB_RPI', '3306'
+            buildConfigField 'int', 'PortHTTP_RPI', '80'
+            buildConfigField 'int', 'PortDB_RPI', '3306'
         }
     }
     compileOptions {
