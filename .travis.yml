@@ -30,7 +30,7 @@ services:
   - docker
 
 before_install:
-  - docker run -d -p 4000:80 -p 5000:3306 ftamagny/embedded -t rpi
+  - docker run -d -p 4000:80 -p 5000:3306  -t rpi ftamagny/embedded
   - yes | sdkmanager --update
   - yes | sdkmanager "platforms;android-27"
   - wget 127.0.0.1:4000/api.php 
