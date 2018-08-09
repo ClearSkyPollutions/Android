@@ -29,5 +29,6 @@ services:
 before_install:
   - docker run -d -p 4000:80 -p 5000:3306 ftamagny/embedded
   - yes | sdkmanager "platforms;android-27"
+  - wget 127.0.0.1:4000/api.php 
 
 script: ./gradlew connectedAndroidTest
