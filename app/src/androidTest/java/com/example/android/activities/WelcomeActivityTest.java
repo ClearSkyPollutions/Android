@@ -140,7 +140,7 @@ public class WelcomeActivityTest {
                         isDisplayed()))
                 .perform(click())
                 .perform(click())
-                .perform(replaceText("192.168.2.118"))
+                .perform(replaceText("127.0.0.1"))
                 .perform(closeSoftKeyboard())
                 .perform(pressImeActionButton());
 
@@ -189,7 +189,7 @@ public class WelcomeActivityTest {
                                 0),
                         isDisplayed()))
                 .perform(click())
-                .perform(replaceText("5000"))
+                .perform(replaceText("6001"))
                 .perform(closeSoftKeyboard())
                 .perform(pressImeActionButton());
 
