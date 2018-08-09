@@ -35,6 +35,7 @@ import static android.support.test.espresso.action.ViewActions.pressImeActionBut
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.ComponentNameMatchers.hasClassName;
@@ -108,7 +109,7 @@ public class WelcomeActivityTest {
                                         0),
                                 0),
                         isDisplayed()))
-                .check(matches(not(isDisplayed())));
+                .check(doesNotExist());
 
         onView(withText(R.string.toast_could_not_connect_RPI)).inRoot(new ToastMatcher())
                     .check(matches(isDisplayed()));
