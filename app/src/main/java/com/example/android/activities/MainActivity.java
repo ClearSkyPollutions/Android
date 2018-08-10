@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
     //This method will be called when the user will tap on allow or deny
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // super() allows fragment-specific onRequestPermissionsResult to be called
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
 
         //Checking the request code of our request
         if(requestCode == STORAGE_PERMISSION_CODE){
@@ -104,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 loadFragment(new MapFragment());
             }else {
                 //Displaying another toast if permission is not granted
-                Toast.makeText(this,"Oops you just denied the permission But is need for Maps",Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.toast_ask_storage,Toast.LENGTH_LONG).show();
             }
         }
     }

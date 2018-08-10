@@ -87,8 +87,10 @@
     <string name="toast_connection_successful_RPI">Connected successfully to the Raspberry Pi</string>
     <string name="toast_data_updated">Local settings synced with the Raspberry Pi</string>
     <string name="toast_data_storage">Using last known settings</string>
-    <string name="toast_waiting_location">Waiting for the location please wait</string>
+    <string name="toast_waiting_location">Acquiring GPS coordinates…</string>
     <string name="toast_your_coordinates">Your GPS coordinates are needed if you wish to share your data</string>
+    <string name="toast_position_acquired">Position acquired</string>
+    <string name="toast_ask_sharing">Please enable data sharing</string>
 
     <!-- Notification -->
     <string name="notification">Notification Air quality</string>
@@ -100,7 +102,7 @@
     <string name="alert_turn_on_gps">Please turn on your GPS</string>
     <string name="alert_button_settings">Settings</string>
     <string name="alert_button_cancel">Cancel</string>
-
+    <string name="toast_ask_storage">You may encounter some bugs if you don\'t allow this permission</string>
 
 
     //Integer

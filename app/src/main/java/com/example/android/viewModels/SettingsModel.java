@@ -49,8 +49,8 @@ public class SettingsModel extends ViewModel {
                     objectServerAddress.getInt("port"));
             boolean isDataShared = response.getBoolean("isDataShared");
             Location positionSensor = new Location(LocationManager.NETWORK_PROVIDER);
-            positionSensor.setLatitude(response.getDouble("positionSensorLatitude"));
-            positionSensor.setLongitude(response.getDouble("positionSensorLongitude"));
+            positionSensor.setLatitude(response.getDouble("latitude"));
+            positionSensor.setLongitude(response.getDouble("longitude"));
 
             getSetting().postValue(new Settings(sensors, frequency,
                     getSetting().getValue().getRaspberryPiAddress(),

@@ -65,7 +65,7 @@ public class SettingsFragment extends Fragment {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private final static int DISTANCE_UPDATES = 5;
-    private final static int TIME_UPDATES = 10000;
+    private final static int TIME_UPDATES = 5000;
     public static final int PERMISSION_REQUEST_LOCATION_CODE = 1;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class SettingsFragment extends Fragment {
                 float accuracy = location.getAccuracy();
                 Log.d("GPS", "Lat " + location.getLatitude() + " long " + location.getLongitude());
                 if (accuracy < 20) {
-                    stopLocation();
+                    stopLocationTracking();
                 }
             }
 
@@ -208,7 +208,6 @@ public class SettingsFragment extends Fragment {
             }
         });
     }
-
 
     private void initInputs(View rootView) {
         mEditTextSensorAdd = rootView.findViewById(R.id.edit_text_add_sensors);
@@ -342,9 +341,9 @@ public class SettingsFragment extends Fragment {
 
         imageButtonPosition.setOnClickListener(v -> {
             if (mSettingsModel.getSetting().getValue().isDataShared()) {
-                activeLocation();
+                startLocationTracking();
             } else {
-                Toast.makeText(getActivity(), "Please active shared your data",
+                Toast.makeText(getActivity(), R.string.toast_ask_sharing,
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -369,45 +368,34 @@ public class SettingsFragment extends Fragment {
         initSwipeRefresh(rootView);
     }
 
-    @SuppressLint("MissingPermission")
-    public void activeLocation() {
-        if (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                this.requestPermissions(
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISSION_REQUEST_LOCATION_CODE);
-            }else {
-                checkProvider();
-            }
+    public void startLocationTracking() {
+        if (ActivityCompat
+                .checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            this.requestPermissions(
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_LOCATION_CODE);
         } else {
             checkProvider();
         }
     }
 
     @SuppressLint("MissingPermission")
-    private void stopLocation() {
+    private void stopLocationTracking() {
         locationManager.removeUpdates(locationListener);
         Location location = locationManager.getLastKnownLocation(
                 LocationManager.NETWORK_PROVIDER);
 
-        Location newLocation = randomLocation(location);
+        Location newLocation = randomizeLocation(location);
         Settings settings = mSettingsModel.getSetting().getValue();
-        mSettingsModel.getSetting().setValue(new Settings(settings.getSensors(),
-                settings.getFrequency(), settings.getRaspberryPiAddress(),
-                settings.getServerAddress(), settings.isDataShared(),
-                newLocation));
+        settings.setPositionSensor(newLocation);
+        mSettingsModel.getSetting().setValue(new Settings(settings));
 
-        Toast.makeText(getActivity(), "Your position are Latitude = "  +
-                newLocation.getLatitude() + " Longitude = " +
-                newLocation.getLongitude(), Toast.LENGTH_LONG).show();
-
-        mSettingsModel.setLocalSettings(getActivity());
-        mSettingsModel.sendNewSettings(getActivity());
+        Toast.makeText(getActivity(), R.string.toast_position_acquired, Toast.LENGTH_LONG).show();
     }
 
-    private Location randomLocation(Location location) {
+    private Location randomizeLocation(Location location) {
         Random rnd = new Random();
         Location newLocation = new Location(location);
 
@@ -460,8 +448,7 @@ public class SettingsFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSION_REQUEST_LOCATION_CODE:
-                Log.d("GPS", "activation ");
-                activeLocation();
+                startLocationTracking();
                 break;
         }
     }
