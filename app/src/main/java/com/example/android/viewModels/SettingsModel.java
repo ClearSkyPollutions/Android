@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.example.android.activities.BuildConfig;
@@ -35,31 +36,35 @@ public class SettingsModel extends ViewModel {
     }
 
     private JSONParser<JSONObject> parseSettings = (JSONObject response) -> {
-        try {
-            ArrayList<String> sensors = new ArrayList<>();
+        //@TODO: Default values
+        ArrayList<String> sensors = new ArrayList<>();
+        int frequency = 0;
+        Address serverAddress = new Address("",80);
+        boolean isDataShared = false;
+        Location positionSensor = new Location(LocationManager.NETWORK_PROVIDER);
 
+        try {
             JSONArray arraySensors = response.getJSONArray("sensors");
             JSONObject objectServerAddress = response.getJSONObject("serverAddress");
 
             for (int i = 0; i < arraySensors.length(); i++) {
                 sensors.add(arraySensors.getString(i));
             }
-            int frequency = response.getInt("frequency");
-            Address serverAddress = new Address(objectServerAddress.getString("ip"),
+            frequency = response.getInt("frequency");
+            serverAddress = new Address(objectServerAddress.getString("ip"),
                     objectServerAddress.getInt("port"));
-            boolean isDataShared = response.getBoolean("isDataShared");
-            Location positionSensor = new Location(LocationManager.NETWORK_PROVIDER);
+            isDataShared = response.getBoolean("isDataShared");
             positionSensor.setLatitude(response.getDouble("latitude"));
             positionSensor.setLongitude(response.getDouble("longitude"));
-
-            getSetting().postValue(new Settings(sensors, frequency,
-                    getSetting().getValue().getRaspberryPiAddress(),
-                    serverAddress, isDataShared, positionSensor));
-
-            refreshSettings.postValue(false);
         } catch (JSONException e) {
+            Log.w("Settings response", "JSON response missing some key");
             e.printStackTrace();
         }
+
+        getSetting().postValue(new Settings(sensors, frequency,
+                getSetting().getValue().getRaspberryPiAddress(),
+                serverAddress, isDataShared, positionSensor));
+        refreshSettings.postValue(false);
     };
 
     public void getLocalSettings(Context context) {
