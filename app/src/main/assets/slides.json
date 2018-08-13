@@ -53,7 +53,8 @@
       "title": "Share your data",
       "lines": [
         "Help us spread knowledge and data about Air Quality !<br>",
-        "We’re building a map of the data collected by our users and accessible to everyone.<br>"
+        "We’re building a map of the data collected by our users and accessible to everyone.<br>",
+        "Your exact position won't be accessible by anyone<br>"
       ],
       "image": "slide1"
     }
