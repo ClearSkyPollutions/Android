@@ -3,7 +3,6 @@ package com.example.android.services;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import com.example.android.helpers.JSONParser;
 import com.example.android.helpers.NotificationHelper;
@@ -26,8 +25,8 @@ public class NotificationJobService extends JobService {
 
     private static final String AQI_NOTIFICATION_TAG = "aqi-notification";
 
-    private static final int NOTIFICATION_PERIOD_SECONDS = 30;
-    private static final int NOTIFICATION_WINDOW_SECONDS = 15;
+    private static final int NOTIFICATION_PERIOD_SECONDS = 10;
+    private static final int NOTIFICATION_WINDOW_SECONDS = 5;
 
     public static boolean isInitialized = false;
     
@@ -42,17 +41,16 @@ public class NotificationJobService extends JobService {
             String levelRcv = response.getString("level");
             label = levelRcv;
             aqi   = aqiRcv;
-            NotificationHelper.createNotificationAQI(getApplicationContext(), label, aqi);
+            NotificationHelper.createNotificationAQI(this, label, aqi);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     };
-    private AsyncTask<Void, Void, Void> mFetchAQITask;
 
     @SuppressLint("StaticFieldLeak")
     @Override
     public boolean onStartJob(JobParameters job) {
-        networkHelper.sendRequestRPI(getApplicationContext(), "aqi.php", null, NetworkHelper.GET, parseAQI, null);
+        networkHelper.sendRequestRPI(this, "aqi.php", null, NetworkHelper.GET, parseAQI, null);
         return false;
     }
 
