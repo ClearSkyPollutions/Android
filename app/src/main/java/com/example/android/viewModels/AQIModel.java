@@ -3,8 +3,10 @@ package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 
+import com.example.android.activities.R;
 import com.example.android.helpers.JSONParser;
 import com.example.android.network.NetworkHelper;
 
@@ -13,9 +15,9 @@ import org.json.JSONObject;
 
 public class AQIModel extends ViewModel {
 
-    public MutableLiveData<String> label;
-    public MutableLiveData<Integer> aqi;
-    public MutableLiveData<Integer> color;
+    private MutableLiveData<String> label;
+    private MutableLiveData<Integer> aqi;
+    private MutableLiveData<Integer> color;
 
     public MutableLiveData<Integer> getAqi() {
         if (aqi == null) {
@@ -37,9 +39,21 @@ public class AQIModel extends ViewModel {
         return color;
     }
 
-    public void loadAQI(Context context) {
+    public void loadAQIRPI(Context context) {
         NetworkHelper netHelper = new NetworkHelper();
         netHelper.sendRequestRPI(context, "aqi.php", null, NetworkHelper.GET, parseAQI, null);
+    }
+    public void loadAQIServer(Context context) {
+        NetworkHelper netHelper = new NetworkHelper();
+
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
+        String systemID = sharedPref.getString("systemID", "-1");
+
+        if (!systemID.equals("-1")) {
+            String query = "id=" + systemID;
+            netHelper.sendRequestServer(context, "aqi.php", query, NetworkHelper.GET, parseAQI, null);
+        }
     }
 
     private JSONParser<JSONObject> parseAQI = (JSONObject response) -> {

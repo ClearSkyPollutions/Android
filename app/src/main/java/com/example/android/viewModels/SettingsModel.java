@@ -30,6 +30,7 @@ public class SettingsModel extends ViewModel {
     private NetworkHelper network = new NetworkHelper();
 
     public MutableLiveData<Boolean> refreshSettings = new MutableLiveData<>();
+    public MutableLiveData<Boolean> refreshSystemID = new MutableLiveData<>();
 
     public MutableLiveData<Settings> getSetting() {
         return setting;
@@ -63,8 +64,33 @@ public class SettingsModel extends ViewModel {
 
         getSetting().postValue(new Settings(sensors, frequency,
                 getSetting().getValue().getRaspberryPiAddress(),
-                serverAddress, isDataShared, positionSensor));
+                serverAddress, isDataShared, positionSensor,
+                getSetting().getValue().getSystemID(),
+                getSetting().getValue().getSystemName());
         refreshSettings.postValue(false);
+    };
+
+    private JSONParser<JSONObject> parseSystemID = (JSONObject response) -> {
+        try {
+            JSONArray systemArray = response.getJSONArray("SYSTEM");
+            JSONObject systemObject = systemArray.getJSONObject(0);
+            String id = systemObject.getString("id");
+            String name = systemObject.getString("name");
+
+            Log.d("System", "id: " + id + " name: " + name);
+            getSetting().setValue(new Settings(getSetting().getValue().getSensors(),
+                    getSetting().getValue().getFrequency(),
+                    getSetting().getValue().getRaspberryPiAddress(),
+                    getSetting().getValue().getServerAddress(),
+                    getSetting().getValue().isDataShared(),
+                    id,
+                    name));
+
+
+            refreshSystemID.postValue(true);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     };
 
     public void getLocalSettings(Context context) {
@@ -81,6 +107,9 @@ public class SettingsModel extends ViewModel {
                         "192.168.0."),
                 sharedPref.getInt(context.getString(R.string.key_raspberryPiAddressPort),
                         80));
+        String systemID = sharedPref.getString("systemID", "-1");
+        String systemName = sharedPref.getString("systemName" , "Rpi");
+
         Address serverAddress = new Address(
                 sharedPref.getString(context.getString(R.string.key_serverAddressIp),
                         BuildConfig.IPADDR_SERVER),
@@ -95,7 +124,7 @@ public class SettingsModel extends ViewModel {
                 context.getString(R.string.key_positionSensorLongitude), -1));
 
         getSetting().setValue(new Settings(sensors, frequency,
-                raspberryPiAddress, serverAddress, isDataShared, positionSensor));
+                raspberryPiAddress, serverAddress, isDataShared, positionSensor, systemID, systemName));
     }
 
     public void setLocalSettings(Context context) {
@@ -123,7 +152,18 @@ public class SettingsModel extends ViewModel {
                 (float) settings.getPositionSensor().getLatitude());
         editor.putFloat(context.getString(R.string.key_positionSensorLongitude),
                 (float) settings.getPositionSensor().getLongitude());
+        
+        editor.putString("systemID", settings.getSystemID());
+        editor.putString("systemName", settings.getSystemName());
+
         editor.apply();
+    }
+
+    public void getSystemIDtoRPI(Context context){
+        String path = "SYSTEM";
+        String query = "transform=1";
+
+        network.sendRequestRPI(context, path, query, Request.Method.GET, parseSystemID,null);
     }
 
     public void communication(Context context, String path, int method, JSONObject configToSend) {

@@ -6,6 +6,8 @@ import android.animation.AnimatorSet;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,7 +16,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +25,18 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
 import com.example.android.adapters.ChartItemAdapter;
 import com.example.android.helpers.ChartHelper;
+import com.example.android.models.Address;
 import com.example.android.models.Chart;
+import com.example.android.network.NetworkHelper;
 import com.example.android.viewModels.AQIModel;
 import com.example.android.viewModels.DataModel;
+import com.example.android.viewModels.SettingsModel;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.sql.Timestamp;
@@ -94,8 +99,7 @@ public class HomeFragment extends Fragment {
         aqiModel = ViewModelProviders.of(getActivity()).get(AQIModel.class);
         binding.setAqiUI(aqiModel);
 
-        mDataModel.syncAll(getContext());
-        aqiModel.loadAQI(getContext());
+        syncAll(getContext());
 
         initViews();
 
@@ -302,8 +306,7 @@ public class HomeFragment extends Fragment {
         mSwipeRefreshLayout = mRootView.findViewById(R.id.swipeRefreshHomeFragment);
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             //mDataModel.loadDataTypeUnits();
-            mDataModel.syncAll(getContext());
-            aqiModel.loadAQI(getContext());
+            syncAll(getContext());
 
             mDataModel.refreshChart.observe(this,
                     refreshValue -> mSwipeRefreshLayout.setRefreshing(refreshValue));
@@ -314,6 +317,54 @@ public class HomeFragment extends Fragment {
         mSetLeftIn = (AnimatorSet) AnimatorInflater.loadAnimator(getContext(), R.animator.in_animation);
         //For animation change the distance
         changeCameraDistance();
+    }
+
+    private void syncAll(Context context){
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.settings_rpi_file_key), Context.MODE_PRIVATE);
+
+        Address addressRPI = new Address(
+                sharedPref.getString("raspberryPiAddressIp",""),
+                sharedPref.getInt("raspberryPiAddressPort", 0));
+        boolean isDataShared = sharedPref.getBoolean("isDataShared",false);
+
+        NetworkHelper networkHelper = new NetworkHelper();
+        networkHelper.checkConnection(addressRPI).observe(
+                this,
+                connectionValue -> {
+                    if (connectionValue) {
+                        mDataModel.syncAllRPI(context);
+                        SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+                        settingsModel.getLocalSettings(sharedPref);
+                        settingsModel.getSystemIDtoRPI(getActivity());
+                        aqiModel.loadAQIRPI(context);
+                        Toast.makeText(getActivity(), R.string.toast_data_updated_RPI,
+                                Toast.LENGTH_SHORT).show();
+                    } else if (isDataShared) {
+                        Address addressServer = new Address(
+                                sharedPref.getString("serverAddressIp",""),
+                                sharedPref.getInt("serverAddressPort", 0));
+
+                        networkHelper.checkConnection(addressServer).observe(
+                                this,
+                                connectionValueServer -> {
+                                    if (connectionValueServer) {
+                                        mDataModel.syncAllServer(context);
+                                        aqiModel.loadAQIServer(context);
+                                        Toast.makeText(getActivity(), R.string.toast_data_updated_Server,
+                                                Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        mDataModel.loadDataTypeUnits();
+                                        Toast.makeText(getActivity(), R.string.toast_could_not_connect,
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                    }else {
+                        mDataModel.loadDataTypeUnits();
+                        Toast.makeText(getActivity(), R.string.toast_could_not_connect,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     public void flipCard() {

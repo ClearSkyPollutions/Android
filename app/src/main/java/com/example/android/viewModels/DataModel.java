@@ -3,11 +3,14 @@ package com.example.android.viewModels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 
+import com.example.android.activities.R;
 import com.example.android.helpers.ChartHelper;
 import com.example.android.helpers.HashHelper;
 import com.example.android.helpers.JSONParser;
+import com.example.android.models.Address;
 import com.example.android.models.Chart;
 import com.example.android.models.Data;
 import com.example.android.network.NetworkHelper;
@@ -46,6 +49,7 @@ public class DataModel extends ViewModel {
     private String lastDateUrlParam;
     private static final String POLLUTANT = "POLLUTANT";
     private static final String DATE = "date";
+    private static final String SYSTEMID = "systemId";
     private static final String VALUE = "value";
     private static final String POLLUTANT_NAME = "name";
     private static final String POLLUTANT_UNIT = "unit";
@@ -104,13 +108,14 @@ public class DataModel extends ViewModel {
         });
     }
 
-    public void syncAll(Context context) {
-        syncChartData(context, AVG_HOUR);
-        syncChartData(context, AVG_DAY);
-        syncChartData(context, AVG_MONTH);
+    public void syncAllRPI(Context context) {
+        syncChartDataRPI(context, AVG_HOUR);
+        syncChartDataRPI(context, AVG_DAY);
+        syncChartDataRPI(context, AVG_MONTH);
+
     }
 
-    private void syncChartData(Context context, String scale) {
+    private void syncChartDataRPI(Context context, String scale) {
         realm.executeTransaction(realmDb -> {
             Data lastData = realmDb
                     .where(Data.class)
@@ -120,8 +125,38 @@ public class DataModel extends ViewModel {
             if (lastData != null) {
                 lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
             }
-            String query = "filter="+DATE+",gt," + lastDateUrlParam + "&order="+DATE+",desc&include="+POLLUTANT+"&transform=1";
-            network.sendRequestRPI(context, scale, query, NetworkHelper.GET, parseChartData, null);
+            String query = "filter="+DATE+",gt," + lastDateUrlParam +
+                    "&order="+DATE+",desc&include="+POLLUTANT+"&transform=1";
+            network.sendRequestRPI(context, scale, query,
+                    NetworkHelper.GET, parseChartData, null);
+            //Log.d(DataModel.class.toString(), "sync " + scale + " data");
+        });
+    }
+
+    public void syncAllServer(Context context) {
+        syncChartDataServer(context, AVG_HOUR);
+        syncChartDataServer(context, AVG_DAY);
+        syncChartDataServer(context, AVG_MONTH);
+    }
+
+    private void syncChartDataServer(Context context, String scale) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
+        String systemID = sharedPref.getString("systemID", "6a923685-f2ee-4b12-8373-8216c895a53e");
+        realm.executeTransaction(realmDb -> {
+            Data lastData = realmDb
+                    .where(Data.class)
+                    .equalTo("scale", scale)
+                    .sort("date", Sort.DESCENDING)
+                    .findFirst();
+            if (lastData != null) {
+                lastDateUrlParam = ChartHelper.getStringDate(lastData.getDate(),"");
+            }
+            String query = "filter[]=" + DATE + ",gt," + lastDateUrlParam +
+                    "&filter[]="+ SYSTEMID + ",eq," + systemID +
+                    "&order=" + DATE + ",desc&include=" + POLLUTANT + "&transform=1";
+            network.sendRequestServer(context, scale, query,
+                    NetworkHelper.GET, parseChartData, null);
             //Log.d(DataModel.class.toString(), "sync " + scale + " data");
         });
     }
@@ -163,7 +198,7 @@ public class DataModel extends ViewModel {
         realm.close();
     };
 
-    public void loadLastData() {
+    private void loadLastData() {
         realm.executeTransactionAsync(realmDb -> {
             Data lastData = realmDb
                     .where(Data.class)
@@ -236,5 +271,4 @@ public class DataModel extends ViewModel {
         super.onCleared();
         realm.close();
     }
-
 }
