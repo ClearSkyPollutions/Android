@@ -30,7 +30,7 @@ public class WelcomeActivity extends AppCompatActivity {
             R.layout.fragment_slider_sensor,
             R.layout.fragment_slider,
             R.layout.fragment_slider_rpi,
-            R.layout.fragment_slider_web}; ;
+            R.layout.fragment_slider_web};
     static final int NUM_SLIDES = LAYOUTS.length;
 
     @Override
@@ -41,7 +41,7 @@ public class WelcomeActivity extends AppCompatActivity {
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.settings_rpi_file_key),
                 Context.MODE_PRIVATE);
-        if(sharedPref.contains("raspberryPiAddressIp")) {
+        if(sharedPref.contains(this.getString(R.string.key_raspberryPiAddressIp))) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
@@ -50,7 +50,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Create or get the ViewModel for our charts, and put defaults values in it
         mSettingsModel = ViewModelProviders.of(this).get(SettingsModel.class);
-        mSettingsModel.getLocalSettings(sharedPref);
+        mSettingsModel.getLocalSettings(this);
 
         RequestQueueSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
 

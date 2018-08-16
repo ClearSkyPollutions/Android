@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="map_file_key">com.example.android.preferences</string>
+
+    <string name="prefs_zoom_level_double">zoomLevelDouble</string>
+    <string name="prefs_zoom_level">zoomLevel</string>
+    <string name="prefs_orientation">orientation</string>
+    <string name="prefs_latitude_string">latitudeString</string>
+    <string name="prefs_longitude_string">longitudeString</string>
+    <string name="prefs_scroll_x">scrollX</string>
+    <string name="prefs_scroll_y">scrollY</string>
+    <string name="prefs_tile_source">tileSource</string>
+
+</resources>

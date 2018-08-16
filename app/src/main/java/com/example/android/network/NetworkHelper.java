@@ -70,8 +70,7 @@ public class NetworkHelper implements Request.Method {
         URL url = buildUrl(address.getIp(), address.getPort(), "api.php", "");
         if(url == null) {
             connection.postValue(false);
-        }
-        else {
+        }else {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
                     url.toString(),
@@ -98,7 +97,6 @@ public class NetworkHelper implements Request.Method {
                     "/" + path, query, null);
             url = uri.toURL();
         } catch (URISyntaxException | MalformedURLException e) {
-            System.out.println("Wrong URL");
             e.printStackTrace();
         }
         return url;

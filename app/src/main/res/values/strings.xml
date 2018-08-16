@@ -1,18 +1,7 @@
 <resources>
     <string name="app_name">ClearSky</string>
 
-    <string name="map_file_key">com.example.android.preferences</string>
     <string name="slider_file_key">com.example.android.slider</string>
-    <string name="settings_rpi_file_key">com.example.android.settingsRPi</string>
-    <string name="prefs_zoom_level_double">zoomLevelDouble</string>
-    <string name="prefs_zoom_level">zoomLevel</string>
-    <string name="prefs_orientation">orientation</string>
-    <string name="prefs_latitude_string">latitudeString</string>
-    <string name="prefs_longitude_string">longitudeString</string>
-    <string name="prefs_scroll_x">scrollX</string>
-    <string name="prefs_scroll_y">scrollY</string>
-    <string name="prefs_tile_source">tilesource</string>
-
 
     <string name="refresh">Refresh</string>
     <string name="title_activity_tabs">TabsActivity</string>
@@ -38,7 +27,6 @@
     <string name="add">ADD</string>
     <string name="validate">Validate</string>
     <string name="networkSecurity_prompt">Choose a Network Security</string>
-
     <string name="ok">Start</string>
 
     <string-array name="networkSecurity">
@@ -67,9 +55,7 @@
         <item>%</item>
     </string-array>
     <string name="dataType_prompt">Choose a Type of Pollutant</string>
-
     <string name="sensor">Sensors</string>
-
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -90,6 +76,8 @@
     <string name="confirm_these_changes">Confirm these changes ?</string>
     <string name="accept">ACCEPT</string>
     <string name="cancel">CANCEL</string>
+
+    <!-- Toast -->
     <string name="toast_name_empty">Please enter a sensor name</string>
     <string name="toast_port_empty">Please enter the port</string>
     <string name="toast_ip_empty">Please enter the Ip address</string>
@@ -101,12 +89,23 @@
     <string name="toast_connection_successful_RPI">Connected successfully to the Raspberry Pi</string>
     <string name="toast_data_updated">Local settings synced with the Raspberry Pi</string>
     <string name="toast_data_storage">Using last known settings</string>
-    <string name="toast_data_updated_RPI">Data updated from the Raspberry Pi</string>
-    <string name="toast_data_updated_Server">Data updated from the web server</string>
+    <string name="toast_waiting_location">Acquiring GPS coordinates…</string>
+    <string name="toast_your_coordinates">Your GPS coordinates are needed if you wish to share your data</string>
+    <string name="toast_position_acquired">Position acquired</string>
+    <string name="toast_ask_sharing">Please enable data sharing</string>
+
     <!-- Notification -->
     <string name="notification">Notification Air quality</string>
     <string name="notification_title">Air quality</string>
     <string name="notification_desc">Index: </string>
+
+    <!-- Alert -->
+    <string name="alert_GPS_settings">GPS settings</string>
+    <string name="alert_turn_on_gps">Please turn on your GPS</string>
+    <string name="alert_button_settings">Settings</string>
+    <string name="alert_button_cancel">Cancel</string>
+    <string name="toast_ask_storage">You may encounter some bugs if you don\'t allow this permission</string>
+
 
     //Integer
     <integer name="anim_length">1000</integer>

@@ -1,15 +1,26 @@
 package com.example.android.fragments;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +28,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -32,6 +42,9 @@ import com.example.android.models.Address;
 import com.example.android.models.Settings;
 import com.example.android.network.NetworkHelper;
 import com.example.android.viewModels.SettingsModel;
+
+import java.util.List;
+import java.util.Random;
 
 public class SettingsFragment extends Fragment {
 
@@ -50,7 +63,12 @@ public class SettingsFragment extends Fragment {
     private CardView mCoverSettingsFragment;
 
     private NetworkHelper mNetworkHelper = new NetworkHelper();
-    private SharedPreferences mPrefSettings;
+
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private final static int DISTANCE_UPDATES = 5;
+    private final static int TIME_UPDATES = 5000;
+    public static final int PERMISSION_REQUEST_LOCATION_CODE = 1;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +76,8 @@ public class SettingsFragment extends Fragment {
         mSettingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
 
         // Set Data in storage
-        mPrefSettings = getActivity().getSharedPreferences(getString(R.string.settings_rpi_file_key), Context.MODE_PRIVATE);
-        mSettingsModel.getLocalSettings(mPrefSettings);
+
+        mSettingsModel.getLocalSettings(getContext());
 
         mSettingsModel.refreshSettings.observe(this, updateSettingsValue -> {
             if (!updateSettingsValue) {
@@ -70,7 +88,44 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        refreshSettings();
+        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
+        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
+                this,
+                connectionValue -> {
+                    if (connectionValue) {
+                        mSettingsModel.communication(getContext(), "config.json", Request.Method.GET, null);
+                    } else {
+                        Toast.makeText(getActivity(), R.string.toast_data_storage,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                float accuracy = location.getAccuracy();
+                Log.d("GPS", "Lat " + location.getLatitude() + " long " + location.getLongitude());
+                if (accuracy < 20) {
+                    stopLocationTracking();
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
     }
 
     @Override
@@ -157,7 +212,6 @@ public class SettingsFragment extends Fragment {
             }
         });
     }
-
 
     private void initInputs(View rootView) {
         mEditTextSensorAdd = rootView.findViewById(R.id.edit_text_add_sensors);
@@ -263,7 +317,7 @@ public class SettingsFragment extends Fragment {
 
         // Popup
         accept.setOnClickListener(v -> {
-            mSettingsModel.setLocalSettings(mPrefSettings);
+            mSettingsModel.setLocalSettings(getContext());
             mSettingsModel.sendNewSettings(getContext());
 
             mCoverSettingsFragment.setVisibility(View.GONE);
@@ -284,9 +338,19 @@ public class SettingsFragment extends Fragment {
 
     private void initSwitch(View rootView) {
         Switch switchShareData = rootView.findViewById(R.id.switch_data_shared);
+        ImageButton imageButtonPosition = rootView.findViewById(R.id.button_position_gps);
 
         switchShareData.setOnCheckedChangeListener((buttonView, isChecked) ->
                 mSettingsModel.getSetting().getValue().setDataShared(isChecked));
+
+        imageButtonPosition.setOnClickListener(v -> {
+            if (mSettingsModel.getSetting().getValue().isDataShared()) {
+                startLocationTracking();
+            } else {
+                Toast.makeText(getActivity(), R.string.toast_ask_sharing,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initSwipeRefresh(View rootView) {
@@ -305,18 +369,89 @@ public class SettingsFragment extends Fragment {
         initSwipeRefresh(rootView);
     }
 
-    private void refreshSettings() {
-        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
-        mNetworkHelper.checkConnection(addressRPI).observe(
-                this,
-                connectionValue -> {
-                    if (connectionValue) {
-                        mSettingsModel.communication(getContext(), "config.json", Request.Method.GET, null);
-                    } else {
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(getActivity(), R.string.toast_data_storage,
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+
+    public void startLocationTracking() {
+        if (ActivityCompat
+                .checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            this.requestPermissions(
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_LOCATION_CODE);
+        } else {
+            checkProvider();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void stopLocationTracking() {
+        locationManager.removeUpdates(locationListener);
+        Location location = locationManager.getLastKnownLocation(
+                LocationManager.NETWORK_PROVIDER);
+
+        Location newLocation = randomizeLocation(location);
+        Settings settings = mSettingsModel.getSetting().getValue();
+        settings.setPositionSensor(newLocation);
+        mSettingsModel.getSetting().setValue(new Settings(settings));
+
+        Toast.makeText(getActivity(), R.string.toast_position_acquired, Toast.LENGTH_LONG).show();
+    }
+
+    private Location randomizeLocation(Location location) {
+        Random rnd = new Random();
+        Location newLocation = new Location(location);
+
+        double rndLatitude = -0.01 + rnd.nextFloat() * 0.01 * 2;
+        double rndLongitude = -0.01 + rnd.nextFloat() * 0.01 * 2;
+        newLocation.setLatitude(location.getLatitude() + rndLatitude);
+        newLocation.setLongitude(location.getLongitude() + rndLongitude);
+
+        return newLocation;
+    }
+
+    @SuppressLint("MissingPermission")
+    private void checkProvider() {
+        List<String> providersNames = locationManager.getProviders(true);
+
+        if (providersNames.contains("network")) {
+            locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    TIME_UPDATES,
+                    DISTANCE_UPDATES,
+                    locationListener);
+            Toast.makeText(getActivity(), R.string.toast_waiting_location,
+                    Toast.LENGTH_LONG).show();
+        } else {
+            showSettingsAlert();
+        }
+    }
+
+    private void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+
+        alertDialog.setTitle(R.string.alert_GPS_settings);
+
+        alertDialog.setMessage(R.string.alert_turn_on_gps);
+
+        alertDialog.setPositiveButton(R.string.alert_button_settings, (dialog, which) -> {
+            Intent intent = new Intent(
+                    android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            getActivity().startActivity(intent);
+        });
+
+        alertDialog.setNegativeButton(R.string.alert_button_cancel,
+                (dialog, which) -> dialog.cancel());
+
+        alertDialog.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_LOCATION_CODE:
+                startLocationTracking();
+                break;
+        }
     }
 }

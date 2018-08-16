@@ -115,8 +115,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="4dp"
                     android:hint="@string/new_sensor"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toStartOf="@+id/button_add_sensor"
@@ -128,13 +127,12 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:background="@null"
-                    android:scaleType="fitXY"
+                    android:background="@drawable/ripple_effect"
+                    android:scaleType="fitCenter"
                     app:layout_constraintBottom_toBottomOf="@+id/edit_text_add_sensors"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/edit_text_add_sensors"
-                    app:srcCompat="@drawable/ic_add_circle_black_24dp" />
+                    app:srcCompat="@drawable/ic_add_circle_primary_color_24dp" />
 
                 <View
                     android:id="@+id/trait2"
@@ -153,6 +151,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/ip_address"
                     android:textColor="@android:color/black"
@@ -255,15 +254,27 @@
                     android:id="@+id/switch_data_shared"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
                     android:layout_marginTop="10dp"
                     android:checked='@{settings.setting.isDataShared}'
                     android:text="@string/share_your_data"
                     android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/button_position_gps"
                     app:layout_constraintStart_toStartOf="@+id/text_ip_server"
                     app:layout_constraintTop_toBottomOf="@id/ip_server" />
+
+                <ImageButton
+                    android:id="@+id/button_position_gps"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/ripple_effect"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintBottom_toBottomOf="@+id/switch_data_shared"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/switch_data_shared"
+                    app:srcCompat="@drawable/ic_my_location_primary_color_24dp" />
 
                 <Button
                     android:id="@+id/validate"
@@ -276,7 +287,7 @@
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/switch_data_shared"
+                    app:layout_constraintEnd_toEndOf="@+id/button_position_gps"
                     app:layout_constraintStart_toStartOf="@+id/ip_address"
                     app:layout_constraintTop_toBottomOf="@id/switch_data_shared" />
 

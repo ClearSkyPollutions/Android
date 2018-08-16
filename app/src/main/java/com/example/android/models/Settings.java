@@ -1,5 +1,7 @@
 package com.example.android.models;
 
+import android.location.Location;
+
 import java.util.ArrayList;
 
 public class Settings {
@@ -11,9 +13,11 @@ public class Settings {
     private boolean isDataShared;
     private String systemID;
     private String systemName;
+    private Location positionSensor;
+
 
     public Settings(ArrayList<String> sensors, int frequency,
-                    Address raspberryPiAddress, Address serverAddress, boolean isDataShared,
+                    Address raspberryPiAddress, Address serverAddress, boolean isDataShared, Location positionSensor,
                     String systemID, String systemName) {
         this.sensors = sensors;
         this.frequency = frequency;
@@ -22,6 +26,7 @@ public class Settings {
         this.isDataShared = isDataShared;
         this.systemID = systemID;
         this.systemName = systemName;
+        this.positionSensor = positionSensor;
     }
 
     public Settings(Settings copy) {
@@ -32,6 +37,7 @@ public class Settings {
         this.isDataShared = copy.isDataShared;
         this.systemID = copy.systemID;
         this.systemName = copy.systemName;
+        this.positionSensor = copy.positionSensor;
     }
 
     public ArrayList<String> getSensors() {
@@ -92,5 +98,11 @@ public class Settings {
 
     public void setSystemName(String systemName) {
         this.systemName = systemName;
+    public Location getPositionSensor() {
+        return positionSensor;
+    }
+
+    public void setPositionSensor(Location positionSensor) {
+        this.positionSensor = positionSensor;
     }
 }
