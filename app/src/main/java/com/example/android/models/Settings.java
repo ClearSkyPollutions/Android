@@ -98,6 +98,7 @@ public class Settings {
 
     public void setSystemName(String systemName) {
         this.systemName = systemName;
+    }
     public Location getPositionSensor() {
         return positionSensor;
     }

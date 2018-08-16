@@ -224,8 +224,7 @@ public class SliderFragment extends Fragment {
 
                 NetworkHelper netHelper = new NetworkHelper();
 
-                netHelper.checkConnection(mSettings.getValue().getRaspberryPiAddress().getIp(),
-                        mSettings.getValue().getRaspberryPiAddress().getPort())
+                netHelper.checkConnection(mSettings.getValue().getRaspberryPiAddress())
                         .observe(this, connected ->
                         {
                             if (!connected) {
@@ -368,7 +367,7 @@ public class SliderFragment extends Fragment {
         mSettings.setValue(new Settings(mSettings.getValue().getSensors(),
                 mSettings.getValue().getFrequency(), mSettings.getValue().getRaspberryPiAddress(),
                 mSettings.getValue().getServerAddress(), mSettings.getValue().isDataShared(),
-                newLocation));
+                newLocation, mSettings.getValue().getSystemID(), mSettings.getValue().getSystemName()));
 
         Toast.makeText(getActivity(), "Your position are Latitude = "  +
                 newLocation.getLatitude() + " Longitude = " +

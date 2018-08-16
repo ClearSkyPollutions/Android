@@ -10,8 +10,10 @@
     <string name="key_serverAddressIp">serverAddressIp</string>
     <string name="key_serverAddressPort">serverAddressPort</string>
     <string name="key_isDataShared">isDataShared</string>
-    <string name="key_positionSensorLatitude">latitude</string>
-    <string name="key_positionSensorLongitude">longitude</string>
+    <string name="key_latitude">latitude</string>
+    <string name="key_longitude">longitude</string>
+    <string name="key_systemID">systemID</string>
+    <string name="key_systemName">systemName</string>
 
     <string name="json_serverAddress">serverAddress</string>
 

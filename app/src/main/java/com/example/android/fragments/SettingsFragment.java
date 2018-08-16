@@ -88,8 +88,10 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        refreshSettings();
+
         Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
-        mNetworkHelper.checkConnection(addressRPI.getIp(), addressRPI.getPort()).observe(
+        mNetworkHelper.checkConnection(addressRPI).observe(
                 this,
                 connectionValue -> {
                     if (connectionValue) {
@@ -369,6 +371,20 @@ public class SettingsFragment extends Fragment {
         initSwipeRefresh(rootView);
     }
 
+    private void refreshSettings() {
+        Address addressRPI = mSettingsModel.getSetting().getValue().getRaspberryPiAddress();
+        mNetworkHelper.checkConnection(addressRPI).observe(
+                this,
+                connectionValue -> {
+                    if (connectionValue) {
+                        mSettingsModel.communication(getContext(), "config.json", Request.Method.GET, null);
+                    } else {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(getActivity(), R.string.toast_data_storage,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
     public void startLocationTracking() {
         if (ActivityCompat

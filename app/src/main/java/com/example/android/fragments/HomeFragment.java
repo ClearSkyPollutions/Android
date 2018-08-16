@@ -328,15 +328,18 @@ public class HomeFragment extends Fragment {
                 sharedPref.getInt("raspberryPiAddressPort", 0));
         boolean isDataShared = sharedPref.getBoolean("isDataShared",false);
 
+
+        SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
+
         NetworkHelper networkHelper = new NetworkHelper();
         networkHelper.checkConnection(addressRPI).observe(
                 this,
                 connectionValue -> {
                     if (connectionValue) {
                         mDataModel.syncAllRPI(context);
-                        SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
-                        settingsModel.getLocalSettings(sharedPref);
-                        settingsModel.getSystemIDtoRPI(getActivity());
+
+                        settingsModel.getLocalSettings(context);
+                        settingsModel.getSystemIDtoRPI(context);
                         aqiModel.loadAQIRPI(context);
                         Toast.makeText(getActivity(), R.string.toast_data_updated_RPI,
                                 Toast.LENGTH_SHORT).show();
@@ -365,6 +368,8 @@ public class HomeFragment extends Fragment {
                                 Toast.LENGTH_LONG).show();
                     }
                 });
+        settingsModel.refreshSystemID.observe(this,
+                refreshSystemIDValue -> settingsModel.setLocalSettings(context));
     }
 
     public void flipCard() {

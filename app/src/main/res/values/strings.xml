@@ -89,6 +89,8 @@
     <string name="toast_connection_successful_RPI">Connected successfully to the Raspberry Pi</string>
     <string name="toast_data_updated">Local settings synced with the Raspberry Pi</string>
     <string name="toast_data_storage">Using last known settings</string>
+    <string name="toast_data_updated_RPI">Data updated from the Raspberry Pi</string>
+    <string name="toast_data_updated_Server">Data updated from the web server</string>
     <string name="toast_waiting_location">Acquiring GPS coordinates…</string>
     <string name="toast_your_coordinates">Your GPS coordinates are needed if you wish to share your data</string>
     <string name="toast_position_acquired">Position acquired</string>

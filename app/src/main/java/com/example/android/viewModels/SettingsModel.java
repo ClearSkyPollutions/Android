@@ -66,7 +66,7 @@ public class SettingsModel extends ViewModel {
                 getSetting().getValue().getRaspberryPiAddress(),
                 serverAddress, isDataShared, positionSensor,
                 getSetting().getValue().getSystemID(),
-                getSetting().getValue().getSystemName());
+                getSetting().getValue().getSystemName()));
         refreshSettings.postValue(false);
     };
 
@@ -83,9 +83,9 @@ public class SettingsModel extends ViewModel {
                     getSetting().getValue().getRaspberryPiAddress(),
                     getSetting().getValue().getServerAddress(),
                     getSetting().getValue().isDataShared(),
+                    getSetting().getValue().getPositionSensor(),
                     id,
                     name));
-
 
             refreshSystemID.postValue(true);
         } catch (JSONException e) {
@@ -107,9 +107,6 @@ public class SettingsModel extends ViewModel {
                         "192.168.0."),
                 sharedPref.getInt(context.getString(R.string.key_raspberryPiAddressPort),
                         80));
-        String systemID = sharedPref.getString("systemID", "-1");
-        String systemName = sharedPref.getString("systemName" , "Rpi");
-
         Address serverAddress = new Address(
                 sharedPref.getString(context.getString(R.string.key_serverAddressIp),
                         BuildConfig.IPADDR_SERVER),
@@ -119,9 +116,14 @@ public class SettingsModel extends ViewModel {
                 false);
         Location positionSensor = new Location(LocationManager.NETWORK_PROVIDER);
         positionSensor.setLatitude(sharedPref.getFloat(
-                context.getString(R.string.key_positionSensorLatitude), -1));
+                context.getString(R.string.key_latitude), -1));
         positionSensor.setLongitude(sharedPref.getFloat(
-                context.getString(R.string.key_positionSensorLongitude), -1));
+                context.getString(R.string.key_longitude), -1));
+
+        String systemID = sharedPref.getString(
+                context.getString(R.string.key_systemID), "-1");
+        String systemName = sharedPref.getString(
+                context.getString(R.string.key_systemName) , "Rpi");
 
         getSetting().setValue(new Settings(sensors, frequency,
                 raspberryPiAddress, serverAddress, isDataShared, positionSensor, systemID, systemName));
@@ -148,13 +150,15 @@ public class SettingsModel extends ViewModel {
                 settings.getServerAddress().getPort());
         editor.putBoolean(context.getString(R.string.key_isDataShared),
                 settings.isDataShared());
-        editor.putFloat(context.getString(R.string.key_positionSensorLatitude),
+        editor.putFloat(context.getString(R.string.key_latitude),
                 (float) settings.getPositionSensor().getLatitude());
-        editor.putFloat(context.getString(R.string.key_positionSensorLongitude),
+        editor.putFloat(context.getString(R.string.key_longitude),
                 (float) settings.getPositionSensor().getLongitude());
         
-        editor.putString("systemID", settings.getSystemID());
-        editor.putString("systemName", settings.getSystemName());
+        editor.putString(context.getString(R.string.key_systemID),
+                settings.getSystemID());
+        editor.putString(context.getString(R.string.key_systemName),
+                settings.getSystemName());
 
         editor.apply();
     }
@@ -189,9 +193,9 @@ public class SettingsModel extends ViewModel {
                     serverAddressJson);
             jsonSend.put(context.getString(R.string.key_isDataShared),
                     settings.isDataShared());
-            jsonSend.put(context.getString(R.string.key_positionSensorLatitude),
+            jsonSend.put(context.getString(R.string.key_latitude),
                     settings.getPositionSensor().getLatitude());
-            jsonSend.put(context.getString(R.string.key_positionSensorLongitude),
+            jsonSend.put(context.getString(R.string.key_longitude),
                     settings.getPositionSensor().getLongitude());
         } catch (JSONException e) {
             e.printStackTrace();
