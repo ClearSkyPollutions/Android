@@ -16,7 +16,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.example.android.activities.R;
 import com.example.android.activities.databinding.FragmentHomeBinding;
 import com.example.android.adapters.ChartItemAdapter;
@@ -339,7 +337,7 @@ public class HomeFragment extends Fragment {
                         SettingsModel settingsModel = ViewModelProviders.of(getActivity()).get(SettingsModel.class);
                         settingsModel.getLocalSettings(sharedPref);
                         settingsModel.getSystemIDtoRPI(getActivity());
-                        aqiModel.loadAQI(context);
+                        aqiModel.loadAQIRPI(context);
                         Toast.makeText(getActivity(), R.string.toast_data_updated_RPI,
                                 Toast.LENGTH_SHORT).show();
                     } else if (isDataShared) {
@@ -352,6 +350,7 @@ public class HomeFragment extends Fragment {
                                 connectionValueServer -> {
                                     if (connectionValueServer) {
                                         mDataModel.syncAllServer(context);
+                                        aqiModel.loadAQIServer(context);
                                         Toast.makeText(getActivity(), R.string.toast_data_updated_Server,
                                                 Toast.LENGTH_SHORT).show();
                                     }else {

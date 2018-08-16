@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 0, launchNotificationIntent,
                 0);
         AQIModel aqiModel = ViewModelProviders.of(this).get(AQIModel.class);
-        aqiModel.loadAQI(this);
+        aqiModel.loadAQIRPI(this);
 
         aqiModel.getAqi().observe(this, aqi -> {
             Notification.Builder builder = new Notification.Builder(this)

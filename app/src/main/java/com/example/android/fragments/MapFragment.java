@@ -159,7 +159,7 @@ public class MapFragment extends Fragment {
         addOverlays();
 
         mapModel.liveRpiArrayList.observe(this, rpiArrayList -> {
-            SimpleDateFormat ft = new SimpleDateFormat("EEEE, d MMM, yyyy HH'h'mm",
+            SimpleDateFormat ft = new SimpleDateFormat("EEEE d MMM yyyy HH'h'mm",
                     Locale.getDefault());
             map.getOverlays().clear();
             addOverlays();

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.android.activities.R;
@@ -20,6 +21,8 @@ import java.net.URL;
 
 
 public class NetworkHelper implements Request.Method {
+
+    private final int timeoutRequest = 2000;
 
     public void sendRequestRPI(Context context, String path, String query,
                                int method, JSONParser<JSONObject> f, JSONObject dataToSend) {
@@ -76,6 +79,10 @@ public class NetworkHelper implements Request.Method {
                     success -> connection.postValue(true),
                     error -> connection.postValue(false)
             );
+            jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    timeoutRequest,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             RequestQueueSingleton.getInstance().addToRequestQueue(jsonObjectRequest);
             Log.d(NetworkHelper.class.toString(), buildUrl(address.getIp(), address.getPort(), "api.php", null).toString());
         }

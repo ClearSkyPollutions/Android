@@ -261,7 +261,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text='@{aqiUI.aqi.toString(), default="0"}'
-                        android:textColor='@{aqiUI.color, default=@android:color/black}'
+                        android:textColor='@{aqiUI.getColor(), default=@android:color/black}'
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
@@ -284,7 +284,7 @@
                         android:layout_height="0dp"
                         android:layout_marginTop="16dp"
                         android:text='@{aqiUI.label, default="No Connection"}'
-                        android:textColor='@{aqiUI.color, default=@android:color/black}'
+                        android:textColor='@{aqiUI.getColor(), default=@android:color/black}'
                         android:textStyle="bold"
                         app:layout_constraintEnd_toStartOf="@+id/ica"
                         app:layout_constraintHorizontal_bias="0.5"
