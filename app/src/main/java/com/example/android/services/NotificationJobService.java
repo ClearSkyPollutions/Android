@@ -3,9 +3,12 @@ package com.example.android.services;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 
+import com.example.android.activities.R;
 import com.example.android.helpers.JSONParser;
 import com.example.android.helpers.NotificationHelper;
+import com.example.android.models.Address;
 import com.example.android.network.NetworkHelper;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.Driver;
@@ -19,6 +22,7 @@ import com.firebase.jobdispatcher.Trigger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 
 public class NotificationJobService extends JobService {
@@ -47,10 +51,23 @@ public class NotificationJobService extends JobService {
         }
     };
 
+    public void getAQi() {
+        Address rpiAddress = networkHelper.getNetworkAddressRPI(this);
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                this.getString(R.string.settings_rpi_file_key),Context.MODE_PRIVATE);
+        String systemId = sharedPref.getString("systemID", "-1");
+        String path = "aqi.php";
+        String query = "id=" + systemId;
+        networkHelper.sendRequest(rpiAddress, path, query, NetworkHelper.GET, parseAQI,
+                error -> networkHelper.sendRequestRPI(this, path, query,
+                        NetworkHelper.GET, parseAQI, null),
+                null);
+    }
+
     @SuppressLint("StaticFieldLeak")
     @Override
     public boolean onStartJob(JobParameters job) {
-        networkHelper.sendRequestRPI(this, "aqi.php", null, NetworkHelper.GET, parseAQI, null);
+        getAQi();
         return false;
     }
 
@@ -78,5 +95,6 @@ public class NotificationJobService extends JobService {
             dispatcher.schedule(NotificationAQIJob);
         }
     }
+
 
 }
