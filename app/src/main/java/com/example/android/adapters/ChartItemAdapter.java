@@ -3,7 +3,9 @@ package com.example.android.adapters;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +21,9 @@ import com.example.android.viewModels.DataModel;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ChartItemAdapter extends BaseAdapter {
 
@@ -35,6 +39,12 @@ public class ChartItemAdapter extends BaseAdapter {
         this.mContext = context;
         this.mChartList = chartList;
         this.mChartHelper = chartHelper;
+
+        SharedPreferences sharedPref = mContext.getSharedPreferences(
+                mContext.getString(R.string.chart_file_key),Context.MODE_PRIVATE);
+
+        this.favorite = new ArrayList<>(sharedPref.getStringSet(
+                mContext.getString(R.string.key_favorite_chart), new HashSet<>()));
     }
 
     public void setIsBackCardVisible(boolean isBackCardVisible) {
@@ -121,6 +131,24 @@ public class ChartItemAdapter extends BaseAdapter {
             mChartList.remove(position);
             notifyDataSetChanged();
         });
+
+        SharedPreferences sharedPref = mContext.getSharedPreferences(
+                mContext.getString(R.string.chart_file_key),Context.MODE_PRIVATE);
+
+        Set<String> favoriteSet = new HashSet<>(favorite);
+        Set<String> pollutantShowSet = new HashSet<>();
+
+        for (int i = 0; i < mChartList.size(); i++) {
+            pollutantShowSet.add(mChartList.get(i).getValue().getType());
+        }
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putStringSet(mContext.getString(R.string.key_favorite_chart),
+                favoriteSet);
+        editor.putStringSet(mContext.getString(R.string.key_pollutant_show_chart),
+                pollutantShowSet);
+
+        editor.apply();
     }
 
     private void initChart(int position, View itemView) {

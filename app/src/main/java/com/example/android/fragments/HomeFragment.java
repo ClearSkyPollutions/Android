@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -106,6 +108,19 @@ public class HomeFragment extends Fragment {
         // When data in DB has been loaded : init charts & lists with this data
         mDataModel.updateChartList.observe(this, updateChartListValue -> {
             if (updateChartListValue){
+
+
+                SharedPreferences sharedPref = getContext().getSharedPreferences(
+                        getContext().getString(R.string.chart_file_key),Context.MODE_PRIVATE);
+
+                ArrayList<String> pollutantShowChart = new ArrayList<>(sharedPref.getStringSet(
+                        getContext().getString(R.string.key_pollutant_show_chart), new HashSet<>()));
+                ArrayList<String> favoriteChart = new ArrayList<>(sharedPref.getStringSet(
+                        getContext().getString(R.string.key_favorite_chart), new HashSet<>()));
+
+                Log.d("PollutantShowChartHome", pollutantShowChart.toString());
+                Log.d("FavoriteChartHome", favoriteChart.toString());
+
                 chartItemAdapter.notifyDataSetChanged();
                 List<String> listTypes = new ArrayList<>();
                 List<String> listUnits = new ArrayList<>();
