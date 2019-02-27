@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 
 public class HomeFragment extends Fragment {
@@ -109,7 +110,6 @@ public class HomeFragment extends Fragment {
         mDataModel.updateChartList.observe(this, updateChartListValue -> {
             if (updateChartListValue){
 
-
                 SharedPreferences sharedPref = getContext().getSharedPreferences(
                         getContext().getString(R.string.chart_file_key),Context.MODE_PRIVATE);
 
@@ -124,13 +124,14 @@ public class HomeFragment extends Fragment {
                 chartItemAdapter.notifyDataSetChanged();
                 List<String> listTypes = new ArrayList<>();
                 List<String> listUnits = new ArrayList<>();
-                for (int i = 0; i < mDataModel.chartList.size(); i++)
+
+                for (int i = 0; i < mDataModel.pollutantInDB.size(); i++)
                 {
-                    if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getType())) {
-                        listTypes.add(mDataModel.chartList.get(i).getValue().getType());
+                    if (!listTypes.contains(mDataModel.pollutantInDB.get(i)) && !pollutantShowChart.contains(mDataModel.pollutantInDB.get(i))) {
+                        listTypes.add(mDataModel.pollutantInDB.get(i));
                     }
-                    if (!listUnits.contains(mDataModel.chartList.get(i).getValue().getUnit())) {
-                        listUnits.add(mDataModel.chartList.get(i).getValue().getUnit());
+                    if (!listUnits.contains(mDataModel.unitInDB.get(i)) && !pollutantShowChart.contains(mDataModel.unitInDB.get(i))) {
+                        listUnits.add(mDataModel.unitInDB.get(i));
                     }
                 }
                 ArrayAdapter<String> listTypeAdapter = new ArrayAdapter<>(getContext(),
@@ -294,6 +295,18 @@ public class HomeFragment extends Fragment {
                 MutableLiveData<Chart> liveChart = new MutableLiveData<>();
                 liveChart.setValue(chart);
                 mDataModel.chartList.add(liveChart);
+
+                SharedPreferences sharedPrefChart = getContext().getSharedPreferences(
+                        getContext().getString(R.string.chart_file_key),Context.MODE_PRIVATE);
+
+                Set<String> pollutantShow = sharedPrefChart.getStringSet(
+                        getContext().getString(R.string.key_pollutant_show_chart), new HashSet<>());
+                pollutantShow.add(mSpinnerDataType.getSelectedItem().toString());
+
+                SharedPreferences.Editor editor = sharedPrefChart.edit();
+                editor.putStringSet(getContext().getString(R.string.key_pollutant_show_chart),
+                        pollutantShow);
+                editor.apply();
             }
 
             //Change item in GridView
@@ -372,17 +385,20 @@ public class HomeFragment extends Fragment {
                                         Toast.makeText(getActivity(), R.string.toast_data_updated_Server,
                                                 Toast.LENGTH_SHORT).show();
                                     }else {
-                                        mDataModel.loadDataTypeUnits();
+                                        mDataModel.loadDataTypeUnits(getContext());
                                         Toast.makeText(getActivity(), R.string.toast_could_not_connect,
                                                 Toast.LENGTH_LONG).show();
                                     }
                                 });
                     }else {
-                        mDataModel.loadDataTypeUnits();
+                        mDataModel.loadDataTypeUnits(getContext());
                         Toast.makeText(getActivity(), R.string.toast_could_not_connect,
                                 Toast.LENGTH_LONG).show();
                     }
                 });
+
+        mDataModel.receiveData.observe(this, receiveDataValue -> mDataModel.loadDataTypeUnits(getContext()));
+
         settingsModel.refreshSystemID.observe(this,
                 refreshSystemIDValue -> settingsModel.setLocalSettings(context));
     }

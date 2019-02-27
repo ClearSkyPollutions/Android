@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.example.android.activities.R;
 import com.example.android.helpers.ChartHelper;
@@ -23,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -41,11 +43,14 @@ public class DataModel extends ViewModel {
     public static final String AVG_DAY = "AVG_DAY";
     public static final String AVG_MONTH = "AVG_MONTH";
 
+    public ArrayList<String> pollutantInDB = new ArrayList<>();
+    public ArrayList<String> unitInDB = new ArrayList<>();
     public List<MutableLiveData<Chart>> chartList = new ArrayList<>();
     public MutableLiveData<String> lastTempValueReceived = new MutableLiveData<>();
     public MutableLiveData<String> lastDatetimeReceived = new MutableLiveData<>();
     public MutableLiveData<Boolean> refreshChart = new MutableLiveData<>();
     public MutableLiveData<Boolean> updateChartList = new MutableLiveData<>();
+    public MutableLiveData<Boolean> receiveData = new MutableLiveData<>();
     private String lastDateUrlParam;
     private static final String POLLUTANT = "POLLUTANT";
     private static final String DATE = "date";
@@ -58,10 +63,19 @@ public class DataModel extends ViewModel {
         realm = Realm.getDefaultInstance();
     }
 
-    public void loadDataTypeUnits() {
-        ArrayList<String> dataType = new ArrayList<>();
-        ArrayList<String> dataUnit = new ArrayList<>();
+    public void loadDataTypeUnits(Context context) {
+        //ArrayList<String> dataType = new ArrayList<>();
+        //ArrayList<String> dataUnit = new ArrayList<>();
         ArrayList<Chart> charts = new ArrayList<>();
+
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.chart_file_key),Context.MODE_PRIVATE);
+
+        ArrayList<String> pollutantShow = new ArrayList<>(sharedPref.getStringSet(
+                context.getString(R.string.key_pollutant_show_chart), new HashSet<>()));
+
+        pollutantInDB.clear();
+        unitInDB.clear();
 
         realm.executeTransaction(realmDb -> {
             RealmResults<Data> realmDataTypeUnit = realmDb
@@ -74,14 +88,14 @@ public class DataModel extends ViewModel {
                 Iterator<Data> iterator = realmDataTypeUnit.iterator();
                 while(iterator.hasNext()) {
                     Data data = iterator.next();
-                    dataType.add(data.getDataType());
-                    dataUnit.add(data.getDataUnit());
+                    pollutantInDB.add(data.getDataType());
+                    unitInDB.add(data.getDataUnit());
                 }
 
-                for (int i = 0; i <= dataType.size() - 1; i++) {
+                for (int i = 0; i <= pollutantInDB.size() - 1; i++) {
                     Random rnd = new Random();
-                    Chart chartReceive = new Chart(dataType.get(i),
-                            dataUnit.get(i),
+                    Chart chartReceive = new Chart(pollutantInDB.get(i),
+                            unitInDB.get(i),
                             Color.argb(255,
                                     rnd.nextInt(256),
                                     rnd.nextInt(256),
@@ -90,16 +104,20 @@ public class DataModel extends ViewModel {
                 }
                 if (chartList.isEmpty()){
                     for(Chart chart : charts) {
-                        MutableLiveData<Chart> liveChart = new MutableLiveData<>();
-                        liveChart.setValue(chart);
-                        chartList.add(liveChart);
-                    }
-                }else {
-                    for(Chart chart : charts) {
-                        if (!containsType(chart.getType())){
+                        if (pollutantShow.contains(chart.getType())){
                             MutableLiveData<Chart> liveChart = new MutableLiveData<>();
                             liveChart.setValue(chart);
                             chartList.add(liveChart);
+                        }
+                    }
+                }else {
+                    for(Chart chart : charts) {
+                        if (pollutantShow.contains(chart.getType())){
+                            if (!containsType(chart.getType())){
+                                MutableLiveData<Chart> liveChart = new MutableLiveData<>();
+                                liveChart.setValue(chart);
+                                chartList.add(liveChart);
+                            }
                         }
                     }
                 }
@@ -192,8 +210,9 @@ public class DataModel extends ViewModel {
                 e.printStackTrace();
             }
         }, () -> {
-            loadDataTypeUnits();
+            //loadDataTypeUnits();
             loadLastData();
+            receiveData.postValue(true);
         });
         realm.close();
     };

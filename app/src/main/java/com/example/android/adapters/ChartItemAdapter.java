@@ -5,7 +5,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,6 +109,10 @@ public class ChartItemAdapter extends BaseAdapter {
         ImageButton mButtonFavorite = itemView.findViewById(R.id.buttonFavori);
         String type = mChartList.get(position).getValue().getType();
 
+        SharedPreferences sharedPref = mContext.getSharedPreferences(
+                mContext.getString(R.string.chart_file_key),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
         if (favorite.contains(type)) {
             mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
         } else {
@@ -124,31 +127,28 @@ public class ChartItemAdapter extends BaseAdapter {
                 favorite.add(type);
                 mButtonFavorite.setImageResource(R.drawable.ic_star_black_24dp);
             }
+            Set<String> favoriteSet = new HashSet<>(favorite);
+
+            editor.putStringSet(mContext.getString(R.string.key_favorite_chart),
+                    favoriteSet);
+            editor.apply();
         });
 
         mButtonDelete.setOnClickListener(v -> {
             mChartList.get(position).removeObservers((LifecycleOwner) mContext);
             mChartList.remove(position);
+
+            Set<String> pollutantShowSet = new HashSet<>();
+            for (int i = 0; i < mChartList.size(); i++) {
+                pollutantShowSet.add(mChartList.get(i).getValue().getType());
+            }
+
+            editor.putStringSet(mContext.getString(R.string.key_pollutant_show_chart),
+                    pollutantShowSet);
+            editor.apply();
+
             notifyDataSetChanged();
         });
-
-        SharedPreferences sharedPref = mContext.getSharedPreferences(
-                mContext.getString(R.string.chart_file_key),Context.MODE_PRIVATE);
-
-        Set<String> favoriteSet = new HashSet<>(favorite);
-        Set<String> pollutantShowSet = new HashSet<>();
-
-        for (int i = 0; i < mChartList.size(); i++) {
-            pollutantShowSet.add(mChartList.get(i).getValue().getType());
-        }
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putStringSet(mContext.getString(R.string.key_favorite_chart),
-                favoriteSet);
-        editor.putStringSet(mContext.getString(R.string.key_pollutant_show_chart),
-                pollutantShowSet);
-
-        editor.apply();
     }
 
     private void initChart(int position, View itemView) {
